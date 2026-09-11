@@ -16,6 +16,9 @@ MonoBehaviour:
   - lane: 0
     hitTime: 1
     holdDuration: 0
+  - lane: 3
+    hitTime: 1
+    holdDuration: 3
   - lane: 1
     hitTime: 1.5
     holdDuration: 0
@@ -25,3 +28,12 @@ MonoBehaviour:
   - lane: 3
     hitTime: 2.5
     holdDuration: 1.5
+  - lane: 0
+    hitTime: 2.5
+    holdDuration: 0
+  - lane: 1
+    hitTime: 3
+    holdDuration: 0
+  - lane: 2
+    hitTime: 3.5
+    holdDuration: 0
