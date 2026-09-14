@@ -13,15 +13,15 @@ MonoBehaviour:
   m_Name: caravan chart
   m_EditorClassIdentifier: Assembly-CSharp::ChartData
   notes:
-  - lane: 0
-    hitTime: 1.125
-    holdDuration: 0.875
   - lane: 1
-    hitTime: 1.125
-    holdDuration: 0.875
+    hitTime: 1
+    holdDuration: 1
   - lane: 2
-    hitTime: 1.125
-    holdDuration: 0.875
+    hitTime: 1
+    holdDuration: 1
+  - lane: 0
+    hitTime: 2.125
+    holdDuration: 0.75
   - lane: 3
-    hitTime: 1.125
-    holdDuration: 0.875
+    hitTime: 2.125
+    holdDuration: 0.75

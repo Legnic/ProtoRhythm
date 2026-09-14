@@ -16,7 +16,11 @@ using UnityEngine;
 //
 //   곡 선택 UI가 생기면서 씬이 시작하자마자 자동으로 재생하지 않고,
 //   플레이어가 곡을 고른 시점에 SongLoader가 Play()를 호출해서
-//   재생을 시작한다.
+//   재생을 시작한다. NoteSpawner는 IsActive(Play가 호출됐는지)를 직접
+//   확인해서, 곡을 고르기 전에는 chart가 미리 배선되어 있어도 스폰하지
+//   않는다 — chart == null 여부만으로는 "아직 재생 전"을 구분할 수 없기
+//   때문이다(씬에 남아있던 이전 채보 참조 때문에 곡 선택 화면에서
+//   노트가 미리 스폰되는 버그가 실제로 있었다).
 // ============================================================
 public class RhythmClock : MonoBehaviour
 {
@@ -37,6 +41,14 @@ public class RhythmClock : MonoBehaviour
     public float CurrentTime { get; private set; }
 
     public bool HasStarted => started && CurrentTime >= 0f;
+
+    // 기능: Play()가 이미 호출되어 곡 재생이 예약/진행 중인지 알려준다.
+    // 원리: HasStarted와 다르다 — HasStarted는 "리드인(대기 시간)까지 지나
+    //       실제로 노래가 흘러나오기 시작했는지"까지 확인하지만(CurrentTime >= 0),
+    //       IsActive는 리드인 중이어도(CurrentTime이 아직 음수여도) true다.
+    //       NoteSpawner는 리드인 중에도 이른 노트를 미리 스폰해야 하므로,
+    //       "Play()가 호출됐는가"만 보는 이 값을 기준으로 삼아야 한다.
+    public bool IsActive => started;
 
     // 기능: 지정된 오디오 클립의 재생을 예약하고, 시간 계산을 시작한다.
     //       SongLoader가 곡을 배선한 직후 호출한다.

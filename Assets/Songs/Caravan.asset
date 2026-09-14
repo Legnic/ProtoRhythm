@@ -14,4 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SongData
   songName: Caravan
   audioClip: {fileID: 8300000, guid: f37122b59453fe04aaa8372abc6daed7, type: 3}
-  chart: {fileID: 11400000, guid: 79540a3b623ff6d49b4a26e2472d4dc5, type: 2}
+  difficulties:
+  - label: Normal
+    level: 1
+    chart: {fileID: 11400000, guid: 79540a3b623ff6d49b4a26e2472d4dc5, type: 2}

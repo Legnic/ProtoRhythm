@@ -14,14 +14,32 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ChartData
   notes:
   - lane: 0
-    hitTime: 1.125
+    hitTime: 1
     holdDuration: 0
   - lane: 1
+    hitTime: 1.125
+    holdDuration: 0
+  - lane: 2
+    hitTime: 1.25
+    holdDuration: 0
+  - lane: 3
     hitTime: 1.375
     holdDuration: 0
   - lane: 2
+    hitTime: 1.5
+    holdDuration: 0
+  - lane: 1
     hitTime: 1.625
     holdDuration: 0
-  - lane: 3
+  - lane: 0
+    hitTime: 1.75
+    holdDuration: 0
+  - lane: 1
     hitTime: 1.875
+    holdDuration: 0
+  - lane: 2
+    hitTime: 2
+    holdDuration: 0
+  - lane: 3
+    hitTime: 2.125
     holdDuration: 0

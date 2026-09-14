@@ -14,4 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SongData
   songName: GHOSTagram
   audioClip: {fileID: 8300000, guid: bf532c730d9e85d438add47380c21b4e, type: 3}
-  chart: {fileID: 11400000, guid: d1d779a88e1675d4e980a8c3c4809d5c, type: 2}
+  difficulties:
+  - label: Normal
+    level: 1
+    chart: {fileID: 11400000, guid: d1d779a88e1675d4e980a8c3c4809d5c, type: 2}

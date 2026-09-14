@@ -32,9 +32,18 @@ public class NoteSpawner : MonoBehaviour
     //       도는 이유는, 프레임 사이 간격이 벌어지거나(랙 등) 여러 노트의
     //       스폰 시점이 한 프레임 안에 몰릴 수 있어 한 번에 여러 개를
     //       스폰해야 할 수도 있기 때문이다.
+    //
+    //       gameManager.clock.IsActive를 반드시 함께 확인해야 한다 —
+    //       chart는 곡을 고르기 전에도 씬에 미리 배선되어 있을 수 있는데
+    //       (곡 선택 화면이 떠 있는 동안에도 chart != null인 상태), 그때
+    //       clock.CurrentTime은 Play()가 호출되지 않아 기본값 0에 멈춰있다.
+    //       이 상태에서 chart만 검사하면 "hitTime - travelTime <= 0"을
+    //       만족하는 이른 시간대 노트(대략 travelTime초 이내)가 곡 선택
+    //       화면에서부터 미리 스폰되어 버리는 문제가 생긴다. IsActive로
+    //       "Play()가 실제로 호출된 뒤"인지부터 확인하면 이 문제가 사라진다.
     void Update()
     {
-        if (chart == null || gameManager == null || gameManager.clock == null)
+        if (chart == null || gameManager == null || gameManager.clock == null || !gameManager.clock.IsActive)
         {
             return;
         }
