@@ -28,6 +28,25 @@ public struct NoteData
     }
 }
 
+// 기능: 변속(SV) 구간 하나 — 이 시각부터 새 배속이 "계단식으로" 즉시 적용되고,
+//       다음 SpeedChange가 나올 때까지(혹은 곡이 끝날 때까지) 그대로 유지된다.
+// 원리: 부드러운 가속/감속 곡선을 따로 표현하지 않는다 — StepMania류 VSRG의
+//       SV처럼, 이 지점들을 충분히 촘촘하게 찍으면 계단식만으로도 사람 눈에는
+//       부드러운 가감속처럼 보인다. 실제 거리 계산(ChartSpeedTable)은
+//       GameManager.cs 참고.
+[System.Serializable]
+public struct SpeedChange
+{
+    public float time;       // 이 시각부터 새 배속이 적용된다.
+    public float multiplier; // 기준 스크롤 속도(baseScrollSpeed)에 곱해지는 배속. 1이 기본.
+
+    public SpeedChange(float time, float multiplier)
+    {
+        this.time = time;
+        this.multiplier = multiplier;
+    }
+}
+
 // ScriptableObject로 만들어두면 Unity 에디터에서 채보 애셋을 파일처럼
 // 관리할 수 있다 (Assets 폴더에 저장, 여러 씬에서 재사용 가능).
 [CreateAssetMenu(fileName = "NewChart", menuName = "Rhythm/Chart Data")]
@@ -35,6 +54,9 @@ public class ChartData : ScriptableObject
 {
     [Tooltip("판정 시각(hitTime) 순으로 정렬되어 있어야 한다. SortByTime()으로 정렬 가능.")]
     public List<NoteData> notes = new List<NoteData>();
+
+    [Tooltip("변속 구간 목록. 비어있으면 곡 전체가 배속 1배(=변속 없음)로 취급된다.")]
+    public List<SpeedChange> speedChanges = new List<SpeedChange>();
 
     // 기능: notes 리스트를 hitTime이 빠른 순서대로 정렬한다.
     // 원리: NoteSpawner는 "포인터 하나로 앞에서부터 훑는" 방식으로 노트를 스폰하기

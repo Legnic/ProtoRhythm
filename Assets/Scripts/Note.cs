@@ -2,9 +2,15 @@ using UnityEngine;
 
 // ============================================================
 // Note.cs
-//   DJMAX 방식 노트 하나. 머리 위치 공식은 그대로다.
+//   DJMAX 방식 노트 하나. 머리 위치 공식의 뼈대는 그대로다.
 //
-//     y = judgmentY + (hitTime - currentTime) * effectiveSpeed
+//     y = judgmentY + (hitTime부터 currentTime까지 이동해야 할 거리)
+//
+//   변속 구간이 없던 시절엔 이 거리가 그냥 (hitTime - currentTime) *
+//   effectiveSpeed 였지만, 지금은 GameManager.GetDistance(currentTime,
+//   hitTime)에 위임한다 — 그 사이에 변속 지점이 몇 개 있든 없든 항상
+//   정확한 값을 돌려준다(GameManager.cs 참고). 변속이 없는 채보라면
+//   결과는 예전 공식과 완전히 같다.
 //
 //   롱노트(holdDuration > 0)는 상태를 하나 더 가진다.
 //     Waiting -> (머리를 누르면) Holding -> (떼거나 판정 구간을 넘기면) Judged
@@ -111,7 +117,7 @@ public class Note : MonoBehaviour
         }
 
         // ==== DJMAX 방식의 핵심 공식 (머리 위치) ====
-        float y = gameManager.judgmentY + (hitTime - currentTime) * gameManager.EffectiveSpeed;
+        float y = gameManager.judgmentY + gameManager.GetDistance(currentTime, hitTime);
         transform.position = new Vector3(laneX, y, transform.position.z);
 
         if (IsLongNote)
@@ -206,13 +212,14 @@ public class Note : MonoBehaviour
 
     // 기능: 머리(headY)부터 꼬리(tailY)까지를 잇는 직사각형으로 몸통 위치/크기를
     //       매 프레임 다시 그린다.
-    // 원리: tailY는 머리와 같은 공식에 holdDuration만 더해 구한다
-    //       (tailY = judgmentY + (hitTime+holdDuration-currentTime)*speed).
-    //       홀드 중에는 머리가 판정선에 고정되어 있으므로, tailY가 시간이 지날수록
-    //       judgmentY에 가까워지면서 몸통이 꼬리 쪽부터 줄어드는 것처럼 보인다.
-    //       length(월드 유닛)를 holdBodyNativeSize.y로 나눠서 localScale.y로
-    //       변환하는 이유는, 스프라이트의 실제 크기가 스케일 1일 때 몇 유닛인지
-    //       모르면 "길이 length만큼 늘리기"를 정확한 배율로 환산할 수 없기 때문이다.
+    // 원리: tailY는 머리와 같은 GetDistance 공식에 hitTime 대신 hitTime+holdDuration을
+    //       넘겨서 구한다 — 꼬리도 "그 시각에 판정선에 도달해야 하는 지점"이라는
+    //       점은 머리와 똑같기 때문이다. 홀드 중에는 머리가 판정선에 고정되어
+    //       있으므로, tailY가 시간이 지날수록 judgmentY에 가까워지면서 몸통이
+    //       꼬리 쪽부터 줄어드는 것처럼 보인다. length(월드 유닛)를
+    //       holdBodyNativeSize.y로 나눠서 localScale.y로 변환하는 이유는,
+    //       스프라이트의 실제 크기가 스케일 1일 때 몇 유닛인지 모르면
+    //       "길이 length만큼 늘리기"를 정확한 배율로 환산할 수 없기 때문이다.
     void UpdateHoldBody(float currentTime)
     {
         if (holdBody == null)
@@ -221,7 +228,7 @@ public class Note : MonoBehaviour
         }
 
         float headY = transform.position.y;
-        float tailY = gameManager.judgmentY + (hitTime + holdDuration - currentTime) * gameManager.EffectiveSpeed;
+        float tailY = gameManager.judgmentY + gameManager.GetDistance(currentTime, hitTime + holdDuration);
         float length = Mathf.Max(0f, tailY - headY);
 
         holdBody.position = new Vector3(laneX, headY + length * 0.5f, transform.position.z + 0.01f);

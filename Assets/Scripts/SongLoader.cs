@@ -18,16 +18,20 @@ public class SongLoader : MonoBehaviour
     [Header("참조")]
     public RhythmClock clock;
     public NoteSpawner noteSpawner;
+    public GameManager gameManager;
 
     // 기능: 곡(SongData)과 난이도(SongDifficulty)를 받아 이 조합으로 완전히
-    //       전환한다 — 음원/채보 배선, 스포너·점수 리셋, 재생 시작까지 한 번에 처리한다.
+    //       전환한다 — 음원/채보 배선, 변속 테이블 재구성, 스포너·점수 리셋,
+    //       재생 시작까지 한 번에 처리한다.
     // 원리: 음원(AudioClip)은 song에서, 채보(ChartData)는 difficulty에서 각각
     //       가져온다 — 같은 곡이라도 난이도마다 채보만 다르고 음원은 같기 때문에
     //       이렇게 나눠서 받는다. 순서가 중요한데, clip과 chart를 먼저 채워 넣고,
-    //       ResetSpawner()로 "다음에 스폰할 노트" 포인터를 처음으로 되돌리고,
-    //       ResetScore()로 이전 곡의 점수/콤보를 지운 뒤, 마지막에 clock.Play()를
-    //       호출해서 실제 재생을 시작한다. clip/chart가 아직 비어 있는 상태로
-    //       Play()가 먼저 실행되면 안 되므로 반드시 이 순서를 지킨다.
+    //       gameManager.SetChart로 이 난이도의 변속 구간에 맞춰 거리 테이블을
+    //       다시 굽고, ResetSpawner()로 "다음에 스폰할 노트" 포인터를 처음으로
+    //       되돌리고, ResetScore()로 이전 곡의 점수/콤보를 지운 뒤, 마지막에
+    //       clock.Play()를 호출해서 실제 재생을 시작한다. clip/chart가 아직
+    //       비어 있는 상태로 Play()가 먼저 실행되면 안 되므로 반드시 이
+    //       순서를 지킨다.
     public void Load(SongData song, SongDifficulty difficulty)
     {
         if (song == null || difficulty == null)
@@ -45,6 +49,11 @@ public class SongLoader : MonoBehaviour
         {
             noteSpawner.chart = difficulty.chart;
             noteSpawner.ResetSpawner();
+        }
+
+        if (gameManager != null)
+        {
+            gameManager.SetChart(difficulty.chart);
         }
 
         ScoreManager.Instance.ResetScore();
