@@ -15,11 +15,22 @@ public class ScoreManager : MonoBehaviour
     public int combo = 0;
     public int maxCombo = 0;
 
+    // 기능: 이 컴포넌트를 전역에서 접근 가능한 싱글턴으로 등록한다.
+    // 원리: Note, InputJudge, SongLoader 등이 서로를 거치지 않고 바로
+    //       ScoreManager.Instance로 접근할 수 있게, 씬 시작 시(Awake) 자기
+    //       자신을 정적 필드에 저장해둔다.
     void Awake()
     {
         Instance = this;
     }
 
+    // 기능: 노트 하나의 판정 결과(등급)를 받아 점수/콤보에 반영한다.
+    // 원리: 등급별로 점수를 더하고 콤보를 1 올린다. Miss는 점수 계산 없이
+    //       바로 ReportMiss()로 넘겨서 콤보를 끊는 공통 처리를 재사용한다.
+    //       (Miss 쪽은 switch 안에서 return하기 때문에 아래의 "콤보 갱신 +
+    //       로그" 코드는 Miss가 아닌 경우에만 실행된다) maxCombo는 매번
+    //       현재 콤보와 비교해서, 이번에 갱신된 콤보가 지금까지의 최고 기록보다
+    //       높을 때만 갱신한다.
     public void ReportHit(Grade grade)
     {
         switch (grade)
@@ -49,9 +60,22 @@ public class ScoreManager : MonoBehaviour
         Debug.Log($"{grade} | Combo {combo} | Score {score}");
     }
 
+    // 기능: 노트를 놓쳤을 때(Miss) 콤보를 끊는다.
+    // 원리: combo를 0으로 되돌리기만 한다 — score/maxCombo는 그대로 둬서,
+    //       이미 쌓은 점수와 이전 최고 콤보 기록은 Miss 한 번으로 사라지지 않는다.
     public void ReportMiss()
     {
         combo = 0;
         Debug.Log("Miss | Combo Reset");
+    }
+
+    // 기능: 점수/콤보/최고 콤보를 전부 0으로 되돌린다.
+    // 원리: 곡을 새로 고를 때(SongLoader.Load) 호출한다 — 호출하지 않으면
+    //       이전 곡에서 쌓은 점수와 콤보가 다음 곡으로 그대로 이어져 버린다.
+    public void ResetScore()
+    {
+        score = 0;
+        combo = 0;
+        maxCombo = 0;
     }
 }

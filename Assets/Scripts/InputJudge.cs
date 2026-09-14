@@ -23,6 +23,12 @@ public class InputJudge : MonoBehaviour
     [Tooltip("레인 순서에 대응하는 키. LaneManager의 레인 개수와 길이가 같아야 한다.")]
     public Key[] laneKeys = { Key.D, Key.F, Key.J, Key.K };
 
+    // 기능: 매 프레임 모든 레인의 키를 검사해서, 그 프레임에 새로 눌리거나(TryPress)
+    //       새로 떼진(TryRelease) 키가 있으면 해당 처리로 넘긴다.
+    // 원리: 새 Input System의 Keyboard.current[Key] 인덱서로 그 키의 현재 상태를
+    //       가져오고, wasPressedThisFrame/wasReleasedThisFrame으로 "이번 프레임에
+    //       상태가 바뀐 순간"만 잡아낸다 — 누르고 있는 동안 매 프레임 반응하면
+    //       안 되므로(한 번 누르면 한 번만 판정해야 하므로) 이 두 플래그를 쓴다.
     void Update()
     {
         var keyboard = Keyboard.current;
@@ -44,6 +50,15 @@ public class InputJudge : MonoBehaviour
         }
     }
 
+    // 기능: 레인의 키를 눌렀을 때(머리 판정) 호출된다. 그 레인에서 가장 먼저
+    //       맞아야 할 노트를 찾아 시간 오차를 계산하고 등급을 매긴다.
+    // 원리: NoteRegistry.GetEarliestNote로 대상 노트를 찾고, 없으면(헛치기)
+    //       그냥 무시한다. 있어도 |현재시각 - hitTime|이 MissWindow를 넘으면
+    //       "너무 멀리 떨어진 노트"이므로 역시 무시한다(이걸 Miss로 처리하면
+    //       판정 범위 밖에서 아무 키나 눌러도 콤보가 끊겨서 너무 가혹해진다).
+    //       탭 노트는 Note.Judge로 바로 끝내고, 롱노트는 머리 등급만 즉시
+    //       ScoreManager에 반영한 뒤 note.BeginHold()로 상태만 넘겨서 노트를
+    //       유지시킨다(꼬리 판정은 나중에 따로 한다).
     void TryPress(int lane)
     {
         Note note = NoteRegistry.GetEarliestNote(lane);
@@ -77,6 +92,13 @@ public class InputJudge : MonoBehaviour
         }
     }
 
+    // 기능: 레인의 키를 뗐을 때(꼬리 판정) 호출된다. 그 레인에서 현재 홀드 중인
+    //       롱노트를 찾아 꼬리 판정을 넘긴다.
+    // 원리: NoteRegistry.GetHoldingNote로 "지금 이 레인에서 눌린 채 유지되고
+    //       있는 노트"를 찾는다. 탭 노트를 뗀 경우처럼 홀드 중인 노트가 없으면
+    //       조용히 무시한다. 실제 판정 계산(오차 비교, 등급 매기기)은
+    //       Note.ReleaseHold 쪽에 맡긴다 — InputJudge는 "누가, 언제" 뗐는지만
+    //       전달하는 역할이다.
     void TryRelease(int lane)
     {
         Note note = NoteRegistry.GetHoldingNote(lane);

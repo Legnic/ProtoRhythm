@@ -14,7 +14,10 @@ public static class NoteRegistry
 {
     private static List<Note>[] lanes;
 
-    // GameManager.Awake()에서 레인 개수만큼 초기화해줘야 한다.
+    // 기능: 레인 개수만큼 빈 리스트 배열을 만들어 명부를 초기화한다.
+    // 원리: GameManager.Awake()에서 씬 시작 시 한 번 호출된다. 정적 클래스라
+    //       씬을 새로 열거나 도메인 리로드가 일어나도 이전 값이 남아있을 수
+    //       있으므로, 매번 배열을 새로 만들어 깨끗한 상태에서 시작하게 한다.
     public static void Init(int laneCount)
     {
         lanes = new List<Note>[laneCount];
@@ -24,6 +27,10 @@ public static class NoteRegistry
         }
     }
 
+    // 기능: 노트 하나를 자신의 레인 명부에 추가한다.
+    // 원리: Note.Setup()이 lane 값을 채운 직후 호출한다. Init이 아직 호출되지
+    //       않았거나(lanes == null) 레인 번호가 범위를 벗어나면 조용히 무시해서
+    //       잘못된 설정이 예외로 게임을 멈추지 않게 한다.
     public static void Register(Note note)
     {
         if (lanes == null || note.lane < 0 || note.lane >= lanes.Length)
@@ -33,6 +40,10 @@ public static class NoteRegistry
         lanes[note.lane].Add(note);
     }
 
+    // 기능: 노트 하나를 자신의 레인 명부에서 제거한다.
+    // 원리: Note.OnDestroy()에서 호출된다. 판정이 끝났든(Judged) 놓쳤든,
+    //       사라지는 노트는 반드시 여기서 빠져야 GetEarliestNote/GetHoldingNote가
+    //       이미 없는 노트를 계속 붙잡고 있지 않는다.
     public static void Unregister(Note note)
     {
         if (lanes == null || note.lane < 0 || note.lane >= lanes.Length)
@@ -42,10 +53,13 @@ public static class NoteRegistry
         lanes[note.lane].Remove(note);
     }
 
-    // 해당 레인에서 hitTime이 가장 빠른(=가장 먼저 판정선에 도달할) "판정 대기 중(Waiting)"
-    // 노트를 찾는다. 입력이 들어왔을 때 "지금 맞춰야 할 노트"는 항상 이 노트이다.
-    // 이미 홀드 중인 롱노트는 제외한다 — 홀드 중에 같은 레인 키를 다시 눌러도 새로
-    // 판정하지 않기 위해서다.
+    // 기능: 해당 레인에서 hitTime이 가장 빠른(=가장 먼저 판정선에 도달할)
+    //       "판정 대기 중(Waiting)" 노트를 찾는다.
+    // 원리: 입력이 들어왔을 때 "지금 맞춰야 할 노트"는 항상 이 노트다. 리스트를
+    //       한 번 순회하면서 State가 Waiting인 것만 후보로 삼고, 그중 hitTime이
+    //       가장 작은 것을 고른다. 이미 홀드 중인 롱노트는 제외하는데, 그렇게
+    //       하지 않으면 홀드 중에 같은 레인 키를 다시 눌렀을 때 이미 판정된
+    //       노트를 또 판정 대상으로 잡아버리는 문제가 생기기 때문이다.
     public static Note GetEarliestNote(int lane)
     {
         if (lanes == null || lane < 0 || lane >= lanes.Length)
@@ -68,8 +82,10 @@ public static class NoteRegistry
         return earliest;
     }
 
-    // 해당 레인에서 현재 홀드 중인 롱노트를 찾는다(없으면 null).
-    // 키를 뗐을 때(릴리즈) 어떤 노트의 꼬리를 판정해야 하는지 알기 위해 쓴다.
+    // 기능: 해당 레인에서 현재 홀드 중인 롱노트를 찾는다(없으면 null).
+    // 원리: 키를 뗐을 때(릴리즈) "어떤 노트의 꼬리를 판정해야 하는지" 알아야 하는데,
+    //       한 레인에서 동시에 홀드 중인 노트는 최대 하나뿐이라고 가정하고
+    //       리스트에서 State가 Holding인 첫 노트를 찾아 바로 반환한다.
     public static Note GetHoldingNote(int lane)
     {
         if (lanes == null || lane < 0 || lane >= lanes.Length)

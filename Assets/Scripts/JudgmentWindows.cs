@@ -28,7 +28,12 @@ public static class JudgmentWindows
     // (Note.cs가 이 값을 기준으로 스스로 사라진다)
     public const float MissWindow = 0.150f;    // ±150ms
 
-    // 시간 오차(절대값)를 넣으면 해당하는 등급을 돌려준다.
+    // 기능: 시간 오차(절대값, 초)를 넣으면 그에 해당하는 판정 등급을 돌려준다.
+    // 원리: 오차가 작은 순서대로(Perfect -> Great -> Good) 문턱값과 비교해서
+    //       가장 먼저 만족하는 등급을 그대로 반환한다. 어느 문턱값도 만족하지
+    //       못하면(=MissWindow보다도 크면) Miss를 돌려준다. 호출하는 쪽
+    //       (InputJudge, Note)이 이미 MissWindow 이내인지 먼저 걸러주는 경우가
+    //       많아서, 실제로는 Miss가 나오지 않는 경로에서도 안전하게 호출할 수 있다.
     public static Grade Evaluate(float timeDiffAbs)
     {
         if (timeDiffAbs <= PerfectWindow) return Grade.Perfect;

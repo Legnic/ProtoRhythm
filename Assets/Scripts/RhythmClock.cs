@@ -13,6 +13,10 @@ using UnityEngine;
 //     프레임이 드랍되면 오차가 누적되어 실제 오디오 재생 위치와
 //     서서히 어긋난다. dspTime은 오디오 하드웨어의 절대 시각이라
 //     이런 드리프트가 생기지 않는다.
+//
+//   곡 선택 UI가 생기면서 씬이 시작하자마자 자동으로 재생하지 않고,
+//   플레이어가 곡을 고른 시점에 SongLoader가 Play()를 호출해서
+//   재생을 시작한다.
 // ============================================================
 public class RhythmClock : MonoBehaviour
 {
@@ -34,13 +38,25 @@ public class RhythmClock : MonoBehaviour
 
     public bool HasStarted => started && CurrentTime >= 0f;
 
-    void Start()
+    // 기능: 지정된 오디오 클립의 재생을 예약하고, 시간 계산을 시작한다.
+    //       SongLoader가 곡을 배선한 직후 호출한다.
+    // 원리: musicSource.Play()로 즉시 재생하지 않고 PlayScheduled로 "앞으로
+    //       startDelay초 뒤"에 재생하도록 예약한다 — 오디오 시스템이 실제로
+    //       소리를 내보내기까지 약간의 준비 시간이 필요한데, 즉시 재생을
+    //       요청하면 그 준비 시간만큼 밀려서 "노트가 판정선에 도달하는 시점"과
+    //       "실제로 소리가 나는 시점"이 어긋날 수 있다. 예약한 dsp 시각
+    //       (dspSongStartTime)을 기준점으로 저장해두면, Update()에서 그 시각
+    //       이후로 얼마나 지났는지를 계산해 정확한 재생 위치를 구할 수 있다.
+    //       다른 곡이 이미 재생 중일 수 있으므로 예약 전에 Stop()으로 먼저 멈춘다.
+    public void Play()
     {
         if (musicSource == null || musicSource.clip == null)
         {
             Debug.LogWarning("RhythmClock: musicSource 또는 musicSource.clip이 비어 있습니다.");
             return;
         }
+
+        musicSource.Stop(); // 다른 곡이 재생 중이었을 수도 있으니 먼저 멈춘다.
 
         double scheduledStartDspTime = AudioSettings.dspTime + startDelay;
         musicSource.PlayScheduled(scheduledStartDspTime);
@@ -49,6 +65,11 @@ public class RhythmClock : MonoBehaviour
         started = true;
     }
 
+    // 기능: 매 프레임 CurrentTime(현재 곡 재생 위치, 초)을 갱신한다.
+    // 원리: 현재 dspTime에서 곡이 시작하기로 예약된 dspTime을 빼면 "곡이 시작한
+    //       뒤로 몇 초가 지났는지"가 그대로 나온다. Play()가 아직 호출되지
+    //       않았다면(started == false) 아무 것도 하지 않아 CurrentTime이
+    //       기본값(0)에 머무르고, NoteSpawner 등도 조용히 대기 상태를 유지한다.
     void Update()
     {
         if (!started) return;
