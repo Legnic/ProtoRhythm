@@ -10,18 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f0854f1956cd29044bf6d951a6ce4e88, type: 3}
-  m_Name: caravan chart
+  m_Name: ClitchHop
   m_EditorClassIdentifier: Assembly-CSharp::ChartData
-  notes:
-  - lane: 1
-    hitTime: 1
-    holdDuration: 1
-  - lane: 2
-    hitTime: 1
-    holdDuration: 1
-  - lane: 0
-    hitTime: 2.125
-    holdDuration: 0.75
-  - lane: 3
-    hitTime: 2.125
-    holdDuration: 0.75
+  notes: []
+  speedChanges: []

@@ -58,6 +58,14 @@ public class ChartData : ScriptableObject
     [Tooltip("변속 구간 목록. 비어있으면 곡 전체가 배속 1배(=변속 없음)로 취급된다.")]
     public List<SpeedChange> speedChanges = new List<SpeedChange>();
 
+    // Chart Editor의 격자 계산(secondsPerStep)에만 쓰는 값이다 — 판정/재생에는
+    // 전혀 관여하지 않는다. 이 채보를 만들 때 쓴 BPM/오프셋을 여기 저장해두면,
+    // Chart Editor가 "불러오기" 할 때 자동으로 채워줘서 매번 다시 입력할 필요가 없다.
+    [Tooltip("이 채보를 만들 때 쓴 BPM. 외부 사이트 등에서 실제 곡의 BPM을 측정해 입력한다.")]
+    public float bpm = 120f;
+    [Tooltip("이 채보를 만들 때 쓴 시작 오프셋(초).")]
+    public float offsetSeconds = 0f;
+
     // 기능: notes 리스트를 hitTime이 빠른 순서대로 정렬한다.
     // 원리: NoteSpawner는 "포인터 하나로 앞에서부터 훑는" 방식으로 노트를 스폰하기
     //       때문에(NoteSpawner.cs 참고), 리스트가 시간순이 아니면 늦게 나와야 할

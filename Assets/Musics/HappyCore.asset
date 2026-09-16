@@ -10,11 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6e4bcb586013bf34c8ac2823c8f32a17, type: 3}
-  m_Name: GHOSTagram
+  m_Name: HappyCore
   m_EditorClassIdentifier: Assembly-CSharp::SongData
-  songName: GHOSTagram
-  audioClip: {fileID: 8300000, guid: bf532c730d9e85d438add47380c21b4e, type: 3}
+  songName: Happy Core
+  audioClip: {fileID: 8300000, guid: 4c6f6605b3c769f4e95e651c102cc008, type: 3}
   difficulties:
   - label: Normal
     level: 1
-    chart: {fileID: 11400000, guid: d1d779a88e1675d4e980a8c3c4809d5c, type: 2}
+    chart: {fileID: 11400000, guid: 5708535c32d4ef84b89c849175b561ae, type: 2}
+  - label: Hard
+    level: 2
+    chart: {fileID: 11400000, guid: 41099f6476f45a449ba4e14fbc9f9409, type: 2}

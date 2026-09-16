@@ -9,7 +9,9 @@ using UnityEngine;
 //
 //   사용법: 메뉴에서 Rhythm > Chart Editor 를 연다.
 //     1. 대상 ChartData 애셋을 지정한다
-//     2. BPM, 시작 오프셋, 마디 수, 박자 세분화(4분~64분음표)를 정한다
+//     2. BPM(외부 사이트 등에서 실제 곡의 BPM을 측정해 입력), 시작 오프셋,
+//        마디 수, 박자 세분화(4분~64분음표)를 정한다 — "불러오기"를 하면
+//        그 채보에 저장돼 있던 BPM/오프셋을 자동으로 채워준다
 //     3. 노트 격자: 클릭하면 탭 노트, 클릭한 채로 아래로 드래그하면
 //        그 길이만큼의 롱노트가 된다 (StepMania류 표준 방식). 클릭하기
 //        전 커서를 올리면 반투명 미리보기가 뜬다. 이미 있는 노트(머리든
@@ -19,6 +21,12 @@ using UnityEngine;
 //        누르면 지운다. 다음 변속 지점이 나오기 전까지 그대로 유지된다
 //        (계단식). 짧은 간격으로 여러 개 찍으면 부드러운 가감속처럼 보인다.
 //     5. "채보 애셋에 저장"을 누르면 ChartData 애셋(노트+변속)에 실제로 기록된다
+//     6. 재생 바: 미리듣기용 AudioClip을 지정하면 ▶로 재생/스페이스바로
+//        토글할 수 있고, 시간 레이블을 클릭하면 그 지점부터 재생한다(스크러빙).
+//        재생 중에는 격자에 재생 위치선이 표시되고 화면이 자동으로 따라간다.
+//        마디 시작 줄을 지날 때마다 그 줄이 잠깐 밝아진다(메트로놈 강조).
+//        1x/0.5x로 재생 속도를 바꿀 수 있다(0.5x는 피치도 낮아짐 — 정확한
+//        타이밍만 느리게 확인하는 용도).
 //
 //   이 파일은 반드시 Assets/Editor 폴더 밑에 둬야 한다.
 // ============================================================
@@ -76,15 +84,34 @@ public class ChartEditorWindow : EditorWindow
 
     private Vector2 scrollPos;
 
+    // 미리듣기용 오디오. ChartData가 아니라 창 자체가 들고 있는 값이라 채보에 저장되지 않는다.
+    public AudioClip previewClip;
+    // 마지막으로 알고 있는 재생 위치(초, 채보 시각 기준). 재생을 멈춰도 유지돼서, 다시 누르면 그 자리에서 이어진다.
+    private float previewTime;
+    // previewTime이 한 번이라도 재생/탐색으로 채워졌는지 — false면 재생 위치선을 아직 그리지 않는다.
+    private bool hasPreviewTime;
+    // 재생 속도 배율. 0.5면 절반 속도(피치도 같이 낮아진다) — 정확한 타이밍만 느리게 확인하는 용도.
+    private float playbackSpeed = 1f;
+
+    // 메트로놈 강조: 재생 중 마디 시작 줄(▶ 표시)을 지나간 순간 그 줄을 잠깐 밝힌다.
+    private int lastMetronomeStep = -1;
+    private double metronomeFlashUntil;
+    private const double MetronomeFlashDuration = 0.15;
+
     private static readonly Color EmptyColor = new Color(0.22f, 0.22f, 0.22f);
     private static readonly Color HeadColor = new Color(0.3f, 0.65f, 1f);
     private static readonly Color BodyColor = new Color(0.3f, 0.65f, 1f, 0.45f);
     private static readonly Color HoverPreviewColor = new Color(0.3f, 0.65f, 1f, 0.25f);
+    private static readonly Color PlayheadColor = new Color(1f, 0.7f, 0.2f);
+    private static readonly Color MetronomeFlashColor = new Color(1f, 0.95f, 0.4f, 0.35f);
 
     private const float CellWidth = 50f;
     private const float CellHeight = 18f;
     private const float SpeedColumnWidth = 64f;
     private const float DefaultSpeedMultiplier = 1.5f;
+    private const float TimeColumnWidth = 70f;
+    private const float RowHeight = CellHeight + 2f;   // EditorGUILayout이 칸 사이에 두는 여백까지 어림한 값
+    private const float HeaderHeight = CellHeight + 20f;
 
     // 기능: 창이 열릴 때 한 번 호출된다. 마우스를 누르지 않고 움직이기만 해도
     //       OnGUI가 MouseMove 이벤트를 받도록 설정한다.
@@ -94,6 +121,15 @@ public class ChartEditorWindow : EditorWindow
     private void OnEnable()
     {
         wantsMouseMove = true;
+    }
+
+    // 기능: 창이 닫히거나 다른 창으로 교체될 때 호출된다. 재생 중이던 미리듣기를 멈춘다.
+    // 원리: AudioUtil의 미리듣기는 창이 사라져도 스스로 멈추지 않는다 — 여기서 정리하지
+    //       않으면 창을 닫아도 음악이 계속 흘러나오는 문제가 생긴다. EditorApplication.update
+    //       구독도 함께 해지해서, 사라진 창을 계속 Repaint하려는 시도가 남지 않게 한다.
+    private void OnDisable()
+    {
+        StopPreview();
     }
 
     // 기능: 이 창이 다시 그려질 때마다(IMGUI는 즉시 모드라 매 프레임/입력마다
@@ -117,12 +153,157 @@ public class ChartEditorWindow : EditorWindow
             hoverStep = -1;
             Repaint();
         }
+        else if (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Space)
+        {
+            // 스페이스바로 재생/정지를 토글한다. 텍스트 필드에 포커스가 있을 때도
+            // 동작하도록 키 자체만 검사한다(스페이스는 어차피 텍스트 입력에선 문자로 소비되므로 충돌이 적다).
+            if (AudioPreviewUtility.IsPlaying())
+            {
+                StopPreview();
+            }
+            else
+            {
+                PlayFrom(previewTime);
+            }
+            Event.current.Use();
+        }
 
         DrawSettings();
+        EditorGUILayout.Space();
+        DrawPreviewBar();
         EditorGUILayout.Space();
         DrawToolbar();
         EditorGUILayout.Space();
         DrawGrid();
+    }
+
+    // 기능: 미리듣기 클립 지정 필드, 재생/정지 버튼, 현재 위치 표시를 그린다.
+    // 원리: 재생 중인지는 매번 AudioPreviewUtility.IsPlaying()으로 직접 물어봐서
+    //       판단한다 — 별도의 "재생 중" bool을 직접 들고 있으면 클립이 자연히
+    //       끝났을 때(OnEditorUpdate가 감지하기 전 프레임) 상태가 잠깐 어긋날 수
+    //       있기 때문이다.
+    private void DrawPreviewBar()
+    {
+        bool playing = AudioPreviewUtility.IsPlaying();
+
+        EditorGUILayout.BeginHorizontal();
+        previewClip = (AudioClip)EditorGUILayout.ObjectField("미리듣기 오디오", previewClip, typeof(AudioClip), false);
+        EditorGUILayout.EndHorizontal();
+
+        EditorGUILayout.BeginHorizontal();
+
+        using (new EditorGUI.DisabledScope(previewClip == null))
+        {
+            if (GUILayout.Button(playing ? "⏸ 정지" : "▶ 재생 (Space)", GUILayout.Width(140)))
+            {
+                if (playing) StopPreview();
+                else PlayFrom(previewTime);
+            }
+        }
+
+        string posLabel = hasPreviewTime ? FormatTime(previewTime) : "--:--.-";
+        string lenLabel = previewClip != null ? FormatTime(previewClip.length) : "--:--.-";
+        GUILayout.Label($"{posLabel} / {lenLabel}", GUILayout.Width(140));
+
+        GUILayout.Label("속도", GUILayout.Width(32));
+        float previousSpeed = playbackSpeed;
+        if (GUILayout.Toggle(Mathf.Approximately(playbackSpeed, 1f), "1x", "Button", GUILayout.Width(44)))
+        {
+            playbackSpeed = 1f;
+        }
+        if (GUILayout.Toggle(Mathf.Approximately(playbackSpeed, 0.5f), "0.5x", "Button", GUILayout.Width(44)))
+        {
+            playbackSpeed = 0.5f;
+        }
+        if (!Mathf.Approximately(previousSpeed, playbackSpeed) && playing)
+        {
+            // 재생 중에 속도를 바꾸면, 지금 위치에서 새 속도로 바로 이어 듣는다.
+            PlayFrom(previewTime);
+        }
+
+        EditorGUILayout.EndHorizontal();
+        EditorGUILayout.HelpBox(
+            "시간 레이블(맨 왼쪽 칸)을 클릭하면 그 지점부터 재생된다. 0.5x는 피치도 같이 낮아지는 " +
+            "대신(테이프를 천천히 돌리는 것과 같은 원리) 정확한 타이밍을 확인하기 좋다.",
+            MessageType.None);
+    }
+
+    // 기능: 초 단위 시간을 "분:초.소수" 문자열로 바꾼다(예: 83.4 -> "1:23.4").
+    private static string FormatTime(float seconds)
+    {
+        seconds = Mathf.Max(0f, seconds);
+        int minutes = (int)(seconds / 60f);
+        float rem = seconds - minutes * 60f;
+        return $"{minutes}:{rem:00.0}";
+    }
+
+    // 기능: 지정한 시각(초, 채보 기준)부터 previewClip을 현재 playbackSpeed로
+    //       재생을 시작하고, 매 에디터 틱마다 위치를 갱신하도록
+    //       EditorApplication.update에 구독한다.
+    // 원리: playbackSpeed가 1이 아니면 AudioPreviewUtility.GetSpeedVariant가
+    //       실제로 재생할, 주파수만 다르게 선언한 클립을 만들어(또는 캐시에서
+    //       찾아) 돌려준다. 이 변형 클립은 declared frequency가 원본과 다르므로,
+    //       시작 샘플 위치는 반드시 "원본 클립의 frequency"로 계산해야 한다
+    //       (같은 샘플 데이터를 그대로 재사용했을 뿐, 샘플 순서 자체는 안 바뀌었기
+    //       때문). EditorWindow는 Play 모드의 MonoBehaviour처럼 매 프레임 Update가
+    //       오지 않기 때문에, 재생 위치를 계속 읽어와 화면(재생 위치선/자동 스크롤)을
+    //       갱신하려면 EditorApplication.update 콜백으로 직접 틱을 받아야 한다.
+    //       중복 구독을 막기 위해 먼저 해지하고 다시 구독한다.
+    private void PlayFrom(float time)
+    {
+        if (previewClip == null) return;
+
+        AudioClip clipToPlay = AudioPreviewUtility.GetSpeedVariant(previewClip, playbackSpeed);
+        int startSample = Mathf.RoundToInt(time * previewClip.frequency);
+
+        AudioPreviewUtility.Stop();
+        AudioPreviewUtility.PlaySamples(clipToPlay, startSample);
+        previewTime = time;
+        hasPreviewTime = true;
+        lastMetronomeStep = -1;
+
+        EditorApplication.update -= OnEditorUpdate;
+        EditorApplication.update += OnEditorUpdate;
+        Repaint();
+    }
+
+    // 기능: 재생을 멈추고 EditorApplication.update 구독을 해지한다.
+    private void StopPreview()
+    {
+        AudioPreviewUtility.Stop();
+        EditorApplication.update -= OnEditorUpdate;
+    }
+
+    // 기능: 재생 중일 때 매 틱마다 현재 위치를 읽어와 화면을 갱신하고, 마디
+    //       시작 줄을 막 지났다면 메트로놈 강조를 켠다.
+    // 원리: AudioUtil의 미리듣기는 클립이 끝나면 스스로 멈추는데, 그걸 InputJudge처럼
+    //       이벤트로 알려주지 않으므로 IsPlaying()을 계속 물어봐서 "이미 멈췄다"를
+    //       스스로 감지해야 한다. 멈췄으면 구독을 해지해서 더 이상 불필요하게
+    //       Repaint를 요청하지 않는다.
+    //       GetPosition()은 "지금 실제로 재생 중인 클립"(속도 변형본일 수 있다)의
+    //       자기 시간이므로, 채보 시각으로 되돌리려면 playbackSpeed를 곱해야 한다
+    //       — 절반 속도로 재생 중이면 그 클립 기준 2초가 지나도 채보상으로는
+    //       1초만 지난 것이기 때문이다.
+    private void OnEditorUpdate()
+    {
+        if (!AudioPreviewUtility.IsPlaying())
+        {
+            EditorApplication.update -= OnEditorUpdate;
+            return;
+        }
+
+        previewTime = AudioPreviewUtility.GetPosition() * playbackSpeed;
+
+        float secondsPerStep = (60f / bpm) / subdivision;
+        int currentStep = Mathf.RoundToInt((previewTime - offsetSeconds) / secondsPerStep);
+        int stepsPerMeasure = beatsPerMeasure * subdivision;
+        if (currentStep > lastMetronomeStep && currentStep % stepsPerMeasure == 0)
+        {
+            lastMetronomeStep = currentStep;
+            metronomeFlashUntil = EditorApplication.timeSinceStartup + MetronomeFlashDuration;
+        }
+
+        Repaint();
     }
 
     // 기능: 대상 ChartData, BPM, 오프셋, 레인 수, 박자 설정 등 채보 편집에
@@ -198,10 +379,21 @@ public class ChartEditorWindow : EditorWindow
         RebuildStepLookup();
         RebuildSpeedLookup();
 
+        bool playing = AudioPreviewUtility.IsPlaying();
+        int playheadStep = hasPreviewTime ? Mathf.RoundToInt((previewTime - offsetSeconds) / secondsPerStep) : -1;
+
+        // 재생 중일 때만 재생 위치선을 따라 자동으로 스크롤한다. 멈춰 있을 땐
+        // 사용자가 자유롭게 격자를 둘러볼 수 있어야 하므로 건드리지 않는다.
+        if (playing && playheadStep >= 0)
+        {
+            float rowY = HeaderHeight + playheadStep * RowHeight;
+            scrollPos.y = Mathf.Max(0f, rowY - 150f);
+        }
+
         scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Height(500));
 
         EditorGUILayout.BeginHorizontal();
-        GUILayout.Label("", GUILayout.Width(70));
+        GUILayout.Label("", GUILayout.Width(TimeColumnWidth));
         GUILayout.Label("변속", GUILayout.Width(SpeedColumnWidth));
         for (int lane = 0; lane < laneCount; lane++)
         {
@@ -214,22 +406,54 @@ public class ChartEditorWindow : EditorWindow
             EditorGUILayout.BeginHorizontal();
 
             float time = offsetSeconds + step * secondsPerStep;
-            bool isMeasureStart = (step % (beatsPerMeasure * subdivision)) == 0;
-            string timeLabel = isMeasureStart ? $"▶ {time:0.00}" : $"{time:0.00}";
-            GUILayout.Label(timeLabel, GUILayout.Width(70));
-
+            DrawTimeCell(time, step);
             DrawSpeedCell(step);
 
+            Rect rowRect = default;
             for (int lane = 0; lane < laneCount; lane++)
             {
                 Rect cellRect = GUILayoutUtility.GetRect(CellWidth, CellHeight, GUILayout.Width(CellWidth));
+                if (lane == 0) rowRect = cellRect;
                 DrawCell(cellRect, lane, step);
             }
 
             EditorGUILayout.EndHorizontal();
+
+            if (step == lastMetronomeStep && EditorApplication.timeSinceStartup < metronomeFlashUntil)
+            {
+                // 메트로놈 강조: 마디 시작 줄을 막 지난 순간 그 줄 전체를 잠깐 밝힌다.
+                // 재생 위치선보다 먼저 그려서, 위치선이 그 위에 덮이도록 한다.
+                EditorGUI.DrawRect(new Rect(0f, rowRect.y, 2000f, rowRect.height), MetronomeFlashColor);
+            }
+
+            if (step == playheadStep)
+            {
+                // 라벨/변속 칸까지 포함해서 폭 전체에 걸치도록 넉넉한 너비로 그린다
+                // (ScrollView가 어차피 넘치는 부분은 잘라서 보여주므로 안전하다).
+                EditorGUI.DrawRect(new Rect(0f, rowRect.y, 2000f, 2f), PlayheadColor);
+            }
         }
 
         EditorGUILayout.EndScrollView();
+    }
+
+    // 기능: 격자 왼쪽의 시간 레이블 칸을 그리고, 클릭하면 그 시각부터 미리듣기를 시작한다(스크러빙).
+    // 원리: 표준 GUILayout.Label은 클릭을 감지하지 못하므로, 노트 칸과 똑같은 방식으로
+    //       GUILayoutUtility.GetRect로 직접 사각형을 받아 Event.current로 클릭을 잡는다.
+    private void DrawTimeCell(float time, int step)
+    {
+        bool isMeasureStart = (step % (beatsPerMeasure * subdivision)) == 0;
+        string timeLabel = isMeasureStart ? $"▶ {time:0.00}" : $"{time:0.00}";
+
+        Rect rect = GUILayoutUtility.GetRect(TimeColumnWidth, CellHeight, GUILayout.Width(TimeColumnWidth));
+        GUI.Label(rect, timeLabel);
+
+        Event e = Event.current;
+        if (e.type == EventType.MouseDown && rect.Contains(e.mousePosition) && previewClip != null)
+        {
+            PlayFrom(time);
+            e.Use();
+        }
     }
 
     // 기능: 격자 칸 하나를 실제로 색칠하고, 그 칸의 마우스 입력 처리를 맡긴다.
@@ -405,14 +629,16 @@ public class ChartEditorWindow : EditorWindow
         return note;
     }
 
-    // 기능: 대상 ChartData의 notes/speedChanges(초 단위)를 읽어서, 현재
-    //       BPM/오프셋/세분화 설정 기준의 격자 좌표(EditorNote/EditorSpeedChange
-    //       리스트)로 되살린다.
-    // 원리: NoteData.hitTime과 SpeedChange.time을 secondsPerStep으로 나눠서
-    //       몇 번째 칸(step)인지 역산한다(반올림하므로, 지금 설정한 BPM/오프셋이
-    //       그 채보를 만들 때 쓴 값과 다르면 칸 위치가 어긋날 수 있다). 홀드
-    //       길이(holdDuration)는 같은 방식으로 "몇 칸을 더 차지하는지"로
-    //       환산해서 lengthSteps에 반영한다(+1은 시작 칸 자신도 포함하기 위함).
+    // 기능: 대상 ChartData의 notes/speedChanges(초 단위)를 읽어서, 그 채보에
+    //       저장되어 있던 BPM/오프셋을 먼저 되살린 뒤(항상 같은 기준으로 역산되게),
+    //       그 기준의 격자 좌표(EditorNote/EditorSpeedChange 리스트)로 되살린다.
+    // 원리: ChartData.bpm/offsetSeconds에 이 채보를 만들 때 쓴 값이 저장되어
+    //       있으므로, 사용자가 이전에 다른 채보를 만지면서 남겨둔 BPM 값을 그대로
+    //       쓰는 대신 항상 정확한 값으로 먼저 덮어쓴다. NoteData.hitTime과
+    //       SpeedChange.time을 secondsPerStep으로 나눠서 몇 번째 칸(step)인지
+    //       역산하고, 홀드 길이(holdDuration)는 같은 방식으로 "몇 칸을 더
+    //       차지하는지"로 환산해서 lengthSteps에 반영한다(+1은 시작 칸 자신도
+    //       포함하기 위함).
     private void LoadFromChart()
     {
         notes.Clear();
@@ -422,6 +648,9 @@ public class ChartEditorWindow : EditorWindow
             EditorUtility.DisplayDialog("불러오기 실패", "대상 ChartData를 먼저 지정하세요.", "확인");
             return;
         }
+
+        bpm = Mathf.Max(1f, targetChart.bpm);
+        offsetSeconds = targetChart.offsetSeconds;
 
         float secondsPerStep = (60f / bpm) / subdivision;
         foreach (NoteData data in targetChart.notes)
@@ -488,6 +717,9 @@ public class ChartEditorWindow : EditorWindow
         }
         speedResult.Sort((a, b) => a.time.CompareTo(b.time));
         targetChart.speedChanges = speedResult;
+
+        targetChart.bpm = bpm;
+        targetChart.offsetSeconds = offsetSeconds;
 
         EditorUtility.SetDirty(targetChart);
         AssetDatabase.SaveAssets();
