@@ -29,10 +29,13 @@ public class InputJudge : MonoBehaviour
     //       가져오고, wasPressedThisFrame/wasReleasedThisFrame으로 "이번 프레임에
     //       상태가 바뀐 순간"만 잡아낸다 — 누르고 있는 동안 매 프레임 반응하면
     //       안 되므로(한 번 누르면 한 번만 판정해야 하므로) 이 두 플래그를 쓴다.
+    //       일시정지 중(clock.IsPaused)에는 아예 아무 것도 하지 않는다 —
+    //       CurrentTime이 얼어있어도 입력 자체를 막아야, 정지 화면에서 몰래
+    //       키를 눌러 판정을 만들어내는 일이 없다.
     void Update()
     {
         var keyboard = Keyboard.current;
-        if (keyboard == null || gameManager == null || gameManager.clock == null)
+        if (keyboard == null || gameManager == null || gameManager.clock == null || gameManager.clock.IsPaused)
         {
             return;
         }

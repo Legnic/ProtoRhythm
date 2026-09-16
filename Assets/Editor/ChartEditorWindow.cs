@@ -630,11 +630,15 @@ public class ChartEditorWindow : EditorWindow
     }
 
     // 기능: 대상 ChartData의 notes/speedChanges(초 단위)를 읽어서, 그 채보에
-    //       저장되어 있던 BPM/오프셋을 먼저 되살린 뒤(항상 같은 기준으로 역산되게),
-    //       그 기준의 격자 좌표(EditorNote/EditorSpeedChange 리스트)로 되살린다.
-    // 원리: ChartData.bpm/offsetSeconds에 이 채보를 만들 때 쓴 값이 저장되어
-    //       있으므로, 사용자가 이전에 다른 채보를 만지면서 남겨둔 BPM 값을 그대로
-    //       쓰는 대신 항상 정확한 값으로 먼저 덮어쓴다. NoteData.hitTime과
+    //       저장되어 있던 BPM/오프셋/레인 수/박자/마디 수를 먼저 전부 되살린
+    //       뒤(항상 같은 기준으로 역산되게), 그 기준의 격자 좌표(EditorNote/
+    //       EditorSpeedChange 리스트)로 되살린다.
+    // 원리: ChartData에 이 채보를 만들 때 쓴 격자 설정이 전부 저장되어 있으므로,
+    //       사용자가 이전에 다른 채보를 만지면서 남겨둔 값을 그대로 쓰는 대신
+    //       항상 정확한 값으로 먼저 덮어쓴다. 특히 subdivision을 다른 채보를
+    //       편집하던 값 그대로 두면, secondsPerStep이 그 채보를 저장할 때와
+    //       달라져서 노트가 다른 칸으로 잘못 역산되어 보인다 — 그래서 BPM과
+    //       마찬가지로 반드시 먼저 복원해야 한다. NoteData.hitTime과
     //       SpeedChange.time을 secondsPerStep으로 나눠서 몇 번째 칸(step)인지
     //       역산하고, 홀드 길이(holdDuration)는 같은 방식으로 "몇 칸을 더
     //       차지하는지"로 환산해서 lengthSteps에 반영한다(+1은 시작 칸 자신도
@@ -651,6 +655,10 @@ public class ChartEditorWindow : EditorWindow
 
         bpm = Mathf.Max(1f, targetChart.bpm);
         offsetSeconds = targetChart.offsetSeconds;
+        laneCount = targetChart.laneCount;
+        beatsPerMeasure = targetChart.beatsPerMeasure;
+        subdivision = targetChart.subdivision;
+        measureCount = targetChart.measureCount;
 
         float secondsPerStep = (60f / bpm) / subdivision;
         foreach (NoteData data in targetChart.notes)
@@ -720,6 +728,10 @@ public class ChartEditorWindow : EditorWindow
 
         targetChart.bpm = bpm;
         targetChart.offsetSeconds = offsetSeconds;
+        targetChart.laneCount = laneCount;
+        targetChart.beatsPerMeasure = beatsPerMeasure;
+        targetChart.subdivision = subdivision;
+        targetChart.measureCount = measureCount;
 
         EditorUtility.SetDirty(targetChart);
         AssetDatabase.SaveAssets();

@@ -76,8 +76,10 @@ public static class AudioPreviewUtility
     // 세션 중 같은 배속을 다시 고를 때마다 매번 새로 만들지 않도록 캐시해둔다.
     private static readonly Dictionary<(AudioClip clip, int speedKey), AudioClip> speedVariantCache = new();
 
+    private const string CacheFolder = "Assets/Editor/AudioPreviewCache";
+
     // 기능: source와 같은 소리를 speedMultiplier배 속도로 재생할 수 있는 클립을 만들어(또는
-    //       캐시에서 찾아) 돌려준다. speedMultiplier가 1이면 source를 그대로 돌려준다.
+    //       캐시/디스크에서 찾아) 돌려준다. speedMultiplier가 1이면 source를 그대로 돌려준다.
     // 원리: AudioUtil의 미리듣기에는 재생 속도/피치를 바꾸는 API가 전혀 없다(리플렉션으로
     //       뒤져봐도 없다) — 그래서 "같은 샘플 데이터인데 재생 주파수(frequency)만
     //       다르게 선언한 클립"을 새로 만드는 우회로를 쓴다. 오디오는 결국 "1초에 몇
@@ -86,9 +88,15 @@ public static class AudioPreviewUtility
     //       카세트테이프를 천천히 돌리는 것과 같은 원리다. 피치가 같이 바뀌는 건
     //       의도된 트레이드오프다(피치 보정까지 하려면 별도의 타임스트레치 알고리즘이
     //       필요한데, 여기서는 "정확한 타이밍만 느리게 확인"하는 용도라 필요 없다).
-    //       GetData/SetData로 전체 샘플을 한 번 복사해야 해서 곡이 길수록 잠깐 시간이
-    //       걸릴 수 있는데, 배속을 바꿀 때 한 번만 만들고 캐시해두므로 반복 재생에는
-    //       영향이 없다.
+    //
+    //       처음엔 AudioClip.Create + SetData로 메모리에서만 클립을 만들었는데, 실제로는
+    //       소리가 전혀 안 나는 문제가 있었다 — AudioUtil.HasPreview()로 확인해보니
+    //       그렇게 즉석에서 만든 클립은 "미리듣기 가능"으로 인식되지 않았다(재생 위치는
+    //       그럴듯하게 흘러가지만 실제 오디오 출력은 없었다). AudioUtil.PlayPreviewClip은
+    //       임포트된(디스크의 애셋으로 등록된) 클립이어야 실제로 소리를 낸다. 그래서
+    //       지금은 변형된 샘플을 임시 WAV 파일로 저장하고 AssetDatabase.ImportAsset으로
+    //       실제 임포트해서, "진짜 애셋"이 된 클립을 재생한다. 파일이 이미 있으면
+    //       (지난 세션에서 만들어둔 것) 다시 만들지 않고 그대로 불러와 쓴다.
     public static AudioClip GetSpeedVariant(AudioClip source, float speedMultiplier)
     {
         if (source == null) return null;
@@ -100,14 +108,67 @@ public static class AudioPreviewUtility
             return cached;
         }
 
-        var samples = new float[source.samples * source.channels];
-        source.GetData(samples, 0);
+        string safeName = string.Join("_", source.name.Split(System.IO.Path.GetInvalidFileNameChars()));
+        string assetPath = $"{CacheFolder}/{safeName}_x{speedMultiplier:0.##}.wav";
 
-        int newFrequency = Mathf.Max(1, Mathf.RoundToInt(source.frequency * speedMultiplier));
-        var variant = AudioClip.Create($"{source.name}_x{speedMultiplier:0.##}", source.samples, source.channels, newFrequency, false);
-        variant.SetData(samples, 0);
+        AudioClip variant = AssetDatabase.LoadAssetAtPath<AudioClip>(assetPath);
+        if (variant == null)
+        {
+            if (!AssetDatabase.IsValidFolder(CacheFolder))
+            {
+                AssetDatabase.CreateFolder("Assets/Editor", "AudioPreviewCache");
+            }
+
+            var samples = new float[source.samples * source.channels];
+            source.GetData(samples, 0);
+            int newFrequency = Mathf.Max(1, Mathf.RoundToInt(source.frequency * speedMultiplier));
+
+            string projectRoot = System.IO.Path.GetDirectoryName(Application.dataPath);
+            string absolutePath = System.IO.Path.Combine(projectRoot, assetPath);
+            WriteWav(absolutePath, samples, source.channels, newFrequency);
+
+            AssetDatabase.ImportAsset(assetPath, ImportAssetOptions.ForceSynchronousImport);
+            variant = AssetDatabase.LoadAssetAtPath<AudioClip>(assetPath);
+        }
 
         speedVariantCache[key] = variant;
         return variant;
+    }
+
+    // 기능: float 샘플 배열을 16비트 PCM WAV 파일로 저장한다.
+    // 원리: WAV는 RIFF 컨테이너 형식이라, "RIFF/WAVE" 헤더 + "fmt " 청크(채널 수,
+    //       샘플레이트, 비트심도 등) + "data" 청크(실제 샘플)만 정확한 순서와 크기로
+    //       쓰면 된다. Unity의 float 샘플(-1~1 범위)을 16비트 정수로 양자화해서 쓴다 —
+    //       미리듣기용이라 원본보다 살짝 거칠어지는 건 문제가 되지 않는다.
+    private static void WriteWav(string path, float[] samples, int channels, int frequency)
+    {
+        int byteRate = frequency * channels * 2;
+        int dataSize = samples.Length * 2;
+
+        using (var stream = new System.IO.FileStream(path, System.IO.FileMode.Create))
+        using (var writer = new System.IO.BinaryWriter(stream))
+        {
+            writer.Write(System.Text.Encoding.ASCII.GetBytes("RIFF"));
+            writer.Write(36 + dataSize);
+            writer.Write(System.Text.Encoding.ASCII.GetBytes("WAVE"));
+
+            writer.Write(System.Text.Encoding.ASCII.GetBytes("fmt "));
+            writer.Write(16);
+            writer.Write((short)1); // PCM
+            writer.Write((short)channels);
+            writer.Write(frequency);
+            writer.Write(byteRate);
+            writer.Write((short)(channels * 2));
+            writer.Write((short)16);
+
+            writer.Write(System.Text.Encoding.ASCII.GetBytes("data"));
+            writer.Write(dataSize);
+
+            foreach (float sample in samples)
+            {
+                short pcm = (short)Mathf.Clamp(Mathf.RoundToInt(sample * 32767f), short.MinValue, short.MaxValue);
+                writer.Write(pcm);
+            }
+        }
     }
 }

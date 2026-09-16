@@ -36,11 +36,17 @@ public class RhythmClock : MonoBehaviour
 
     private double dspSongStartTime;
     private bool started = false;
+    private bool paused = false;
+    private double dspPausedAt;
 
     // 외부(NoteSpawner, Note 등)에서 읽어가는, 보정이 반영된 현재 노래 재생 시각
     public float CurrentTime { get; private set; }
 
     public bool HasStarted => started && CurrentTime >= 0f;
+
+    // 기능: 일시정지 중인지 알려준다. InputJudge가 이 값을 보고 일시정지
+    //       중에는 입력을 아예 무시한다.
+    public bool IsPaused => paused;
 
     // 기능: Play()가 이미 호출되어 곡 재생이 예약/진행 중인지 알려준다.
     // 원리: HasStarted와 다르다 — HasStarted는 "리드인(대기 시간)까지 지나
@@ -51,16 +57,23 @@ public class RhythmClock : MonoBehaviour
     public bool IsActive => started;
 
     // 기능: 지정된 오디오 클립의 재생을 예약하고, 시간 계산을 시작한다.
-    //       SongLoader가 곡을 배선한 직후 호출한다.
+    //       SongLoader가 곡을 배선한 직후 호출한다. minLeadIn을 주면
+    //       startDelay보다 그 값이 더 크면 그 값을 대신 쓴다.
     // 원리: musicSource.Play()로 즉시 재생하지 않고 PlayScheduled로 "앞으로
-    //       startDelay초 뒤"에 재생하도록 예약한다 — 오디오 시스템이 실제로
-    //       소리를 내보내기까지 약간의 준비 시간이 필요한데, 즉시 재생을
-    //       요청하면 그 준비 시간만큼 밀려서 "노트가 판정선에 도달하는 시점"과
-    //       "실제로 소리가 나는 시점"이 어긋날 수 있다. 예약한 dsp 시각
-    //       (dspSongStartTime)을 기준점으로 저장해두면, Update()에서 그 시각
-    //       이후로 얼마나 지났는지를 계산해 정확한 재생 위치를 구할 수 있다.
-    //       다른 곡이 이미 재생 중일 수 있으므로 예약 전에 Stop()으로 먼저 멈춘다.
-    public void Play()
+    //       (startDelay와 minLeadIn 중 더 큰 값)초 뒤"에 재생하도록 예약한다.
+    //       startDelay는 원래 "오디오 하드웨어가 소리를 낼 준비 시간"만을 위한
+    //       값(0.3~1초면 충분)이었는데, 그 값만 쓰면 문제가 생긴다 — 노트가
+    //       spawnY에서 judgmentY까지 떨어지는 데 걸리는 시간(travelTime)이
+    //       startDelay보다 길면, 채보 맨 앞쪽의 이른 노트들은 "리드인 동안
+    //       화면 맨 위에서부터 떨어질 시간"을 다 못 받고 이미 절반쯘 떨어진
+    //       채로 갑자기 나타나 버린다 — 음악은 정확히 제때 시작되는데(dspTime
+    //       기준이라 항상 정확하다) 노트가 나오는 모양이 이상해서 "싱크가
+    //       어긋난 것처럼" 보이는 원인이다. minLeadIn으로 SongLoader가
+    //       "이 채보의 가장 이른 노트가 온전히 떨어지려면 최소 몇 초가
+    //       필요한지"를 계산해서 넘겨주면, 실제 리드인이 그보다 짧아지지
+    //       않는다. 다른 곡이 이미 재생 중일 수 있으므로 예약 전에 Stop()으로
+    //       먼저 멈춘다.
+    public void Play(float minLeadIn = 0f)
     {
         if (musicSource == null || musicSource.clip == null)
         {
@@ -70,11 +83,40 @@ public class RhythmClock : MonoBehaviour
 
         musicSource.Stop(); // 다른 곡이 재생 중이었을 수도 있으니 먼저 멈춘다.
 
-        double scheduledStartDspTime = AudioSettings.dspTime + startDelay;
+        double actualDelay = System.Math.Max(startDelay, minLeadIn);
+        double scheduledStartDspTime = AudioSettings.dspTime + actualDelay;
         musicSource.PlayScheduled(scheduledStartDspTime);
 
         dspSongStartTime = scheduledStartDspTime;
         started = true;
+        paused = false;
+    }
+
+    // 기능: 재생을 일시정지한다 — 오디오도 멈추고, CurrentTime도 그 순간에서
+    //       더 흐르지 않게 얼려둔다.
+    // 원리: dspTime은 Time.timeScale과 무관하게 항상 흐르는 하드웨어 시계라서,
+    //       "일시정지"라고 해서 저절로 멈추지 않는다. 여기서 직접 paused
+    //       플래그로 Update()의 CurrentTime 갱신을 막아야 한다. 정지한 시각
+    //       (dspPausedAt)을 기억해두는 이유는, Resume()에서 "멈춰있던 만큼"을
+    //       계산해 dspSongStartTime을 뒤로 밀어야 하기 때문이다 — 그렇게
+    //       해야 재개했을 때 CurrentTime이 멈췄던 지점부터 다시 흐른다
+    //       (안 그러면 일시정지 동안 흘러버린 실제 시간만큼 노트가 튀어버린다).
+    public void Pause()
+    {
+        if (!started || paused) return;
+        musicSource.Pause();
+        dspPausedAt = AudioSettings.dspTime;
+        paused = true;
+    }
+
+    // 기능: 일시정지를 풀고 멈췄던 지점부터 다시 재생한다.
+    public void Resume()
+    {
+        if (!started || !paused) return;
+        double pausedDuration = AudioSettings.dspTime - dspPausedAt;
+        dspSongStartTime += pausedDuration; // 멈춰있던 시간만큼 시작 기준점을 뒤로 민다.
+        musicSource.UnPause();
+        paused = false;
     }
 
     // 기능: 매 프레임 CurrentTime(현재 곡 재생 위치, 초)을 갱신한다.
@@ -82,9 +124,10 @@ public class RhythmClock : MonoBehaviour
     //       뒤로 몇 초가 지났는지"가 그대로 나온다. Play()가 아직 호출되지
     //       않았다면(started == false) 아무 것도 하지 않아 CurrentTime이
     //       기본값(0)에 머무르고, NoteSpawner 등도 조용히 대기 상태를 유지한다.
+    //       일시정지 중(paused)에도 갱신을 멈춰서 CurrentTime을 그 자리에 얼려둔다.
     void Update()
     {
-        if (!started) return;
+        if (!started || paused) return;
 
         double elapsed = AudioSettings.dspTime - dspSongStartTime;
         CurrentTime = (float)elapsed + audioOffset;

@@ -14,3 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ChartData
   notes: []
   speedChanges: []
+  bpm: 95
+  offsetSeconds: 0

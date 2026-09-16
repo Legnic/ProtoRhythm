@@ -65,6 +65,14 @@ public class ChartData : ScriptableObject
     public float bpm = 120f;
     [Tooltip("이 채보를 만들 때 쓴 시작 오프셋(초).")]
     public float offsetSeconds = 0f;
+    [Tooltip("Chart Editor 격자의 레인 수(편집 화면 표시용).")]
+    public int laneCount = 4;
+    [Tooltip("Chart Editor 격자의 한 마디당 박자 수.")]
+    public int beatsPerMeasure = 4;
+    [Tooltip("Chart Editor 격자의 박자 세분화 (1=4분, 2=8분, 4=16분, 8=32분, 16=64분음표).")]
+    public int subdivision = 4;
+    [Tooltip("Chart Editor 격자의 마디 수.")]
+    public int measureCount = 8;
 
     // 기능: notes 리스트를 hitTime이 빠른 순서대로 정렬한다.
     // 원리: NoteSpawner는 "포인터 하나로 앞에서부터 훑는" 방식으로 노트를 스폰하기
