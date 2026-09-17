@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 // ============================================================
 // TitleUI.cs
@@ -26,13 +25,13 @@ public class TitleUI : MonoBehaviour
     // 기능: "시작" 버튼에 연결한다.
     public void StartGame()
     {
-        SceneManager.LoadScene("SelectScene");
+        SceneLoader.Load(this, "SelectScene");
     }
 
     // 기능: "옵션" 버튼에 연결한다.
     public void OpenOptions()
     {
-        SceneManager.LoadScene("OptionsScene");
+        SceneLoader.Load(this, "OptionsScene");
     }
 
     // 기능: "나가기" 버튼에 연결한다 — 플레이를 종료한다.

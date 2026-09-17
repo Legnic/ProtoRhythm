@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 
@@ -54,12 +53,12 @@ public class ResultUI : MonoBehaviour
     // 기능: "선택 화면으로" 버튼에 연결한다.
     public void BackToSelect()
     {
-        SceneManager.LoadScene("SelectScene");
+        SceneLoader.Load(this, "SelectScene");
     }
 
     // 기능: "처음으로" 버튼에 연결한다.
     public void BackToTitle()
     {
-        SceneManager.LoadScene("TitleScene");
+        SceneLoader.Load(this, "TitleScene");
     }
 }

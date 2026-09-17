@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 // ============================================================
@@ -30,7 +29,7 @@ public class OptionsUI : MonoBehaviour
     {
         if (keyMappingTabButton != null) keyMappingTabButton.onClick.AddListener(ShowKeyMapping);
         if (calibrationTabButton != null) calibrationTabButton.onClick.AddListener(ShowCalibration);
-        if (backButton != null) backButton.onClick.AddListener(() => SceneManager.LoadScene("TitleScene"));
+        if (backButton != null) backButton.onClick.AddListener(() => SceneLoader.Load(this, "TitleScene"));
 
         ShowCalibration();
     }

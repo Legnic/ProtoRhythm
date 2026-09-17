@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 
@@ -57,7 +56,7 @@ public class SongSelectUI : MonoBehaviour
         }
         if (quitToTitleButton != null)
         {
-            quitToTitleButton.onClick.AddListener(() => SceneManager.LoadScene("TitleScene"));
+            quitToTitleButton.onClick.AddListener(() => SceneLoader.Load(this, "TitleScene"));
         }
 
         ShowSongList();
@@ -195,7 +194,7 @@ public class SongSelectUI : MonoBehaviour
 
         GameSession.SelectedSong = selectedSong;
         GameSession.SelectedDifficulty = difficulty;
-        SceneManager.LoadScene("PlayScene");
+        SceneLoader.Load(this, "PlayScene");
     }
 
     // 기능: listParent 밑의 버튼들을 전부 지운다.

@@ -40,18 +40,27 @@ public class Note : MonoBehaviour
 
     private GameManager gameManager;
     private float laneX;
+    private ObjectPool pool;
 
-    // 롱노트일 때만 만들어지는, 머리(판정 지점)부터 꼬리까지를 표시하는 몸통 스프라이트.
+    // 롱노트일 때만 보여주는, 머리(판정 지점)부터 꼬리까지를 표시하는 몸통 스프라이트.
+    // 풀링을 위해 한 번 만들면 파괴하지 않고 이 노트의 자식으로 두고 재사용한다
+    // (Setup에서 매번 IsLongNote 여부에 맞춰 활성/비활성만 바꾼다).
     private Transform holdBody;
     private Vector2 holdBodyNativeSize = Vector2.one;
 
-    // 기능: NoteSpawner가 노트를 생성한 직후 호출해서, 이 노트가 어떤 레인/시각의
+    // 기능: NoteSpawner가 이 노트를 풀에서 꺼낸 직후 호출해서, 어느 풀로
+    //       돌아가야 하는지 기억해둔다.
+    public void SetPool(ObjectPool notePool)
+    {
+        pool = notePool;
+    }
+
+    // 기능: NoteSpawner가 노트를 꺼낸 직후 호출해서, 이 노트가 어떤 레인/시각의
     //       노트인지 채워 넣고 NoteRegistry에 등록한다.
-    // 원리: 프리팹을 Instantiate만 하면 lane 필드가 기본값(0)인 채로 남기 때문에,
-    //       OnEnable 같은 자동 호출 시점에서 등록하면 아직 올바른 레인 값이
-    //       채워지기 전이라 잘못된 레인에 등록되는 문제가 생긴다. 그래서 값 설정과
-    //       등록(NoteRegistry.Register)을 이 메서드 안에서 순서대로, 명시적으로
-    //       한 번에 처리한다.
+    // 원리: 풀에서 재사용된 오브젝트는 이전 판정의 lane/hitTime 등 값이 그대로
+    //       남아있을 수 있으므로, 매번 이 메서드에서 전부 새로 채워 넣는다.
+    //       값 설정과 등록(NoteRegistry.Register)을 이 메서드 안에서 순서대로,
+    //       명시적으로 한 번에 처리한다.
     public void Setup(GameManager manager, float x, int laneIndex, float hitTimeValue, float holdDurationValue = 0f)
     {
         gameManager = manager;
@@ -63,23 +72,41 @@ public class Note : MonoBehaviour
 
         if (IsLongNote)
         {
-            CreateHoldBody();
+            EnsureHoldBody();
+        }
+        else if (holdBody != null)
+        {
+            holdBody.gameObject.SetActive(false);
         }
 
         NoteRegistry.Register(this);
     }
 
-    // 기능: 이 노트 오브젝트가 파괴될 때(판정이 끝났든, 씬이 바뀌었든) 뒷정리를 한다.
-    // 원리: NoteRegistry에서 자기 자신을 지워서 "죽은 노트를 계속 붙잡고 있는" 문제를
-    //       막고, 롱노트라면 별도 오브젝트로 만들어둔 홀드 몸통(holdBody)도 함께
-    //       Destroy한다 — 부모-자식 관계가 아니라 독립된 오브젝트라 자동으로
-    //       같이 사라지지 않기 때문에 직접 챙겨야 한다.
+    // 기능: 이 노트 오브젝트가 실제로 파괴될 때(씬이 바뀌는 등, 풀 반환과는 별개로)
+    //       명부에서 빠지지 못한 채 남는 일을 막는 안전망이다.
+    // 원리: 평소에는 ReturnToPool()이 이미 Unregister까지 끝내두므로 여기서 할
+    //       일이 없지만(List.Remove는 없는 항목에 대해 안전하게 아무 일도 안 한다),
+    //       씬 언로드처럼 풀을 거치지 않고 바로 파괴되는 경우에 대비한 안전망이다.
+    //       holdBody는 이제 이 노트의 자식이라 별도로 챙기지 않아도 함께 파괴된다.
     void OnDestroy()
     {
         NoteRegistry.Unregister(this);
-        if (holdBody != null)
+    }
+
+    // 기능: 판정이 끝난(또는 강제로 정리해야 하는) 노트를 명부에서 빼고 풀로 돌려보낸다.
+    // 원리: Finish()와 NoteRegistry.ClearAll()(다시하기 시 화면에 남은 노트 정리)이
+    //       공통으로 거쳐가는 지점이다. pool이 없다면(예: 풀 없이 직접 테스트하는 경우)
+    //       기존처럼 Destroy로 안전하게 대체한다.
+    public void ReturnToPool()
+    {
+        NoteRegistry.Unregister(this);
+        if (pool != null)
         {
-            Destroy(holdBody.gameObject);
+            pool.Release(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
         }
     }
 
@@ -181,33 +208,39 @@ public class Note : MonoBehaviour
     {
         State = NoteState.Judged;
         ScoreManager.Instance.ReportHit(grade, lane);
-        Destroy(gameObject);
+        ReturnToPool();
     }
 
-    // 기능: 롱노트의 몸통(머리~꼬리를 잇는 스프라이트)을 만든다.
-    // 원리: 머리 노트와 같은 스프라이트를 재사용하되 반투명하게 만들어 별도
-    //       오브젝트(HoldBody)로 띄운다. 스프라이트의 "원래" 크기(sprite.bounds.size,
-    //       로컬 스케일이 1일 때의 월드 유닛 크기)를 미리 기억해둬야, 나중에
-    //       UpdateHoldBody에서 "몸통 길이를 몇 유닛으로 만들지"를 실제 스케일 값으로
-    //       정확히 환산할 수 있다.
-    void CreateHoldBody()
+    // 기능: 롱노트의 몸통(머리~꼬리를 잇는 스프라이트)이 아직 없으면 만들고, 있으면
+    //       재사용한다.
+    // 원리: 풀링 도입 전에는 노트마다 매번 새로 만들고 OnDestroy에서 같이 파괴했지만,
+    //       이제 노트 오브젝트 자체가 재사용되므로 몸통도 한 번만 만들어 이 노트의
+    //       자식으로 붙여두고 계속 재사용한다(activate/deactivate만 반복). 머리 노트와
+    //       같은 스프라이트를 재사용하되 반투명하게 표시한다. 스프라이트의 "원래" 크기
+    //       (sprite.bounds.size, 로컬 스케일이 1일 때의 월드 유닛 크기)를 매번 다시
+    //       기억해두는 이유는, 재사용 시점의 스프라이트가 바뀌어 있을 수도 있기 때문이다.
+    void EnsureHoldBody()
     {
-        var bodyObj = new GameObject("HoldBody");
-        var sr = bodyObj.AddComponent<SpriteRenderer>();
-
         SpriteRenderer headSprite = GetComponent<SpriteRenderer>();
+
+        if (holdBody == null)
+        {
+            var bodyObj = new GameObject("HoldBody");
+            bodyObj.transform.SetParent(transform, false);
+            bodyObj.AddComponent<SpriteRenderer>();
+            holdBody = bodyObj.transform;
+        }
+
+        SpriteRenderer sr = holdBody.GetComponent<SpriteRenderer>();
         sr.sprite = headSprite.sprite;
         sr.color = new Color(headSprite.color.r, headSprite.color.g, headSprite.color.b, 0.8f);
         sr.sortingOrder = headSprite.sortingOrder - 1;
 
         // 스프라이트의 "원래" 크기(로컬 스케일 1일 때 월드 유닛 크기)를 알아야
         // 몸통 길이를 원하는 월드 유닛 길이에 맞게 정확히 스케일링할 수 있다.
-        if (headSprite.sprite != null)
-        {
-            holdBodyNativeSize = headSprite.sprite.bounds.size;
-        }
+        holdBodyNativeSize = headSprite.sprite != null ? headSprite.sprite.bounds.size : Vector2.one;
 
-        holdBody = bodyObj.transform;
+        holdBody.gameObject.SetActive(true);
     }
 
     // 기능: 머리(headY)부터 꼬리(tailY)까지를 잇는 직사각형으로 몸통 위치/크기를

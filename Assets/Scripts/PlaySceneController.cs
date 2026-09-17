@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 // ============================================================
 // PlaySceneController.cs
@@ -109,7 +108,7 @@ public class PlaySceneController : MonoBehaviour
     // 기능: 일시정지 패널의 "돌아가기" 버튼에 연결한다 — 곡 선택 화면으로 돌아간다.
     public void BackToSelect()
     {
-        SceneManager.LoadScene("SelectScene");
+        SceneLoader.Load(this, "SelectScene");
     }
 
     // 기능: 일시정지 패널의 "다시하기" 버튼에 연결한다 — 씬을 새로 로드하지
@@ -141,6 +140,6 @@ public class PlaySceneController : MonoBehaviour
         hasGoneToResult = true;
         GameSession.FinalScore = ScoreManager.Instance.score;
         GameSession.FinalMaxCombo = ScoreManager.Instance.maxCombo;
-        SceneManager.LoadScene("ResultScene");
+        SceneLoader.Load(this, "ResultScene");
     }
 }
