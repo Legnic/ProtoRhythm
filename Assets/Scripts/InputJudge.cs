@@ -86,7 +86,7 @@ public class InputJudge : MonoBehaviour
         if (note.IsLongNote)
         {
             // 머리 판정만 바로 반영하고, 노트는 유지한 채 홀드 상태로 넘긴다.
-            ScoreManager.Instance.ReportHit(grade);
+            ScoreManager.Instance.ReportHit(grade, lane);
             note.BeginHold();
         }
         else

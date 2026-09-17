@@ -45,6 +45,8 @@ public class ResultUI : MonoBehaviour
             backgroundRenderer.sprite = (song != null && song.backgroundImage != null) ? song.backgroundImage : defaultBackground;
         }
 
+        if (AmbientLoopPlayer.Instance != null) AmbientLoopPlayer.Instance.EnsurePlaying();
+
         if (backToSelectButton != null) backToSelectButton.onClick.AddListener(BackToSelect);
         if (backToTitleButton != null) backToTitleButton.onClick.AddListener(BackToTitle);
     }

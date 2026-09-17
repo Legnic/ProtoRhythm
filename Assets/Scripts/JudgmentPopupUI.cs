@@ -52,7 +52,8 @@ public class JudgmentPopupUI : MonoBehaviour
     // 기능: 새 판정이 들어올 때마다 텍스트를 바꾸고 다시 최대 밝기로 되돌린다.
     // 원리: 이전 판정의 페이드가 끝나기 전에 다음 판정이 들어와도(연타 등)
     //       그냥 remaining을 리셋해서 항상 "가장 최근 판정"이 온전히 보이게 한다.
-    private void HandleJudged(Grade grade)
+    //       어떤 레인에서 판정됐는지는 이 연출과 무관해서 받기만 하고 쓰지 않는다.
+    private void HandleJudged(Grade grade, int lane)
     {
         if (judgmentText == null) return;
 

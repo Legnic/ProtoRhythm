@@ -119,6 +119,51 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &28505106
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 28505108}
+  - component: {fileID: 28505107}
+  m_Layer: 0
+  m_Name: AmbientLoopPlayer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &28505107
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 28505106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c72784943699de44cbf268c2864dccdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AmbientLoopPlayer
+  clip: {fileID: 8300000, guid: 97a66005cea083b418eb04c2c8317476, type: 3}
+--- !u!4 &28505108
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 28505106}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &238783021
 GameObject:
   m_ObjectHideFlags: 0
@@ -187,7 +232,7 @@ MonoBehaviour:
   m_text: "\uC2DC\uC791"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8447e6df0145f134ab7fb9e2184153db, type: 2}
-  m_sharedMaterial: {fileID: -371782844307238350, guid: 8447e6df0145f134ab7fb9e2184153db, type: 2}
+  m_sharedMaterial: {fileID: 7011912087024558366, guid: 8447e6df0145f134ab7fb9e2184153db, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -370,7 +415,7 @@ MonoBehaviour:
   m_text: "\uB098\uAC00\uAE30"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8447e6df0145f134ab7fb9e2184153db, type: 2}
-  m_sharedMaterial: {fileID: -371782844307238350, guid: 8447e6df0145f134ab7fb9e2184153db, type: 2}
+  m_sharedMaterial: {fileID: 7011912087024558366, guid: 8447e6df0145f134ab7fb9e2184153db, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1163,7 +1208,7 @@ MonoBehaviour:
   m_text: ProtoRythm
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8447e6df0145f134ab7fb9e2184153db, type: 2}
-  m_sharedMaterial: {fileID: -371782844307238350, guid: 8447e6df0145f134ab7fb9e2184153db, type: 2}
+  m_sharedMaterial: {fileID: 7011912087024558366, guid: 8447e6df0145f134ab7fb9e2184153db, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1240,3 +1285,4 @@ SceneRoots:
   - {fileID: 1016721735}
   - {fileID: 2097270911}
   - {fileID: 698043036}
+  - {fileID: 28505108}

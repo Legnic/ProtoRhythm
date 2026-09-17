@@ -358,7 +358,40 @@ public class ChartEditorWindow : EditorWindow
         subdivision = EditorGUILayout.IntPopup("박자 세분화", subdivision,
             new[] { "4분음표", "8분음표", "16분음표", "32분음표", "64분음표" },
             new[] { 1, 2, 4, 8, 16 });
-        measureCount = EditorGUILayout.IntSlider("마디 수", measureCount, 1, 64);
+
+        EditorGUILayout.BeginHorizontal();
+        measureCount = Mathf.Max(1, EditorGUILayout.IntField("마디 수", measureCount));
+        using (new EditorGUI.DisabledScope(previewClip == null))
+        {
+            if (GUILayout.Button("곡 길이에 맞추기", GUILayout.Width(110)))
+            {
+                FitMeasureCountToPreviewClip();
+            }
+        }
+        EditorGUILayout.EndHorizontal();
+    }
+
+    // 기능: "곡 길이에 맞추기" 버튼에 연결된다. 격자가 previewClip 전체 길이를
+    //       덮기에 충분한 마디 수를 계산해서 measureCount에 채워 넣는다.
+    // 원리: 마디 수는 슬라이더(최대 64)로 제한되어 있었는데, BPM/세분화에 따라
+    //       64마디가 곡 전체 길이(특히 3~4분대 곡)를 못 덮는 경우가 있어
+    //       "20초 정도밖에 채보를 못 찍는다"는 문제가 생겼다 — 사용자가 매번
+    //       마디 수를 감으로 늘려야 했던 것도 번거로웠다. 여기서는 곡 길이
+    //       (previewClip.length)에서 오프셋을 뺀 만큼을 secondsPerStep으로
+    //       나눠 필요한 스텝 수를 구하고, 한 마디의 스텝 수(beatsPerMeasure *
+    //       subdivision)로 올림 나눗셈해서 정확히 곡 끝까지(또는 그 이상)
+    //       덮는 마디 수를 얻는다.
+    private void FitMeasureCountToPreviewClip()
+    {
+        if (previewClip == null) return;
+
+        float secondsPerStep = (60f / bpm) / subdivision;
+        int stepsPerMeasure = Mathf.Max(1, beatsPerMeasure * subdivision);
+        float coveredSeconds = Mathf.Max(0f, previewClip.length - offsetSeconds);
+        int neededSteps = secondsPerStep > 0f ? Mathf.CeilToInt(coveredSeconds / secondsPerStep) : 0;
+
+        measureCount = Mathf.Max(1, Mathf.CeilToInt((float)neededSteps / stepsPerMeasure));
+        Repaint();
     }
 
     // 기능: 불러오기/저장/전체 지우기 버튼과 조작 안내 문구를 그린다.

@@ -180,7 +180,7 @@ public class Note : MonoBehaviour
     void Finish(Grade grade)
     {
         State = NoteState.Judged;
-        ScoreManager.Instance.ReportHit(grade);
+        ScoreManager.Instance.ReportHit(grade, lane);
         Destroy(gameObject);
     }
 

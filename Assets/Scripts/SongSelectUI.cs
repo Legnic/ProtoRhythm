@@ -97,6 +97,8 @@ public class SongSelectUI : MonoBehaviour
             backgroundRenderer.sprite = defaultBackground;
         }
 
+        if (AmbientLoopPlayer.Instance != null) AmbientLoopPlayer.Instance.EnsurePlaying();
+
         ClearList();
 
         if (library == null || buttonPrefab == null || listParent == null)
@@ -131,7 +133,9 @@ public class SongSelectUI : MonoBehaviour
     {
         selectedSong = song;
 
-        // 난이도 화면으로 넘어온 시점에 이 곡의 미리듣기를 시작한다.
+        // 난이도 화면으로 넘어온 시점에 환경음을 멈추고 이 곡의 미리듣기를 시작한다.
+        if (AmbientLoopPlayer.Instance != null) AmbientLoopPlayer.Instance.Stop();
+
         if (previewPlayer != null)
         {
             previewPlayer.Play(song.audioClip);

@@ -17,6 +17,8 @@ public class TitleUI : MonoBehaviour
     {
         if (startButton != null) startButton.onClick.AddListener(StartGame);
         if (quitButton != null) quitButton.onClick.AddListener(QuitGame);
+
+        if (AmbientLoopPlayer.Instance != null) AmbientLoopPlayer.Instance.EnsurePlaying();
     }
 
     // 기능: "시작" 버튼에 연결한다.

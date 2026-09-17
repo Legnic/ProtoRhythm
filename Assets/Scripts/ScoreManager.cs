@@ -15,11 +15,13 @@ public class ScoreManager : MonoBehaviour
     public int combo = 0;
     public int maxCombo = 0;
 
-    // 기능: 노트 하나가 판정될 때마다(Miss 포함) 그 등급을 알려주는 이벤트.
+    // 기능: 노트 하나가 판정될 때마다(Miss 포함) 그 등급과 레인을 알려주는 이벤트.
     // 원리: JudgmentPopupUI 같은 화면 연출 스크립트가 ScoreManager 내부
     //       구현(점수 계산 방식 등)을 몰라도, 이 이벤트만 구독하면 "지금 막
-    //       어떤 등급이 나왔는지"를 바로 알 수 있게 한다.
-    public static event System.Action<Grade> OnJudged;
+    //       어떤 레인에서 어떤 등급이 나왔는지"를 바로 알 수 있게 한다.
+    //       레인 정보는 JudgmentHitEffectSpawner처럼 "그 레인의 판정선에만"
+    //       연출을 넣어야 하는 구독자를 위해 추가했다.
+    public static event System.Action<Grade, int> OnJudged;
 
     // 기능: 이 컴포넌트를 전역에서 접근 가능한 싱글턴으로 등록한다.
     // 원리: Note, InputJudge, SongLoader 등이 서로를 거치지 않고 바로
@@ -30,16 +32,16 @@ public class ScoreManager : MonoBehaviour
         Instance = this;
     }
 
-    // 기능: 노트 하나의 판정 결과(등급)를 받아 점수/콤보에 반영한다.
+    // 기능: 노트 하나의 판정 결과(등급, 레인)를 받아 점수/콤보에 반영한다.
     // 원리: 등급별로 점수를 더하고 콤보를 1 올린다. Miss는 점수 계산 없이
     //       바로 ReportMiss()로 넘겨서 콤보를 끊는 공통 처리를 재사용한다.
     //       (Miss 쪽은 switch 안에서 return하기 때문에 아래의 "콤보 갱신 +
     //       로그" 코드는 Miss가 아닌 경우에만 실행된다) maxCombo는 매번
     //       현재 콤보와 비교해서, 이번에 갱신된 콤보가 지금까지의 최고 기록보다
     //       높을 때만 갱신한다.
-    public void ReportHit(Grade grade)
+    public void ReportHit(Grade grade, int lane)
     {
-        OnJudged?.Invoke(grade);
+        OnJudged?.Invoke(grade, lane);
 
         switch (grade)
         {

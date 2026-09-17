@@ -17,5 +17,5 @@ MonoBehaviour:
   backgroundImage: {fileID: 569563003343743361, guid: 9cc9fff912f0ed9458b9cac10999ff9e, type: 3}
   difficulties:
   - label: Normal
-    level: 1
+    level: 4
     chart: {fileID: 11400000, guid: 0334ec745e69ed44b829a03ed1c2a711, type: 2}
