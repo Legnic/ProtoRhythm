@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SongData
   songName: Chip Tune
   audioClip: {fileID: 8300000, guid: 6702c82c3419e2345bf37d8dbff0b80f, type: 3}
+  backgroundImage: {fileID: -8647009338400139376, guid: aa6e820dbcffab64bb072e334e791025, type: 3}
   difficulties:
   - label: Normal
     level: 1

@@ -197,7 +197,7 @@ public class Note : MonoBehaviour
 
         SpriteRenderer headSprite = GetComponent<SpriteRenderer>();
         sr.sprite = headSprite.sprite;
-        sr.color = new Color(headSprite.color.r, headSprite.color.g, headSprite.color.b, 0.5f);
+        sr.color = new Color(headSprite.color.r, headSprite.color.g, headSprite.color.b, 0.8f);
         sr.sortingOrder = headSprite.sortingOrder - 1;
 
         // 스프라이트의 "원래" 크기(로컬 스케일 1일 때 월드 유닛 크기)를 알아야

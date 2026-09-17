@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SongData
   songName: Happy Core
   audioClip: {fileID: 8300000, guid: 4c6f6605b3c769f4e95e651c102cc008, type: 3}
+  backgroundImage: {fileID: 6233457851192879063, guid: 3af3ca4506994ba479af75a7c935948d, type: 3}
   difficulties:
   - label: Normal
     level: 1

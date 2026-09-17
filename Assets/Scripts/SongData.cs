@@ -35,6 +35,9 @@ public class SongData : ScriptableObject
     public string songName;
     public AudioClip audioClip;
 
+    [Tooltip("이 곡을 고르거나 플레이할 때 배경으로 보여줄 이미지 (선택 사항, 비워두면 기본 배경을 그대로 쓴다)")]
+    public Sprite backgroundImage;
+
     [Tooltip("이 곡에 딸린 난이도들. Easy/Normal/Hard처럼 여러 개를 추가할 수 있다.")]
     public List<SongDifficulty> difficulties = new List<SongDifficulty>();
 }

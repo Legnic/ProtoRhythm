@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.UI;
+using TMPro;
 
 // ============================================================
 // JudgmentPopupUI.cs
@@ -12,11 +12,11 @@ using UnityEngine.UI;
 // ============================================================
 public class JudgmentPopupUI : MonoBehaviour
 {
-    public Text judgmentText;
+    public TMP_Text judgmentText;
 
     [Range(0f, 1f)]
     [Tooltip("판정 직후 텍스트의 최대 투명도(알파). 플레이에 방해되지 않도록 0.5~0.7 정도를 권장한다.")]
-    public float maxAlpha = 0.6f;
+    public float maxAlpha = 0.9f;
 
     [Tooltip("최대 투명도를 그대로 유지하는 시간(초).")]
     public float holdDuration = 0.15f;

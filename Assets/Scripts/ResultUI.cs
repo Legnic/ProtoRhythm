@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
 
 // ============================================================
 // ResultUI.cs
@@ -11,12 +12,18 @@ using UnityEngine.UI;
 public class ResultUI : MonoBehaviour
 {
     [Header("표시")]
-    public Text scoreText;
-    public Text comboText;
+    public TMP_Text scoreText;
+    public TMP_Text comboText;
 
     [Header("버튼")]
     public Button backToSelectButton;
     public Button backToTitleButton;
+
+    [Header("배경")]
+    [Tooltip("방금 플레이한 곡의 배경 이미지를 보여줄 SpriteRenderer — 선택 사항.")]
+    public SpriteRenderer backgroundRenderer;
+    [Tooltip("곡에 backgroundImage가 없을 때 대신 보여줄 기본 배경.")]
+    public Sprite defaultBackground;
 
     // 기능: 화면이 뜨자마자 GameSession에 담겨온 값을 그려주고, 버튼 클릭을
     //       코드로 연결한다(이 프로젝트 전체에서 쓰는 패턴 — SongSelectUI,
@@ -30,6 +37,12 @@ public class ResultUI : MonoBehaviour
         if (comboText != null)
         {
             comboText.text = $"Max Combo: {GameSession.FinalMaxCombo}";
+        }
+
+        if (backgroundRenderer != null)
+        {
+            SongData song = GameSession.SelectedSong;
+            backgroundRenderer.sprite = (song != null && song.backgroundImage != null) ? song.backgroundImage : defaultBackground;
         }
 
         if (backToSelectButton != null) backToSelectButton.onClick.AddListener(BackToSelect);

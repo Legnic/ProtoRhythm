@@ -24,6 +24,12 @@ public class SongLoader : MonoBehaviour
     [Tooltip("3-2-1 카운트다운이 항상 온전히(적어도 3초) 보이도록 하는 최소 리드인(초).")]
     public float minCountdownSeconds = 3f;
 
+    [Header("배경")]
+    [Tooltip("곡별 배경 이미지를 보여줄 SpriteRenderer — 선택 사항.")]
+    public SpriteRenderer backgroundRenderer;
+    [Tooltip("곡에 backgroundImage가 없을 때 대신 보여줄 기본 배경.")]
+    public Sprite defaultBackground;
+
     // 기능: PlayScene이 시작되면 GameSession에 담겨온 곡/난이도로 자동 로드한다.
     // 원리: SelectScene에서 SceneManager.LoadScene으로 넘어왔기 때문에, 여기서는
     //       버튼 클릭 같은 이벤트가 아니라 그냥 씬이 시작됐다는 사실 자체가
@@ -64,6 +70,11 @@ public class SongLoader : MonoBehaviour
         if (clock != null && clock.musicSource != null)
         {
             clock.musicSource.clip = song.audioClip;
+        }
+
+        if (backgroundRenderer != null)
+        {
+            backgroundRenderer.sprite = song.backgroundImage != null ? song.backgroundImage : defaultBackground;
         }
 
         if (noteSpawner != null)

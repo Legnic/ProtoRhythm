@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.UI;
+using TMPro;
 
 // ============================================================
 // CountdownUI.cs
@@ -20,7 +20,7 @@ using UnityEngine.UI;
 public class CountdownUI : MonoBehaviour
 {
     public RhythmClock clock;
-    public Text countdownText;
+    public TMP_Text countdownText;
 
     void Update()
     {

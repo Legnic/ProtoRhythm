@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
 
 // ============================================================
 // SongSelectUI.cs
@@ -29,7 +30,7 @@ public class SongSelectUI : MonoBehaviour
     [Tooltip("항목 하나당 만들어질 버튼 프리팹. 자식에 Text가 있어야 한다.")]
     public Button buttonPrefab;
     [Tooltip("화면 위쪽 제목 텍스트 (선택 사항). 단계에 따라 문구가 바뀐다.")]
-    public Text titleText;
+    public TMP_Text titleText;
     [Tooltip("난이도 선택 단계에서만 보이는 뒤로가기 버튼(곡 목록으로) — 선택 사항.")]
     public Button backButton;
     [Tooltip("곡 목록 단계에서만 보이는 돌아가기 버튼(타이틀로) — 선택 사항.")]
@@ -37,6 +38,12 @@ public class SongSelectUI : MonoBehaviour
 
     [Tooltip("난이도 선택 화면에서 곡 미리듣기를 재생하는 컴포넌트 — 선택 사항.")]
     public SongPreviewPlayer previewPlayer;
+
+    [Header("배경")]
+    [Tooltip("곡별 배경 이미지를 보여줄 SpriteRenderer — 선택 사항.")]
+    public SpriteRenderer backgroundRenderer;
+    [Tooltip("곡 목록 단계(아직 곡을 안 골랐을 때)나, 고른 곡에 backgroundImage가 없을 때 대신 보여줄 기본 배경.")]
+    public Sprite defaultBackground;
 
     // 난이도 목록을 보여주는 중일 때, 어떤 곡을 골랐었는지 기억해둔다.
     private SongData selectedSong;
@@ -85,6 +92,11 @@ public class SongSelectUI : MonoBehaviour
             titleText.text = "곡 선택";
         }
 
+        if (backgroundRenderer != null)
+        {
+            backgroundRenderer.sprite = defaultBackground;
+        }
+
         ClearList();
 
         if (library == null || buttonPrefab == null || listParent == null)
@@ -98,7 +110,7 @@ public class SongSelectUI : MonoBehaviour
             if (song == null) continue;
 
             Button button = Instantiate(buttonPrefab, listParent);
-            Text label = button.GetComponentInChildren<Text>();
+            TMP_Text label = button.GetComponentInChildren<TMP_Text>();
             if (label != null)
             {
                 label.text = song.songName;
@@ -138,6 +150,11 @@ public class SongSelectUI : MonoBehaviour
             titleText.text = $"{song.songName} - 난이도 선택";
         }
 
+        if (backgroundRenderer != null)
+        {
+            backgroundRenderer.sprite = song.backgroundImage != null ? song.backgroundImage : defaultBackground;
+        }
+
         ClearList();
 
         foreach (SongDifficulty difficulty in song.difficulties)
@@ -145,7 +162,7 @@ public class SongSelectUI : MonoBehaviour
             if (difficulty == null) continue;
 
             Button button = Instantiate(buttonPrefab, listParent);
-            Text label = button.GetComponentInChildren<Text>();
+            TMP_Text label = button.GetComponentInChildren<TMP_Text>();
             if (label != null)
             {
                 label.text = difficulty.label;
