@@ -70,6 +70,7 @@ public class SongLoader : MonoBehaviour
         if (clock != null && clock.musicSource != null)
         {
             clock.musicSource.clip = song.audioClip;
+            clock.audioOffset = GameSettings.AudioOffset;
         }
 
         if (backgroundRenderer != null)
