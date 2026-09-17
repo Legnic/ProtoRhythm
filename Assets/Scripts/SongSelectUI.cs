@@ -35,6 +35,9 @@ public class SongSelectUI : MonoBehaviour
     [Tooltip("곡 목록 단계에서만 보이는 돌아가기 버튼(타이틀로) — 선택 사항.")]
     public Button quitToTitleButton;
 
+    [Tooltip("난이도 선택 화면에서 곡 미리듣기를 재생하는 컴포넌트 — 선택 사항.")]
+    public SongPreviewPlayer previewPlayer;
+
     // 난이도 목록을 보여주는 중일 때, 어떤 곡을 골랐었는지 기억해둔다.
     private SongData selectedSong;
 
@@ -61,6 +64,13 @@ public class SongSelectUI : MonoBehaviour
     void ShowSongList()
     {
         selectedSong = null;
+
+        // 곡 목록 단계(아직 곡을 고르기 전 + 난이도 화면에서 뒤로 돌아온 경우
+        // 모두 포함)에서는 미리듣기가 나오면 안 된다.
+        if (previewPlayer != null)
+        {
+            previewPlayer.Stop();
+        }
 
         if (backButton != null)
         {
@@ -109,6 +119,12 @@ public class SongSelectUI : MonoBehaviour
     {
         selectedSong = song;
 
+        // 난이도 화면으로 넘어온 시점에 이 곡의 미리듣기를 시작한다.
+        if (previewPlayer != null)
+        {
+            previewPlayer.Play(song.audioClip);
+        }
+
         if (backButton != null)
         {
             backButton.gameObject.SetActive(true);
@@ -148,6 +164,14 @@ public class SongSelectUI : MonoBehaviour
     //       스스로 읽어서 재생을 시작한다.
     void SelectDifficulty(SongDifficulty difficulty)
     {
+        // 플레이 화면으로 넘어가면 미리듣기는 반드시 꺼져 있어야 한다 —
+        // 그대로 두면 다음 씬에서도 계속 흘러나오거나(오디오는 씬을 넘어도
+        // 저절로 멈추지 않는다), 곧이어 시작될 실제 곡 재생과 겹쳐 들린다.
+        if (previewPlayer != null)
+        {
+            previewPlayer.Stop();
+        }
+
         GameSession.SelectedSong = selectedSong;
         GameSession.SelectedDifficulty = difficulty;
         SceneManager.LoadScene("PlayScene");

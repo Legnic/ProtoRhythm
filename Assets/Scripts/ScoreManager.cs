@@ -15,6 +15,12 @@ public class ScoreManager : MonoBehaviour
     public int combo = 0;
     public int maxCombo = 0;
 
+    // 기능: 노트 하나가 판정될 때마다(Miss 포함) 그 등급을 알려주는 이벤트.
+    // 원리: JudgmentPopupUI 같은 화면 연출 스크립트가 ScoreManager 내부
+    //       구현(점수 계산 방식 등)을 몰라도, 이 이벤트만 구독하면 "지금 막
+    //       어떤 등급이 나왔는지"를 바로 알 수 있게 한다.
+    public static event System.Action<Grade> OnJudged;
+
     // 기능: 이 컴포넌트를 전역에서 접근 가능한 싱글턴으로 등록한다.
     // 원리: Note, InputJudge, SongLoader 등이 서로를 거치지 않고 바로
     //       ScoreManager.Instance로 접근할 수 있게, 씬 시작 시(Awake) 자기
@@ -33,6 +39,8 @@ public class ScoreManager : MonoBehaviour
     //       높을 때만 갱신한다.
     public void ReportHit(Grade grade)
     {
+        OnJudged?.Invoke(grade);
+
         switch (grade)
         {
             case Grade.Perfect:

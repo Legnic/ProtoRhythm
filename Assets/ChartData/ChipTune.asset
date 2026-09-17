@@ -46,28 +46,28 @@ MonoBehaviour:
   - lane: 0
     hitTime: 0.675
     holdDuration: 0
+  - lane: 1
+    hitTime: 0.90000004
+    holdDuration: 0
   - lane: 3
     hitTime: 0.90000004
     holdDuration: 0
-  - lane: 1
-    hitTime: 0.90000004
+  - lane: 0
+    hitTime: 1.0500001
     holdDuration: 0
   - lane: 2
     hitTime: 1.0500001
     holdDuration: 0
-  - lane: 0
-    hitTime: 1.0500001
-    holdDuration: 0
-  - lane: 0
-    hitTime: 1.125
-    holdDuration: 0
   - lane: 2
     hitTime: 1.125
     holdDuration: 0
-  - lane: 1
+  - lane: 0
+    hitTime: 1.125
+    holdDuration: 0
+  - lane: 3
     hitTime: 1.35
     holdDuration: 0
-  - lane: 3
+  - lane: 1
     hitTime: 1.35
     holdDuration: 0
   - lane: 2
@@ -76,6 +76,99 @@ MonoBehaviour:
   - lane: 0
     hitTime: 1.6500001
     holdDuration: 0
+  - lane: 3
+    hitTime: 1.8750001
+    holdDuration: 0
+  - lane: 2
+    hitTime: 1.95
+    holdDuration: 0
+  - lane: 1
+    hitTime: 2.025
+    holdDuration: 0
+  - lane: 0
+    hitTime: 2.1000001
+    holdDuration: 0
+  - lane: 3
+    hitTime: 2.325
+    holdDuration: 0
+  - lane: 2
+    hitTime: 2.4
+    holdDuration: 0
+  - lane: 1
+    hitTime: 2.5500002
+    holdDuration: 0.52500004
+  - lane: 3
+    hitTime: 2.625
+    holdDuration: 0
+  - lane: 2
+    hitTime: 2.8500001
+    holdDuration: 0
+  - lane: 3
+    hitTime: 2.9250002
+    holdDuration: 0.15
+  - lane: 0
+    hitTime: 3.3000002
+    holdDuration: 0
+  - lane: 1
+    hitTime: 3.45
+    holdDuration: 0
+  - lane: 2
+    hitTime: 3.525
+    holdDuration: 0
+  - lane: 3
+    hitTime: 3.6750002
+    holdDuration: 0
+  - lane: 2
+    hitTime: 3.9
+    holdDuration: 0
+  - lane: 3
+    hitTime: 3.9
+    holdDuration: 0
+  - lane: 0
+    hitTime: 3.9
+    holdDuration: 0
+  - lane: 1
+    hitTime: 3.9
+    holdDuration: 0
+  - lane: 3
+    hitTime: 4.125
+    holdDuration: 0
+  - lane: 0
+    hitTime: 4.125
+    holdDuration: 0
+  - lane: 1
+    hitTime: 4.2000003
+    holdDuration: 0
+  - lane: 2
+    hitTime: 4.2000003
+    holdDuration: 0
+  - lane: 3
+    hitTime: 4.425
+    holdDuration: 0
+  - lane: 0
+    hitTime: 4.65
+    holdDuration: 0.375
+  - lane: 1
+    hitTime: 5.025
+    holdDuration: 0
+  - lane: 2
+    hitTime: 5.175
+    holdDuration: 0
+  - lane: 3
+    hitTime: 5.3250003
+    holdDuration: 0
+  - lane: 0
+    hitTime: 5.4750004
+    holdDuration: 0.3
+  - lane: 1
+    hitTime: 5.4750004
+    holdDuration: 0.3
+  - lane: 2
+    hitTime: 5.925
+    holdDuration: 0.3
+  - lane: 3
+    hitTime: 5.925
+    holdDuration: 0.3
   speedChanges: []
   bpm: 100
   offsetSeconds: 0
