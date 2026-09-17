@@ -2543,6 +2543,7 @@ GameObject:
   - component: {fileID: 2708598583397607897}
   - component: {fileID: 2708598583397607910}
   - component: {fileID: 2708598583397607899}
+  - component: {fileID: -5334670789487494144}
   m_Layer: 0
   m_Name: CFXR Impact Glowing HDR (Blue)
   m_TagString: Untagged
@@ -6039,6 +6040,20 @@ MonoBehaviour:
     perlinColor: 0
     perlinColorSpeed: 1
   fadeOutReference: {fileID: 0}
+--- !u!114 &-5334670789487494144
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2708598583397607911}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b62cb0cef394da46bfc509af173488d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LaneHitEffect
+  duration: 1.5
+  endScaleMultiplier: 1.6
 --- !u!1 &2708598584241629776
 GameObject:
   m_ObjectHideFlags: 0

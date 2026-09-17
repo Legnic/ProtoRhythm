@@ -25,18 +25,6 @@ public static class AudioPreviewUtility
     private static readonly MethodInfo StopMethod = AudioUtilType.GetMethod("StopAllPreviewClips", Flags);
     private static readonly MethodInfo IsPlayingMethod = AudioUtilType.GetMethod("IsPreviewClipPlaying", Flags);
     private static readonly MethodInfo GetPositionMethod = AudioUtilType.GetMethod("GetPreviewClipPosition", Flags);
-    private static readonly MethodInfo SetSamplePositionMethod = AudioUtilType.GetMethod("SetPreviewClipSamplePosition", Flags);
-
-    // 기능: 클립을 지정한 시각(초)부터 재생한다.
-    // 원리: AudioUtil.PlayPreviewClip은 시작 위치를 "샘플 단위" 정수로만 받기
-    //       때문에, 초 -> 샘플 변환(시각 × clip.frequency)을 여기서 대신 해준다.
-    //       범위를 벗어난 시각(음수, 클립 길이 초과)이 들어와도 죽지 않게
-    //       0~samples-1로 잘라낸다.
-    public static void Play(AudioClip clip, float startTime, bool loop = false)
-    {
-        if (clip == null) return;
-        PlaySamples(clip, Mathf.RoundToInt(startTime * clip.frequency), loop);
-    }
 
     // 기능: 샘플 인덱스를 직접 지정해서 재생한다(속도 변형 클립처럼 declared
     //       frequency가 원본과 달라서, "시각 × frequency" 계산을 호출부가
@@ -51,14 +39,6 @@ public static class AudioPreviewUtility
         if (clip == null) return;
         int clamped = Mathf.Clamp(startSample, 0, clip.samples - 1);
         PlayMethod.Invoke(null, new object[] { clip, clamped, loop });
-    }
-
-    // 기능: 재생 중인 클립의 위치를 다른 시각(초)으로 즉시 옮긴다 — 스크러빙.
-    public static void Seek(AudioClip clip, float time)
-    {
-        if (clip == null) return;
-        int sample = Mathf.Clamp(Mathf.RoundToInt(time * clip.frequency), 0, clip.samples - 1);
-        SetSamplePositionMethod.Invoke(null, new object[] { clip, sample });
     }
 
     public static void Stop()

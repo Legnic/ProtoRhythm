@@ -4,8 +4,6 @@ using UnityEngine;
 // ScoreManager.cs
 //   콤보와 점수를 추적하는 간단한 매니저.
 //   씬에 하나만 존재한다고 가정하고 정적 Instance로 접근한다.
-//   (UI 연동은 범위 밖이라 Debug.Log로 대체해두었다.
-//    실제 프로젝트에서는 OnJudged 같은 이벤트를 추가해 UI에 연결하면 된다)
 // ============================================================
 public class ScoreManager : MonoBehaviour
 {
@@ -35,8 +33,8 @@ public class ScoreManager : MonoBehaviour
     // 기능: 노트 하나의 판정 결과(등급, 레인)를 받아 점수/콤보에 반영한다.
     // 원리: 등급별로 점수를 더하고 콤보를 1 올린다. Miss는 점수 계산 없이
     //       바로 ReportMiss()로 넘겨서 콤보를 끊는 공통 처리를 재사용한다.
-    //       (Miss 쪽은 switch 안에서 return하기 때문에 아래의 "콤보 갱신 +
-    //       로그" 코드는 Miss가 아닌 경우에만 실행된다) maxCombo는 매번
+    //       (Miss 쪽은 switch 안에서 return하기 때문에 아래의 "콤보 갱신"
+    //       코드는 Miss가 아닌 경우에만 실행된다) maxCombo는 매번
     //       현재 콤보와 비교해서, 이번에 갱신된 콤보가 지금까지의 최고 기록보다
     //       높을 때만 갱신한다.
     public void ReportHit(Grade grade, int lane)
@@ -66,8 +64,6 @@ public class ScoreManager : MonoBehaviour
         {
             maxCombo = combo;
         }
-
-        Debug.Log($"{grade} | Combo {combo} | Score {score}");
     }
 
     // 기능: 노트를 놓쳤을 때(Miss) 콤보를 끊는다.
@@ -76,7 +72,6 @@ public class ScoreManager : MonoBehaviour
     public void ReportMiss()
     {
         combo = 0;
-        Debug.Log("Miss | Combo Reset");
     }
 
     // 기능: 점수/콤보/최고 콤보를 전부 0으로 되돌린다.
