@@ -12,7 +12,74 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0854f1956cd29044bf6d951a6ce4e88, type: 3}
   m_Name: ChipTune
   m_EditorClassIdentifier: Assembly-CSharp::ChartData
-  notes: []
+  notes:
+  - lane: 3
+    hitTime: 0
+    holdDuration: 0
+  - lane: 2
+    hitTime: 0
+    holdDuration: 0
+  - lane: 1
+    hitTime: 0
+    holdDuration: 0
+  - lane: 0
+    hitTime: 0
+    holdDuration: 0
+  - lane: 3
+    hitTime: 0.22500001
+    holdDuration: 0
+  - lane: 2
+    hitTime: 0.22500001
+    holdDuration: 0
+  - lane: 1
+    hitTime: 0.22500001
+    holdDuration: 0
+  - lane: 0
+    hitTime: 0.22500001
+    holdDuration: 0
+  - lane: 3
+    hitTime: 0.45000002
+    holdDuration: 0
+  - lane: 3
+    hitTime: 0.52500004
+    holdDuration: 0
+  - lane: 0
+    hitTime: 0.675
+    holdDuration: 0
+  - lane: 3
+    hitTime: 0.90000004
+    holdDuration: 0
+  - lane: 1
+    hitTime: 0.90000004
+    holdDuration: 0
+  - lane: 2
+    hitTime: 1.0500001
+    holdDuration: 0
+  - lane: 0
+    hitTime: 1.0500001
+    holdDuration: 0
+  - lane: 0
+    hitTime: 1.125
+    holdDuration: 0
+  - lane: 2
+    hitTime: 1.125
+    holdDuration: 0
+  - lane: 1
+    hitTime: 1.35
+    holdDuration: 0
+  - lane: 3
+    hitTime: 1.35
+    holdDuration: 0
+  - lane: 2
+    hitTime: 1.6500001
+    holdDuration: 0
+  - lane: 0
+    hitTime: 1.6500001
+    holdDuration: 0
   speedChanges: []
   bpm: 100
   offsetSeconds: 0
+  laneCount: 4
+  beatsPerMeasure: 4
+  subdivision: 8
+  measureCount: 8

@@ -42,6 +42,11 @@ public class RhythmClock : MonoBehaviour
     // 외부(NoteSpawner, Note 등)에서 읽어가는, 보정이 반영된 현재 노래 재생 시각
     public float CurrentTime { get; private set; }
 
+    [Tooltip("SongLoader가 계산해서 채워주는, 노트가 spawnY에서 judgmentY까지 떨어지는 데 걸리는 시간(초). " +
+             "리드인 전체(카운트다운+이 시간) 중 뒤쪽 이 시간만큼이 '노트가 실제로 떨어지는 구간'이다. " +
+             "CountdownUI가 카운트다운 숫자를 언제 그만 보여줄지 판단하는 데 쓴다.")]
+    public float noteLeadTime = 0f;
+
     public bool HasStarted => started && CurrentTime >= 0f;
 
     // 기능: 일시정지 중인지 알려준다. InputJudge가 이 값을 보고 일시정지
@@ -104,7 +109,26 @@ public class RhythmClock : MonoBehaviour
     public void Pause()
     {
         if (!started || paused) return;
-        musicSource.Pause();
+
+        // 리드인(카운트다운) 중이라 아직 실제로 재생을 시작하기 전이라면,
+        // PlayScheduled로 걸어둔 예약은 아직 대기 중인 상태다. Unity의
+        // AudioSource.Pause()/UnPause()는 이렇게 "아직 시작 안 한 예약
+        // 재생"을 올바르게 다루지 못한다 — Pause() 후 UnPause()하면 원래
+        // 예약된 미래 시각이 아니라 UnPause()한 바로 그 순간부터 재생이
+        // 시작돼 버려서, 음악이 노트보다 먼저 나오는 문제가 생긴다(직접
+        // 확인됨). 그래서 이 경우엔 아예 Stop()으로 예약 자체를 취소하고,
+        // Resume()에서 새로 계산한 시각으로 PlayScheduled를 다시 건다.
+        // 이미 재생이 시작된 뒤(HasStarted)라면 평범하게 Pause()/UnPause()로
+        // 충분하다.
+        if (HasStarted)
+        {
+            musicSource.Pause();
+        }
+        else
+        {
+            musicSource.Stop();
+        }
+
         dspPausedAt = AudioSettings.dspTime;
         paused = true;
     }
@@ -113,9 +137,24 @@ public class RhythmClock : MonoBehaviour
     public void Resume()
     {
         if (!started || !paused) return;
+
+        bool wasStartedBeforePause = HasStarted;
+
         double pausedDuration = AudioSettings.dspTime - dspPausedAt;
         dspSongStartTime += pausedDuration; // 멈춰있던 시간만큼 시작 기준점을 뒤로 민다.
-        musicSource.UnPause();
+
+        if (wasStartedBeforePause)
+        {
+            musicSource.UnPause();
+        }
+        else
+        {
+            // Pause()에서 예약을 취소했으므로, 뒤로 밀린 새 시작 시각으로
+            // 다시 예약한다 — 리드인이 남은 만큼 노트가 마저 떨어지고,
+            // CurrentTime이 정확히 0이 되는 시점에 맞춰 재생이 시작된다.
+            musicSource.PlayScheduled(dspSongStartTime);
+        }
+
         paused = false;
     }
 

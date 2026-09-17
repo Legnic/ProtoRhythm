@@ -41,6 +41,11 @@ public static class AudioPreviewUtility
     // 기능: 샘플 인덱스를 직접 지정해서 재생한다(속도 변형 클립처럼 declared
     //       frequency가 원본과 달라서, "시각 × frequency" 계산을 호출부가
     //       직접 해야 하는 경우에 쓴다).
+    // 원리: PlayPreviewClip을 정지 상태에서 곧바로 한 번만 호출하면, 요청한
+    //       시작 샘플과 무관하게 재생이 실제로 소리를 내기 시작하는 순간까지
+    //       내부적으로 아주 짧은(수십 ms) 시간이 걸리는데, 그동안 흘러야 할
+    //       도입부 소리가 그냥 유실되는 현상이 있다(Unity 에디터 프리뷰 전용
+    //       재생 경로의 알려진 특성 — 실제 게임 재생(AudioSource)에는 해당 없다).
     public static void PlaySamples(AudioClip clip, int startSample, bool loop = false)
     {
         if (clip == null) return;

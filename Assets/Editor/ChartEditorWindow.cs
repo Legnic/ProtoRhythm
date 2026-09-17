@@ -199,6 +199,16 @@ public class ChartEditorWindow : EditorWindow
                 if (playing) StopPreview();
                 else PlayFrom(previewTime);
             }
+
+            // 격자는 오프셋(첫 박자)부터 시작하므로, 그 앞에 있을 수 있는
+            // 도입부(인트로)는 격자 칸을 클릭해서는 절대 되돌아갈 수 없다.
+            // 격자에 0초 줄을 추가하는 대신, 오디오 클립 자체의 맨 처음으로
+            // 보내는 버튼을 따로 둔다 — 오프셋 앞쪽은 "채보 칸"이 아니라
+            // "클립의 진짜 처음"이라는 뜻이 더 명확하기 때문이다.
+            if (GUILayout.Button("⏮ 0:00", GUILayout.Width(60)))
+            {
+                SeekTo(0f);
+            }
         }
 
         string posLabel = hasPreviewTime ? FormatTime(previewTime) : "--:--.-";
@@ -267,6 +277,27 @@ public class ChartEditorWindow : EditorWindow
         Repaint();
     }
 
+    // 기능: 실제로 재생을 시작하지 않고, "다음에 재생을 누르면 여기서부터
+    //       시작한다"는 위치(previewTime)만 옮긴다. 재생 중이었다면 멈춘다.
+    // 원리: 예전에는 시간 레이블을 클릭하면 그 자리에서 곧바로 재생까지
+    //       시작해버렸는데(PlayFrom), 그러면 위치만 확인하고 싶어도 매번
+    //       소리가 나버리고, 클릭할 때마다 Stop 직후 곧바로 Play가 실행되어
+    //       재생 시작 부분이 유실되는 문제(AudioPreviewUtility 참고)도 같이
+    //       겪게 된다. 위치 이동과 재생 시작을 분리해서, 사용자가 ▶ 재생
+    //       버튼(또는 스페이스바)을 눌렀을 때만 실제로 소리가 나게 한다.
+    private void SeekTo(float time)
+    {
+        if (AudioPreviewUtility.IsPlaying())
+        {
+            StopPreview();
+        }
+
+        previewTime = time;
+        hasPreviewTime = true;
+        lastMetronomeStep = -1;
+        Repaint();
+    }
+
     // 기능: 재생을 멈추고 EditorApplication.update 구독을 해지한다.
     private void StopPreview()
     {
@@ -297,7 +328,7 @@ public class ChartEditorWindow : EditorWindow
         float secondsPerStep = (60f / bpm) / subdivision;
         int currentStep = Mathf.RoundToInt((previewTime - offsetSeconds) / secondsPerStep);
         int stepsPerMeasure = beatsPerMeasure * subdivision;
-        if (currentStep > lastMetronomeStep && currentStep % stepsPerMeasure == 0)
+        if (currentStep >= 0 && currentStep > lastMetronomeStep && currentStep % stepsPerMeasure == 0)
         {
             lastMetronomeStep = currentStep;
             metronomeFlashUntil = EditorApplication.timeSinceStartup + MetronomeFlashDuration;
@@ -376,17 +407,27 @@ public class ChartEditorWindow : EditorWindow
         int totalSteps = measureCount * beatsPerMeasure * subdivision;
         float secondsPerStep = (60f / bpm) / subdivision;
 
+        // 오프셋(offsetSeconds) 이전, 즉 곡의 진짜 도입부(0초~오프셋)도 격자에
+        // 표시하고 그 구간에 노트를 놓을 수 있어야 한다 — 실제 게임에서는
+        // 음악이 오디오 클립의 0초 지점부터 재생되므로(RhythmClock 참고),
+        // 오프셋 이전이라고 노트를 못 놓을 이유가 없다. 이 구간은 step을
+        // 음수로 확장해서 표현한다: step -preSteps가 대략 0초, step 0이
+        // 오프셋(첫 박자)이 되도록 한다.
+        int preSteps = secondsPerStep > 0f ? Mathf.Max(0, Mathf.CeilToInt(offsetSeconds / secondsPerStep)) : 0;
+
         RebuildStepLookup();
         RebuildSpeedLookup();
 
         bool playing = AudioPreviewUtility.IsPlaying();
-        int playheadStep = hasPreviewTime ? Mathf.RoundToInt((previewTime - offsetSeconds) / secondsPerStep) : -1;
+        int playheadStep = hasPreviewTime ? Mathf.RoundToInt((previewTime - offsetSeconds) / secondsPerStep) : int.MinValue;
 
         // 재생 중일 때만 재생 위치선을 따라 자동으로 스크롤한다. 멈춰 있을 땐
         // 사용자가 자유롭게 격자를 둘러볼 수 있어야 하므로 건드리지 않는다.
-        if (playing && playheadStep >= 0)
+        // 화면상 행 위치는 맨 위에 그려지는 step(-preSteps)을 0으로 놓고
+        // 세어야 하므로 playheadStep에 preSteps를 더해서 픽셀로 환산한다.
+        if (playing && playheadStep >= -preSteps)
         {
-            float rowY = HeaderHeight + playheadStep * RowHeight;
+            float rowY = HeaderHeight + (playheadStep + preSteps) * RowHeight;
             scrollPos.y = Mathf.Max(0f, rowY - 150f);
         }
 
@@ -401,7 +442,7 @@ public class ChartEditorWindow : EditorWindow
         }
         EditorGUILayout.EndHorizontal();
 
-        for (int step = 0; step < totalSteps; step++)
+        for (int step = -preSteps; step < totalSteps; step++)
         {
             EditorGUILayout.BeginHorizontal();
 
@@ -442,7 +483,10 @@ public class ChartEditorWindow : EditorWindow
     //       GUILayoutUtility.GetRect로 직접 사각형을 받아 Event.current로 클릭을 잡는다.
     private void DrawTimeCell(float time, int step)
     {
-        bool isMeasureStart = (step % (beatsPerMeasure * subdivision)) == 0;
+        // 마디 시작 표시(▶)는 채보의 첫 박자(step 0, 오프셋)부터 셈한다 — 그
+        // 이전(도입부, 음수 step)은 아직 "마디"라는 개념이 없는 구간이므로
+        // 항상 일반 칸으로 표시한다.
+        bool isMeasureStart = step >= 0 && (step % (beatsPerMeasure * subdivision)) == 0;
         string timeLabel = isMeasureStart ? $"▶ {time:0.00}" : $"{time:0.00}";
 
         Rect rect = GUILayoutUtility.GetRect(TimeColumnWidth, CellHeight, GUILayout.Width(TimeColumnWidth));
@@ -451,7 +495,7 @@ public class ChartEditorWindow : EditorWindow
         Event e = Event.current;
         if (e.type == EventType.MouseDown && rect.Contains(e.mousePosition) && previewClip != null)
         {
-            PlayFrom(time);
+            SeekTo(time);
             e.Use();
         }
     }
@@ -663,11 +707,9 @@ public class ChartEditorWindow : EditorWindow
         float secondsPerStep = (60f / bpm) / subdivision;
         foreach (NoteData data in targetChart.notes)
         {
+            // 오프셋(첫 박자) 이전 시각(도입부 구간)의 노트도 음수 step으로
+            // 그대로 되살린다 — 격자가 이제 그 구간까지 표시한다(DrawGrid 참고).
             int startStep = Mathf.RoundToInt((data.hitTime - offsetSeconds) / secondsPerStep);
-            if (startStep < 0)
-            {
-                continue;
-            }
 
             // 탭 노트는 1칸, 롱노트는 홀드 길이를 스텝 수로 환산해 그만큼 칸을 차지한다.
             int lengthSteps = data.holdDuration > 0f
@@ -680,10 +722,6 @@ public class ChartEditorWindow : EditorWindow
         foreach (SpeedChange sc in targetChart.speedChanges)
         {
             int step = Mathf.RoundToInt((sc.time - offsetSeconds) / secondsPerStep);
-            if (step < 0)
-            {
-                continue;
-            }
             speedChanges.Add(new EditorSpeedChange { step = step, multiplier = sc.multiplier });
         }
     }

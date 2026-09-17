@@ -81,19 +81,22 @@ public class SongLoader : MonoBehaviour
 
         if (clock != null)
         {
-            // 노트가 spawnY에서 judgmentY까지 떨어지는 데 걸리는 시간만큼은
-            // 최소한 리드인을 줘야, 채보 맨 앞의 이른 노트도 화면 맨 위에서부터
-            // 온전히 떨어지는 모습으로 나온다(RhythmClock.Play 주석 참고).
-            // 여기에 minCountdownSeconds와 비교해 더 큰 값을 쓴다 — 그래야
-            // CountdownUI가 항상 "3, 2, 1"을 온전히 다 보여줄 수 있다(떨어지는
-            // 데 필요한 시간이 3초보다 짧아도 카운트다운은 어색하게 잘리지 않는다).
+            // 노트가 spawnY에서 judgmentY까지 떨어지는 데 걸리는 시간(travelTime).
+            // 카운트다운(minCountdownSeconds)이 "완전히 끝난 뒤에" 노트가 나타나
+            // 떨어지기 시작해야 하므로, 전체 리드인은 둘 중 더 큰 값이 아니라
+            // 둘을 합한 값이어야 한다 — max로 잡으면 travelTime이
+            // minCountdownSeconds보다 짧을 때 노트가 카운트다운 도중에 이미
+            // 나타나 버린다(실제로 보고된 버그). clock.noteLeadTime에 travelTime만
+            // 따로 저장해두는 이유는, CountdownUI가 "카운트다운이 끝나고 노트가
+            // 떨어지기 시작하는 시점"이 정확히 언제인지 알아야 하기 때문이다.
             float travelTime = 0f;
             if (gameManager != null)
             {
                 float speed = Mathf.Max(gameManager.EffectiveSpeed, 0.0001f);
                 travelTime = (gameManager.spawnY - gameManager.judgmentY) / speed;
             }
-            float minLeadIn = Mathf.Max(travelTime, minCountdownSeconds);
+            clock.noteLeadTime = travelTime;
+            float minLeadIn = travelTime + minCountdownSeconds;
             clock.Play(minLeadIn);
         }
     }
