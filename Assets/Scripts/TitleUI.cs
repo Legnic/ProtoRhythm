@@ -8,7 +8,6 @@ using UnityEngine.SceneManagement;
 public class TitleUI : MonoBehaviour
 {
     public UnityEngine.UI.Button startButton;
-    public UnityEngine.UI.Button optionsButton;
     public UnityEngine.UI.Button quitButton;
 
     // 기능: 씬이 열릴 때마다 버튼 클릭을 코드로 연결한다 — 인스펙터의 영구
@@ -17,7 +16,6 @@ public class TitleUI : MonoBehaviour
     void Start()
     {
         if (startButton != null) startButton.onClick.AddListener(StartGame);
-        if (optionsButton != null) optionsButton.onClick.AddListener(OpenOptions);
         if (quitButton != null) quitButton.onClick.AddListener(QuitGame);
 
         if (AmbientLoopPlayer.Instance != null) AmbientLoopPlayer.Instance.EnsurePlaying();
@@ -27,12 +25,6 @@ public class TitleUI : MonoBehaviour
     public void StartGame()
     {
         SceneManager.LoadScene("SelectScene");
-    }
-
-    // 기능: "옵션" 버튼에 연결한다.
-    public void OpenOptions()
-    {
-        SceneManager.LoadScene("OptionsScene");
     }
 
     // 기능: "나가기" 버튼에 연결한다 — 플레이를 종료한다.
