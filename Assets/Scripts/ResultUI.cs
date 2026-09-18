@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 
@@ -14,6 +13,8 @@ public class ResultUI : MonoBehaviour
     [Header("표시")]
     public TMP_Text scoreText;
     public TMP_Text comboText;
+    public TMP_Text maxComboText;
+    public TMP_Text timingFeedbackText;
 
     [Header("버튼")]
     public Button backToSelectButton;
@@ -36,14 +37,25 @@ public class ResultUI : MonoBehaviour
         }
         if (comboText != null)
         {
-            comboText.text = $"Max Combo: {GameSession.FinalMaxCombo}";
+            comboText.text = $"Combo: {GameSession.FinalCombo}";
+        }
+        if (maxComboText != null)
+        {
+            maxComboText.text = $"Max Combo: {GameSession.FinalMaxCombo}";
+        }
+        if (timingFeedbackText != null)
+        {
+            timingFeedbackText.text = $"FAST {GameSession.FinalFastCount} / LATE {GameSession.FinalLateCount}";
         }
 
-        if (backgroundRenderer != null)
+        SongData song = GameSession.SelectedSong;
+        SongBackgroundCache.Load(song != null ? song.backgroundImage : null, sprite =>
         {
-            SongData song = GameSession.SelectedSong;
-            backgroundRenderer.sprite = (song != null && song.backgroundImage != null) ? song.backgroundImage : defaultBackground;
-        }
+            if (backgroundRenderer != null)
+            {
+                backgroundRenderer.sprite = sprite != null ? sprite : defaultBackground;
+            }
+        });
 
         if (AmbientLoopPlayer.Instance != null) AmbientLoopPlayer.Instance.EnsurePlaying();
 
@@ -54,12 +66,12 @@ public class ResultUI : MonoBehaviour
     // 기능: "선택 화면으로" 버튼에 연결한다.
     public void BackToSelect()
     {
-        SceneManager.LoadScene("SelectScene");
+        SceneLoader.Load(this, "SelectScene");
     }
 
     // 기능: "처음으로" 버튼에 연결한다.
     public void BackToTitle()
     {
-        SceneManager.LoadScene("TitleScene");
+        SceneLoader.Load(this, "TitleScene");
     }
 }

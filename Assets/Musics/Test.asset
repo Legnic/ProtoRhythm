@@ -13,7 +13,18 @@ MonoBehaviour:
   m_Name: Test
   m_EditorClassIdentifier: Assembly-CSharp::SongData
   songName: Test
-  audioClip: {fileID: 8300000, guid: 3cb65debdcf8609458f56f9631d646be, type: 3}
+  audioClip:
+    m_AssetGUID: 3cb65debdcf8609458f56f9631d646be
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
+  backgroundImage:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
   difficulties:
   - label: Nomal
     level: 1

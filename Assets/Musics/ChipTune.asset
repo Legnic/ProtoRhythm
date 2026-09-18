@@ -13,8 +13,18 @@ MonoBehaviour:
   m_Name: ChipTune
   m_EditorClassIdentifier: Assembly-CSharp::SongData
   songName: Chip Tune
-  audioClip: {fileID: 8300000, guid: 6702c82c3419e2345bf37d8dbff0b80f, type: 3}
-  backgroundImage: {fileID: -8647009338400139376, guid: aa6e820dbcffab64bb072e334e791025, type: 3}
+  audioClip:
+    m_AssetGUID: 6702c82c3419e2345bf37d8dbff0b80f
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
+  backgroundImage:
+    m_AssetGUID: aa6e820dbcffab64bb072e334e791025
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
   difficulties:
   - label: Super Hard
     level: 13

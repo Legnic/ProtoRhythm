@@ -13,9 +13,19 @@ MonoBehaviour:
   m_Name: GlitchHop
   m_EditorClassIdentifier: Assembly-CSharp::SongData
   songName: Glitch Hop
-  audioClip: {fileID: 8300000, guid: f353bf6829441274a907a92b8485ca89, type: 3}
-  backgroundImage: {fileID: 569563003343743361, guid: 9cc9fff912f0ed9458b9cac10999ff9e, type: 3}
+  audioClip:
+    m_AssetGUID: f353bf6829441274a907a92b8485ca89
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
+  backgroundImage:
+    m_AssetGUID: 9cc9fff912f0ed9458b9cac10999ff9e
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
   difficulties:
   - label: Normal
-    level: 4
+    level: 6
     chart: {fileID: 11400000, guid: 0334ec745e69ed44b829a03ed1c2a711, type: 2}

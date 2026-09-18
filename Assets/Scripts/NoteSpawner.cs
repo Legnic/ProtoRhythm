@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 // ============================================================
@@ -27,7 +28,71 @@ public class NoteSpawner : MonoBehaviour
     public ChartData chart;
     public GameObject notePrefab;
 
+    [Header("풀링")]
+    [Tooltip("미리 만들어둘 노트 개수. 채보에서 동시에 화면에 떠 있을 수 있는 최대 노트 수보다 넉넉하게 잡아둔다.")]
+    public int prewarmCount = 32;
+
     private int nextNoteIndex = 0;
+    private ObjectPool pool;
+
+    // 기능: 씬이 시작되자마자(곡을 고르기 전이라도) 노트 풀을 미리 채워두고,
+    //       셰이더 워밍업을 예약한다.
+    // 원리: Instantiate/Destroy를 매 노트마다 반복하는 대신, 여기서 한 번에
+    //       필요한 만큼 만들어두고 이후에는 재사용만 한다 — Awake는 모든
+    //       오브젝트의 Start보다 먼저 실행되므로, SongLoader.Start()가 곧바로
+    //       스폰을 시작해도 풀이 항상 준비되어 있다.
+    void Awake()
+    {
+        if (notePrefab != null)
+        {
+            pool = ObjectPool.Create("NotePool", notePrefab, prewarmCount);
+            pool.transform.SetParent(transform);
+        }
+    }
+
+    void Start()
+    {
+        if (pool != null)
+        {
+            StartCoroutine(WarmUpShader());
+        }
+    }
+
+    // 기능: 실제 곡이 시작되어 노트가 쏟아지기 전에, 노트 하나를 카메라 시야
+    //       안(판정선 위치)에서 완전히 투명한 상태로 딱 한 프레임 그려서
+    //       셰이더 변형을 미리 컴파일해둔다.
+    // 원리: URP에서 특정 머티리얼/키워드 조합은 그 조합이 세션 중 처음으로
+    //       실제 그려지는 순간 그 자리에서 컴파일된다 — "두 번째부터는
+    //       안 그런데 처음에만 심하게 렉 걸린다"는 증상의 전형적인 원인이다.
+    //       프러스텀(카메라 시야) 밖에 두면 애초에 그려지지 않아 컴파일이
+    //       일어나지 않으므로 반드시 시야 안에 둬야 하고, 대신 알파를 0으로
+    //       만들어 화면에는 아무것도 보이지 않게 한다.
+    private IEnumerator WarmUpShader()
+    {
+        Vector3 pos = new Vector3(
+            laneManager != null ? laneManager.GetLaneX(0) : 0f,
+            gameManager != null ? gameManager.judgmentY : 0f,
+            0f);
+        GameObject obj = pool.Get(pos, Quaternion.identity);
+
+        SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
+        Color original = Color.white;
+        if (sr != null)
+        {
+            original = sr.color;
+            Color invisible = original;
+            invisible.a = 0f;
+            sr.color = invisible;
+        }
+
+        yield return null; // 한 프레임 그려지길 기다린다 (여기서 실제 컴파일이 일어난다).
+
+        if (sr != null)
+        {
+            sr.color = original;
+        }
+        pool.Release(obj);
+    }
 
     // 기능: 매 프레임 "지금 스폰해야 할 노트가 있는지" 확인하고, 있으면 만든다.
     // 원리: spawnDistance(화면에 보이는 구간의 전체 길이, spawnY-judgmentY)는
@@ -73,23 +138,24 @@ public class NoteSpawner : MonoBehaviour
     //       경고만 남기고 조용히 넘어간다 — 게임 전체가 멈추지 않게 하기 위함이다.
     void SpawnNote(NoteData data)
     {
-        if (notePrefab == null)
+        if (notePrefab == null || pool == null)
         {
             Debug.LogWarning("NoteSpawner: notePrefab이 연결되지 않았습니다.");
             return;
         }
 
         Vector3 spawnPos = new Vector3(laneManager.GetLaneX(data.lane), gameManager.spawnY, 0f);
-        GameObject obj = Instantiate(notePrefab, spawnPos, Quaternion.identity);
+        GameObject obj = pool.Get(spawnPos, Quaternion.identity);
 
         Note note = obj.GetComponent<Note>();
         if (note == null)
         {
             Debug.LogWarning("NoteSpawner: notePrefab에 Note 컴포넌트가 없습니다.");
-            Destroy(obj);
+            pool.Release(obj);
             return;
         }
 
+        note.SetPool(pool);
         note.Setup(gameManager, laneManager.GetLaneX(data.lane), data.lane, data.hitTime, data.holdDuration);
     }
 

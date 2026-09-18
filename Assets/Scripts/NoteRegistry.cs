@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using UnityEngine;
 
 // ============================================================
 // NoteRegistry.cs
@@ -83,26 +82,29 @@ public static class NoteRegistry
         return earliest;
     }
 
-    // 기능: 화면에 남아있는 노트를 전부 파괴하고 명부를 깨끗하게 비운다.
+    // 기능: 화면에 남아있는 노트를 전부 풀로 돌려보내고 명부를 깨끗하게 비운다.
     // 원리: "다시하기"처럼 씬을 새로 로드하지 않고 곡을 처음부터 다시 트는
     //       경우에 필요하다 — ResetSpawner()는 "다음에 스폰할 노트" 포인터만
     //       되돌릴 뿐, 이전 시도에서 이미 스폰되어 화면에 떠 있던 노트는 그대로
     //       남아있는다. 그 상태로 그냥 다시 재생하면 이전 시도의 노트와 새
     //       시도의 노트가 뒤섞여 화면에 남는다. 각 레인 리스트를 복사해서
-    //       순회하는 이유는, Note.OnDestroy() -> Unregister가 원본 리스트를
+    //       순회하는 이유는, Note.ReturnToPool() -> Unregister가 원본 리스트를
     //       변경하기 때문에 순회 중인 리스트를 직접 건드리면 안 되기 때문이다.
+    //       Destroy 대신 ReturnToPool을 쓰는 이유는, "다시하기"를 반복할 때마다
+    //       노트를 또 Instantiate하지 않고 풀에 있던 것을 그대로 재사용하기
+    //       위함이다.
     public static void ClearAll()
     {
         if (lanes == null) return;
 
         foreach (List<Note> lane in lanes)
         {
-            var toDestroy = new List<Note>(lane);
-            foreach (Note note in toDestroy)
+            var toClear = new List<Note>(lane);
+            foreach (Note note in toClear)
             {
                 if (note != null)
                 {
-                    Object.Destroy(note.gameObject);
+                    note.ReturnToPool();
                 }
             }
         }
