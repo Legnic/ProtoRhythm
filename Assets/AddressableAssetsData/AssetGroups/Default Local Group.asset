@@ -20,21 +20,6 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 3cb65debdcf8609458f56f9631d646be
-    m_Address: Test_Audio
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 4c6f6605b3c769f4e95e651c102cc008
-    m_Address: HappyCore_Audio
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 6702c82c3419e2345bf37d8dbff0b80f
-    m_Address: ChipTune_Audio
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 9cc9fff912f0ed9458b9cac10999ff9e
     m_Address: GlitchHop_BG
     m_ReadOnly: 0
@@ -42,11 +27,6 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: aa6e820dbcffab64bb072e334e791025
     m_Address: ChipTune_BG
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: f353bf6829441274a907a92b8485ca89
-    m_Address: GlitchHop_Audio
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

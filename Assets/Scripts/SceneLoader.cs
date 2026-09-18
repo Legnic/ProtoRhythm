@@ -96,10 +96,21 @@ public static class SceneLoader
 
         visualRoot.AddComponent<LoadingOverlayVisual>().label = label;
 
-        // 앱이 시작하자마자 이미 켜진 채로 시작한다 — 타이틀 화면의 첫
-        // 프레임 준비가 끝날 때까지(TextGlyphWarmup.HideOverlay 호출 전까지)
-        // 화면을 가린다.
+        // 앱이 시작하자마자 이미 켜진 채로 시작한다 — 최초 씬(타이틀)이
+        // 첫 프레임을 실제로 그릴 때까지 화면을 가린다. 최초 진입은
+        // Load()를 거치지 않으므로(빌드 세팅의 시작 씬이 곧바로 로드됨)
+        // 여기서 직접 한 프레임 뒤에 걷어낸다 — 예전에는 TextGlyphWarmup이
+        // 이 역할을 맡았지만, 그 스크립트를 없앤 뒤로는 씬에 아무것도
+        // 없어도 항상 걷히도록 SceneLoader 자신이 책임진다.
         visualRoot.SetActive(true);
+        runner.StartCoroutine(HideInitialOverlayNextFrame());
+    }
+
+    // 기능: 최초 씬의 첫 프레임이 실제로 그려지길 한 프레임 기다렸다가 오버레이를 걷는다.
+    private static IEnumerator HideInitialOverlayNextFrame()
+    {
+        yield return null;
+        HideOverlay();
     }
 
     // 기능: 지정한 씬으로 전환한다 — 로딩 오버레이를 띄운 채 비동기로 불러온다.
@@ -127,8 +138,9 @@ public static class SceneLoader
         }
     }
 
-    // 기능: 오버레이를 끈다. TextGlyphWarmup처럼 앱 시작 시점의 준비 작업이
-    //       끝났을 때 직접 호출해서 화면을 드러낸다.
+    // 기능: 오버레이를 끈다. 앱 시작 시점의 준비 작업이 끝났을 때 다른
+    //       코드가 직접 호출해서 화면을 드러낼 수도 있다(최초 진입은
+    //       Bootstrap이 스스로 한 프레임 뒤에 호출한다).
     public static void HideOverlay()
     {
         if (visualRoot != null)
