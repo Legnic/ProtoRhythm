@@ -258,15 +258,20 @@ public class SongSelectUI : MonoBehaviour
     // 원리: 곡 목록 <-> 난이도 목록을 오갈 때마다 이전 단계의 버튼이 남아있으면
     //       안 되므로, 자식을 뒤에서부터 순서대로 Destroy한다(앞에서부터 지우면
     //       인덱스가 밀려서 하나씩 건너뛰는 실수가 생기기 쉽다).
-    // DestroyImmediate를 쓰는 이유: 에디터에서 Play 버튼을 눌러 테스트할 때
-    //       Destroy()를 쓰면 "Play 모드 종료 후에도 버튼이 남아서 씬이 꼬이는"
-    //       문제가 생긴다. DestroyImmediate()를 쓰면 즉시 제거되므로 이런
-    //       문제를 피할 수 있다(실제 게임에서는 Destroy()를 써도 상관없다).
+    // 반드시 DestroyImmediate가 아니라 Destroy를 써야 한다 — 이 메서드는 곡
+    //       버튼의 onClick(ShowDifficultyList)에서 호출되는데, 그 순간 지우는
+    //       대상 중에는 "지금 클릭 이벤트를 처리하고 있는 바로 그 버튼 자신"도
+    //       들어있다. DestroyImmediate로 자기 자신을 즉시 파괴하면 UGUI
+    //       이벤트 시스템이 그 클릭을 마저 처리하는 도중에 상태가 꼬여서,
+    //       실제로 "곡을 처음 클릭하면 난이도 화면이 아니라 곡 목록이 그대로
+    //       남고, 뒤로 갔다가 다시 눌러야 정상적으로 넘어가는" 버그가 있었다.
+    //       Destroy()는 파괴를 이번 프레임 끝으로 미루므로, 클릭 이벤트 처리가
+    //       완전히 끝난 뒤에 안전하게 지워진다.
     void ClearList()
     {
         for (int i = listParent.childCount - 1; i >= 0; i--)
         {
-            DestroyImmediate(listParent.GetChild(i).gameObject);
+            Destroy(listParent.GetChild(i).gameObject);
         }
     }
 }
