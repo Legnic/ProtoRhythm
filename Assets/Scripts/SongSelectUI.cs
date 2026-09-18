@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -47,6 +48,24 @@ public class SongSelectUI : MonoBehaviour
     // 난이도 목록을 보여주는 중일 때, 어떤 곡을 골랐었는지 기억해둔다.
     private SongData selectedSong;
 
+    // song.audioClip(미리듣기용)은 Addressable 참조라 난이도 화면으로 들어갈
+    // 때마다 비동기로 로드해야 한다. Load를 다시 부르면 이전 곡의 핸들이
+    // 자동으로 해제되므로, 곡을 여러 번 오가며 눌러도 메모리가 쌓이지 않는다.
+    // 배경 이미지는 SongBackgroundCache(정적, 씬이 바뀌어도 유지)를 쓴다 —
+    // 여기서 인스턴스 슬롯으로 들고 있다가 씬 전환으로 파괴되며 해제해버리면,
+    // 다음 씬(PlayScene)이 방금 화면에 보여주고 있던 바로 그 배경을 처음부터
+    // 다시 로드하게 된다(실제로 "플레이 화면 진입 시 배경이 한 박자 늦게
+    // 뜬다"로 보고된 버그).
+    private readonly AddressableAssetSlot<AudioClip> previewAudioSlot = new AddressableAssetSlot<AudioClip>();
+
+    // 곡 목록이 뜨자마자 모든 곡의 배경 이미지를 미리 로드해두는 슬롯들이다 —
+    // 곡을 클릭하는 시점엔 이미 다 로드돼 있어 배경이 살짝 늦게 뜨는 지연이
+    // 사라진다. 오디오는 파일이 훨씬 커서 미리 로드하면 초기 진입이 오히려
+    // 느려지므로 배경만 미리 로드한다. 이 화면을 떠나면(OnDestroy) 다른 곡들
+    // 것은 더 필요 없으니 해제하지만, 실제로 고른 곡의 배경은
+    // SongBackgroundCache가 별도로 들고 있어서 이 해제와 무관하게 이어진다.
+    private readonly List<AddressableAssetSlot<Sprite>> backgroundPreloadSlots = new List<AddressableAssetSlot<Sprite>>();
+
     // 기능: 씬이 시작될 때 뒤로가기/타이틀로 버튼 리스너를 걸어두고, 곡 목록 화면으로 시작한다.
     void Start()
     {
@@ -60,6 +79,22 @@ public class SongSelectUI : MonoBehaviour
         }
 
         ShowSongList();
+        PreloadBackgrounds();
+    }
+
+    // 기능: 라이브러리에 있는 모든 곡의 배경 이미지를 한 번에 로드 걸어둔다.
+    private void PreloadBackgrounds()
+    {
+        if (library == null) return;
+
+        foreach (SongData song in library.songs)
+        {
+            if (song == null) continue;
+
+            var slot = new AddressableAssetSlot<Sprite>();
+            slot.Load(song.backgroundImage, _ => { });
+            backgroundPreloadSlots.Add(slot);
+        }
     }
 
     // 기능: 목록 영역을 SongLibrary의 곡들로 채운다 (선택의 1단계).
@@ -72,11 +107,14 @@ public class SongSelectUI : MonoBehaviour
         selectedSong = null;
 
         // 곡 목록 단계(아직 곡을 고르기 전 + 난이도 화면에서 뒤로 돌아온 경우
-        // 모두 포함)에서는 미리듣기가 나오면 안 된다.
+        // 모두 포함)에서는 미리듣기가 나오면 안 된다. 로드해뒀던 이전 곡의
+        // 미리듣기 오디오 핸들도 이제 필요 없으니 해제한다(배경은
+        // SongBackgroundCache가 별도로 관리하므로 여기서 건드리지 않는다).
         if (previewPlayer != null)
         {
             previewPlayer.Stop();
         }
+        previewAudioSlot.Release();
 
         if (backButton != null)
         {
@@ -133,12 +171,16 @@ public class SongSelectUI : MonoBehaviour
         selectedSong = song;
 
         // 난이도 화면으로 넘어온 시점에 환경음을 멈추고 이 곡의 미리듣기를 시작한다.
+        // 음원은 Addressable 참조라 즉시 쓸 수 없으므로 로드가 끝나는 대로 재생한다.
         if (AmbientLoopPlayer.Instance != null) AmbientLoopPlayer.Instance.Stop();
 
-        if (previewPlayer != null)
+        previewAudioSlot.Load(song.audioClip, clip =>
         {
-            previewPlayer.Play(song.audioClip);
-        }
+            if (previewPlayer != null)
+            {
+                previewPlayer.Play(clip);
+            }
+        });
 
         if (backButton != null)
         {
@@ -153,10 +195,13 @@ public class SongSelectUI : MonoBehaviour
             titleText.text = $"{song.songName} - 난이도 선택";
         }
 
-        if (backgroundRenderer != null)
+        SongBackgroundCache.Load(song.backgroundImage, sprite =>
         {
-            backgroundRenderer.sprite = song.backgroundImage != null ? song.backgroundImage : defaultBackground;
-        }
+            if (backgroundRenderer != null)
+            {
+                backgroundRenderer.sprite = sprite != null ? sprite : defaultBackground;
+            }
+        });
 
         ClearList();
 
@@ -195,6 +240,18 @@ public class SongSelectUI : MonoBehaviour
         GameSession.SelectedSong = selectedSong;
         GameSession.SelectedDifficulty = difficulty;
         SceneLoader.Load(this, "PlayScene");
+    }
+
+    // 기능: 씬이 바뀌어 이 컴포넌트가 파괴될 때 로드해둔 미리듣기/미리로드용
+    //       Addressable 핸들을 해제한다. 실제로 고른 곡의 배경(SongBackgroundCache)은
+    //       여기서 해제하지 않는다 — 다음 씬(PlayScene)이 이어서 써야 한다.
+    void OnDestroy()
+    {
+        previewAudioSlot.Release();
+        foreach (var slot in backgroundPreloadSlots)
+        {
+            slot.Release();
+        }
     }
 
     // 기능: listParent 밑의 버튼들을 전부 지운다.

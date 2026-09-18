@@ -17,7 +17,7 @@ using UnityEngine;
 public class ObjectPool : MonoBehaviour
 {
     private GameObject prefab;
-    private readonly Stack<GameObject> free = new Stack<GameObject>();
+    private readonly Queue<GameObject> free = new Queue<GameObject>();
 
     // 기능: 풀을 담을 컨테이너 오브젝트를 만들고, 미리 count개만큼 채워둔다.
     public static ObjectPool Create(string name, GameObject prefab, int prewarmCount)
@@ -36,7 +36,7 @@ public class ObjectPool : MonoBehaviour
         {
             GameObject obj = Instantiate(prefab, transform);
             obj.SetActive(false);
-            free.Push(obj);
+            free.Enqueue(obj);
         }
     }
 
@@ -47,7 +47,7 @@ public class ObjectPool : MonoBehaviour
     //       Instantiate 비용을 치르는 쪽이 안전하다.
     public GameObject Get(Vector3 position, Quaternion rotation)
     {
-        GameObject obj = free.Count > 0 ? free.Pop() : Instantiate(prefab);
+        GameObject obj = free.Count > 0 ? free.Dequeue() : Instantiate(prefab);
         obj.transform.SetParent(null);
         obj.transform.SetPositionAndRotation(position, rotation);
         obj.SetActive(true);
@@ -59,6 +59,6 @@ public class ObjectPool : MonoBehaviour
     {
         obj.SetActive(false);
         obj.transform.SetParent(transform);
-        free.Push(obj);
+        free.Enqueue(obj);
     }
 }

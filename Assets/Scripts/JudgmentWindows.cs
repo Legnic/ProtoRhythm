@@ -17,16 +17,17 @@ public enum Grade
 
 public static class JudgmentWindows
 {
-    // 실제 상용 VSRG들은 보통 ±16ms~50ms 수준의 좁은 창을 쓰지만,
-    // 여기서는 이해하기 쉽도록 넉넉한 값으로 시작한다. 실제 게임에
-    // 맞게 조정해서 쓰면 된다.
-    public const float PerfectWindow = 0.033f; // ±33ms
-    public const float GreatWindow = 0.066f;   // ±66ms
-    public const float GoodWindow = 0.100f;    // ±100ms
+    // Phigros 수준의 널널한 판정 — Perfect/Good 경계(80ms, 160ms)는 Phigros의
+    // 실제 판정 범위를 그대로 따른 것이다. 이 프로젝트에는 Phigros에 없는
+    // Great 등급이 하나 더 있어서, 그 사이(120ms)를 자연스럽게 채워 넣었다.
+    public const float PerfectWindow = 0.080f; // ±80ms (Phigros Perfect)
+    public const float GreatWindow = 0.120f;   // ±120ms
+    public const float GoodWindow = 0.160f;    // ±160ms (Phigros Good)
 
     // 이 범위를 넘어서면 더 이상 판정 대상이 아니라 자동으로 Miss가 된다.
-    // (Note.cs가 이 값을 기준으로 스스로 사라진다)
-    public const float MissWindow = 0.150f;    // ±150ms
+    // (Note.cs가 이 값을 기준으로 스스로 사라진다) Phigros는 Good 밖을 바로
+    // Miss로 치므로 GoodWindow와 같은 값을 쓴다.
+    public const float MissWindow = 0.160f;    // ±160ms
 
     // 기능: 시간 오차(절대값, 초)를 넣으면 그에 해당하는 판정 등급을 돌려준다.
     // 원리: 오차가 작은 순서대로(Perfect -> Great -> Good) 문턱값과 비교해서

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 
 // ============================================================
 // SongData.cs
@@ -33,10 +34,12 @@ public class SongDifficulty
 public class SongData : ScriptableObject
 {
     public string songName;
-    public AudioClip audioClip;
 
-    [Tooltip("이 곡을 고르거나 플레이할 때 배경으로 보여줄 이미지 (선택 사항, 비워두면 기본 배경을 그대로 쓴다)")]
-    public Sprite backgroundImage;
+    [Tooltip("이 곡의 음원. 곡을 고를 때가 아니라 실제로 재생이 필요해질 때만 비동기로 로드되는 Addressable 참조다 — 곡이 늘어나도 라이브러리 전체 로드에 모든 음원이 딸려오지 않는다.")]
+    public AssetReferenceT<AudioClip> audioClip;
+
+    [Tooltip("이 곡을 고르거나 플레이할 때 배경으로 보여줄 이미지 (선택 사항, 비워두면 기본 배경을 그대로 쓴다). audioClip과 마찬가지로 필요할 때만 비동기 로드된다.")]
+    public AssetReferenceSprite backgroundImage;
 
     [Tooltip("이 곡에 딸린 난이도들. Easy/Normal/Hard처럼 여러 개를 추가할 수 있다.")]
     public List<SongDifficulty> difficulties = new List<SongDifficulty>();

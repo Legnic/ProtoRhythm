@@ -793,6 +793,52 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1856073243}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1210852388
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1210852390}
+  - component: {fileID: 1210852389}
+  m_Layer: 0
+  m_Name: TextGlyphWarmup
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1210852389
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1210852388}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 077cc478e5adc244daa2cc4ea71210c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TextGlyphWarmup
+  font: {fileID: 11400000, guid: 8447e6df0145f134ab7fb9e2184153db, type: 2}
+  warmupText: "ProtoRythm \uC2DC\uC791 \uC635\uC158 \uB098\uAC00\uAE30 \uB3CC\uC544\uAC00\uAE30 \uACE1 \uC120\uD0DD \uB4A4\uB85C 0123456789\n\uACC4\uC18D\uD558\uAE30 \uC77C\uC2DC\uC815\uC9C0 \uB2E4\uC2DC\uD558\uAE30 \uC120\uD0DD \uD654\uBA74\uC73C\uB85C \uCC98\uC74C\uC73C\uB85C \uACB0\uACFC \uC800\uC7A5 \uCD08\uAE30\uD654\n\uD0A4 \uB9E4\uD551 \uD310\uC815 \uBCF4\uC815 \uC624\uD504\uC14B: ms Score: Max Combo:\n\uBA54\uD2B8\uB85C\uB188 \uC18C\uB9AC\uC640 \uAE5C\uBE61\uC784\uC774 \uB3D9\uC2DC\uC5D0 \uB290\uAEF4\uC9C0\uB3C4\uB85D \uC2AC\uB77C\uC774\uB354\uB85C \uC870\uC808\uD558\uC138\uC694.\n\uBC14\uAFB8\uACE0 \uC2F6\uC740 \uB808\uC778\uC758 \uBC84\uD2BC\uC744 \uB204\uB978 \uB4A4, \uC6D0\uD558\uB294 \uD0A4\uB97C \uB204\uB974\uC138\uC694. (Esc: \uCDE8\uC18C)\nHappy Core Normal Hard Glitch Hop Chip Tune Super Hard Test Nomal\nPerfect Great Good Miss"
+--- !u!4 &1210852390
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1210852388}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1632743514
 GameObject:
   m_ObjectHideFlags: 0
@@ -1546,3 +1592,4 @@ SceneRoots:
   - {fileID: 2097270911}
   - {fileID: 698043036}
   - {fileID: 28505108}
+  - {fileID: 1210852390}
