@@ -23,6 +23,22 @@ public class InputJudge : MonoBehaviour
     [Tooltip("레인 순서에 대응하는 키. LaneManager의 레인 개수와 길이가 같아야 한다.")]
     public Key[] laneKeys = { Key.D, Key.F, Key.J, Key.K };
 
+    // 기능: 씬이 시작될 때, 옵션 화면(키 매핑 탭)에서 저장해둔 키가 있으면
+    //       인스펙터 기본값 대신 그 키로 덮어쓴다.
+    // 원리: 옵션 화면(KeyMappingController)은 PlayScene과 다른 씬에 있어서
+    //       이 배열을 직접 바꿀 수 없다 — 대신 GameSettings(PlayerPrefs)에
+    //       레인별로 저장해두면, 여기서 씬이 시작될 때마다 읽어와 반영한다
+    //       (SongLoader가 GameSettings.AudioOffset을 읽어오는 것과 같은 패턴).
+    //       레인을 한 번도 바꾼 적이 없으면 GameSettings.GetLaneKey가 기존
+    //       기본값을 그대로 돌려주므로 동작이 달라지지 않는다.
+    void Start()
+    {
+        for (int lane = 0; lane < laneKeys.Length; lane++)
+        {
+            laneKeys[lane] = GameSettings.GetLaneKey(lane, laneKeys[lane]);
+        }
+    }
+
     // 기능: 매 프레임 모든 레인의 키를 검사해서, 그 프레임에 새로 눌리거나(TryPress)
     //       새로 떼진(TryRelease) 키가 있으면 해당 처리로 넘긴다.
     // 원리: 새 Input System의 Keyboard.current[Key] 인덱서로 그 키의 현재 상태를
