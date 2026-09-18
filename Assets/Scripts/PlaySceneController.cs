@@ -139,7 +139,10 @@ public class PlaySceneController : MonoBehaviour
     {
         hasGoneToResult = true;
         GameSession.FinalScore = ScoreManager.Instance.score;
+        GameSession.FinalCombo = ScoreManager.Instance.combo;
         GameSession.FinalMaxCombo = ScoreManager.Instance.maxCombo;
+        GameSession.FinalFastCount = TimingFeedback.FastCount;
+        GameSession.FinalLateCount = TimingFeedback.LateCount;
         SceneLoader.Load(this, "ResultScene");
     }
 }

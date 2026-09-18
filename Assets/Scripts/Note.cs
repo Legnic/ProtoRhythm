@@ -184,7 +184,12 @@ public class Note : MonoBehaviour
         }
 
         float tailTime = hitTime + holdDuration;
-        float diff = Mathf.Abs(currentTime - tailTime);
+        float signedDiff = currentTime - tailTime;
+        float diff = Mathf.Abs(signedDiff);
+
+        // 실제로 뗀 시각이 있으므로(자동 타임아웃이 아니므로) 결과 등급과
+        // 무관하게 FAST/LATE 피드백을 보고한다 — InputJudge.TryPress와 같은 이유.
+        TimingFeedback.Report(signedDiff, lane);
 
         // 너무 일찍 떼면(MissWindow 밖) 꼬리는 Miss, 그 안이면 오차에 따라 등급을 매긴다.
         Grade grade = diff <= JudgmentWindows.MissWindow ? JudgmentWindows.Evaluate(diff) : Grade.Miss;
@@ -253,6 +258,12 @@ public class Note : MonoBehaviour
     //       holdBodyNativeSize.y로 나눠서 localScale.y로 변환하는 이유는,
     //       스프라이트의 실제 크기가 스케일 1일 때 몇 유닛인지 모르면
     //       "길이 length만큼 늘리기"를 정확한 배율로 환산할 수 없기 때문이다.
+    //       여기에 다시 transform.lossyScale.y로 나누는 이유는, holdBody가
+    //       이 노트(head)의 자식이라 localScale이 부모의 lossyScale과
+    //       곱해져서 화면에 나타나기 때문이다 — Note 프리팹 자체가 Y축을
+    //       0.5로 눌러둔 모양이라, 이 나눗셈이 없으면 몸통이 의도한
+    //       length의 절반 높이로만 그려져 머리와 몸통 사이에 빈틈이
+    //       생긴다(실제로 보고된 "헤드가 분리되어 보이는" 버그의 원인).
     void UpdateHoldBody(float currentTime)
     {
         if (holdBody == null)
@@ -266,8 +277,13 @@ public class Note : MonoBehaviour
 
         holdBody.position = new Vector3(laneX, headY + length * 0.5f, transform.position.z + 0.01f);
 
-        float scaleX = holdBodyNativeSize.x > 0f ? transform.localScale.x : 1f;
-        float scaleY = holdBodyNativeSize.y > 0f ? length / holdBodyNativeSize.y : length;
+        // 너비는 머리와 같은 화면 폭으로 보이면 되므로 로컬 스케일 1이면 충분하다
+        // (부모의 lossyScale.x가 그대로 곱해져 머리와 같은 폭이 된다).
+        float scaleX = 1f;
+        float lossyScaleY = transform.lossyScale.y;
+        float scaleY = (holdBodyNativeSize.y > 0f && lossyScaleY != 0f)
+            ? length / (holdBodyNativeSize.y * lossyScaleY)
+            : length;
         holdBody.localScale = new Vector3(scaleX, scaleY, 1f);
     }
 }

@@ -13,6 +13,8 @@ public class ResultUI : MonoBehaviour
     [Header("표시")]
     public TMP_Text scoreText;
     public TMP_Text comboText;
+    public TMP_Text maxComboText;
+    public TMP_Text timingFeedbackText;
 
     [Header("버튼")]
     public Button backToSelectButton;
@@ -35,7 +37,15 @@ public class ResultUI : MonoBehaviour
         }
         if (comboText != null)
         {
-            comboText.text = $"Max Combo: {GameSession.FinalMaxCombo}";
+            comboText.text = $"Combo: {GameSession.FinalCombo}";
+        }
+        if (maxComboText != null)
+        {
+            maxComboText.text = $"Max Combo: {GameSession.FinalMaxCombo}";
+        }
+        if (timingFeedbackText != null)
+        {
+            timingFeedbackText.text = $"FAST {GameSession.FinalFastCount} / LATE {GameSession.FinalLateCount}";
         }
 
         SongData song = GameSession.SelectedSong;

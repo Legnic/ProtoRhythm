@@ -12,6 +12,9 @@ public static class GameSettings
 {
     private const string AudioOffsetKey = "AudioOffset";
     private const string LaneKeyPrefix = "LaneKey_";
+    private const string MasterVolumeKey = "MasterVolume";
+    private const string TimingFeedbackDeadZoneKey = "TimingFeedbackDeadZone";
+    private const string TimingFeedbackDisplayModeKey = "TimingFeedbackDisplayMode";
 
     // 기능: 저장된 오디오 오프셋(초)을 읽어온다. 저장된 적이 없으면 0(보정 없음).
     public static float AudioOffset
@@ -42,6 +45,31 @@ public static class GameSettings
     public static void SetLaneKey(int lane, Key key)
     {
         PlayerPrefs.SetInt(LaneKeyPrefix + lane, (int)key);
+    }
+
+    // 기능: 저장된 전체 볼륨(0~1)을 읽어온다. 저장된 적이 없으면 1(최대).
+    public static float MasterVolume
+    {
+        get => PlayerPrefs.GetFloat(MasterVolumeKey, 1f);
+        set => PlayerPrefs.SetFloat(MasterVolumeKey, value);
+    }
+
+    // 기능: FAST/LATE 판정에서 "오차 없음"으로 취급할 범위(초, ±). 이 안쪽은
+    //       화면에도 안 뜨고 결과 화면 집계에도 잡히지 않는다. TimingFeedback.cs
+    //       참고 — 하드코딩하지 않고 여기 설정값으로 분리해뒀다. 기본값 20ms.
+    public static float TimingFeedbackDeadZone
+    {
+        get => PlayerPrefs.GetFloat(TimingFeedbackDeadZoneKey, 0.020f);
+        set => PlayerPrefs.SetFloat(TimingFeedbackDeadZoneKey, value);
+    }
+
+    // 기능: 플레이 화면에서 FAST/LATE를 얼마나 자세히 보여줄지. 기본값은
+    //       FastLate(단순 FAST/LATE만) — 밀리초 수치까지 보여주는 건 원하는
+    //       사람만 옵션에서 따로 켜도록 한다.
+    public static TimingFeedbackDisplayMode TimingFeedbackDisplayMode
+    {
+        get => (TimingFeedbackDisplayMode)PlayerPrefs.GetInt(TimingFeedbackDisplayModeKey, (int)TimingFeedbackDisplayMode.FastLate);
+        set => PlayerPrefs.SetInt(TimingFeedbackDisplayModeKey, (int)value);
     }
 
     // 기능: 지금까지 바뀐 값을 디스크에 실제로 기록한다.

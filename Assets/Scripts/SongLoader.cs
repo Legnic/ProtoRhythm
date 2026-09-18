@@ -111,6 +111,7 @@ public class SongLoader : MonoBehaviour
         }
 
         ScoreManager.Instance.ResetScore();
+        TimingFeedback.ResetCounts();
 
         if (clock != null)
         {

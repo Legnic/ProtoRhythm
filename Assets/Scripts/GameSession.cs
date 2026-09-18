@@ -15,5 +15,8 @@ public static class GameSession
     public static SongDifficulty SelectedDifficulty;
 
     public static int FinalScore;
+    public static int FinalCombo;
     public static int FinalMaxCombo;
+    public static int FinalFastCount;
+    public static int FinalLateCount;
 }

@@ -88,7 +88,8 @@ public class InputJudge : MonoBehaviour
         }
 
         float currentTime = gameManager.clock.CurrentTime;
-        float diff = Mathf.Abs(currentTime - note.hitTime);
+        float signedDiff = currentTime - note.hitTime;
+        float diff = Mathf.Abs(signedDiff);
 
         if (diff > JudgmentWindows.MissWindow)
         {
@@ -98,6 +99,11 @@ public class InputJudge : MonoBehaviour
         }
 
         Grade grade = JudgmentWindows.Evaluate(diff);
+
+        // 판정 점수(grade)와는 완전히 별개로, FAST/LATE 교정 피드백을 보고한다.
+        // 이 지점의 diff는 항상 MissWindow 이내이므로(위에서 이미 걸러짐) 실제로
+        // 입력이 있었던 경우만 해당하고, TimingFeedback.cs 참고.
+        TimingFeedback.Report(signedDiff, lane);
 
         if (note.IsLongNote)
         {
