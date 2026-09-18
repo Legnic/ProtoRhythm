@@ -68,13 +68,32 @@ public class AddressableAssetSlot<T> where T : Object
     //       콜백이 이 Release 이후에 도착하더라도 무시되게 한다 — 그렇지 않으면
     //       "뒤로 가기를 눌러 화면을 떠난 뒤"에도 늦게 도착한 콜백이 이미 지운
     //       화면을 예전 곡 정보로 다시 덮어쓸 수 있다.
+    //
+    //       Addressables.Release(handle)을 try-catch로 감싸는 이유: 에디터에서
+    //       Play를 재생/정지하며 반복 테스트할 때(DisableDomainReload 설정),
+    //       Addressables 런타임 자체는 Stop 시점에 정리되지만 이 클래스의
+    //       static 소유자(SongBackgroundCache 등)가 들고 있던 handle/hasHandle은
+    //       정적 필드라 그대로 남아있어, 다음 Play에서 이 handle을 해제하려 하면
+    //       "Attempting to use an invalid operation handle" 예외가 난다. 이
+    //       예외를 잡지 않으면 호출한 쪽(SongSelectUI.ShowDifficultyList 등)의
+    //       나머지 로직이 통째로 중단돼, 미리듣기는 재생되는데 난이도 목록은
+    //       안 뜨는 것처럼 보이는 버그로 이어진다(실제로 보고된 버그). 이미
+    //       무효화된 핸들은 해제할 대상 자체가 없는 것이나 마찬가지라, 예외를
+    //       삼키고 계속 진행해도 안전하다.
     public void Release()
     {
         version++;
 
         if (hasHandle)
         {
-            Addressables.Release(handle);
+            try
+            {
+                Addressables.Release(handle);
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning($"AddressableAssetSlot: 핸들 해제 중 예외를 무시합니다({e.Message}).");
+            }
             hasHandle = false;
         }
     }

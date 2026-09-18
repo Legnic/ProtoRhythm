@@ -44,6 +44,7 @@ public class CalibrationController : MonoBehaviour
 
     private double dspStart;
     private float testOffset; // 초 단위. 저장 전까지의 작업 값.
+    private AudioClip cachedTickClip;
 
     // 기능: 오브젝트가 처음 만들어질 때 한 번만 버튼/슬라이더 리스너를 코드로
     //       연결한다. 탭을 오갈 때마다 이 패널이 SetActive로 꺼졌다 켜지므로,
@@ -74,7 +75,11 @@ public class CalibrationController : MonoBehaviour
 
         if (tickSource != null)
         {
-            tickSource.clip = GenerateClickClip(tickInterval);
+            if (cachedTickClip == null)
+            {
+                cachedTickClip = GenerateClickClip(tickInterval);
+            }
+            tickSource.clip = cachedTickClip;
             tickSource.loop = true;
             dspStart = AudioSettings.dspTime + 0.2;
             tickSource.PlayScheduled(dspStart);
