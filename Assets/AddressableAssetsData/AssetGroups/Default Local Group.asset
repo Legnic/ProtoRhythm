@@ -20,6 +20,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 97a66005cea083b418eb04c2c8317476
+    m_Address: Assets/AudioClip/BirdSoundLoop.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 9cc9fff912f0ed9458b9cac10999ff9e
     m_Address: GlitchHop_BG
     m_ReadOnly: 0
