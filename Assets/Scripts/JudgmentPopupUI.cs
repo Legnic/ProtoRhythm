@@ -38,7 +38,6 @@ public class JudgmentPopupUI : MonoBehaviour
 
         if (judgmentText != null)
         {
-            baseColor = judgmentText.color;
             remaining = 0f;
             SetAlpha(0f);
         }
@@ -58,8 +57,22 @@ public class JudgmentPopupUI : MonoBehaviour
         if (judgmentText == null) return;
 
         judgmentText.text = grade.ToString();
+        baseColor = GetGradeColor(grade);
         remaining = holdDuration + fadeDuration;
         SetAlpha(maxAlpha);
+    }
+
+    // 기능: 등급별 고정 색상. Perfect=금색, Great=파란색, Good=초록색, Miss=빨간색.
+    private static Color GetGradeColor(Grade grade)
+    {
+        switch (grade)
+        {
+            case Grade.Perfect: return new Color32(0xFF, 0xD7, 0x00, 0xFF);
+            case Grade.Great: return new Color32(0x1E, 0x90, 0xFF, 0xFF);
+            case Grade.Good: return new Color32(0x00, 0xC8, 0x53, 0xFF);
+            case Grade.Miss: return new Color32(0xFF, 0x00, 0x00, 0xFF);
+            default: return Color.white;
+        }
     }
 
     // 기능: holdDuration 동안은 그대로 두고, 그 이후 fadeDuration에 걸쳐 알파를 0으로 줄인다.
