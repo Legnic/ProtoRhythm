@@ -1,7 +1,7 @@
 ﻿<Solution>
+  <Project Path="Assembly-CSharp.csproj" />
   <Project Path="CFXRRuntime.csproj" />
   <Project Path="CFXREditor.csproj" />
-  <Project Path="Assembly-CSharp.csproj" />
   <Project Path="BinaryCharm.Common.Runtime.csproj" />
   <Project Path="BinaryCharm.UI.TextColorButtons.Editor.csproj" />
   <Project Path="BinaryCharm.TextColorButtons.Runtime.csproj" />
