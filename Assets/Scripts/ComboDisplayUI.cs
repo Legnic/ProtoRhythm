@@ -38,6 +38,11 @@ public class ComboDisplayUI : MonoBehaviour
     private readonly List<Image> digitPool = new List<Image>();
     private int lastCombo = -1;
 
+    // combo.ToString()으로 매번 문자열을 새로 만들면 콤보가 바뀔 때마다(=거의 매
+    // 판정마다) GC 쓰레기가 쌓인다. int는 최대 10자리(부호 제외)이므로 이 버퍼
+    // 하나를 계속 재사용해 자릿수를 직접 뽑아낸다.
+    private readonly int[] digitBuffer = new int[10];
+
     void OnEnable()
     {
         lastCombo = -1; // 켜지자마자 한 번은 무조건 갱신되게 한다.
@@ -70,18 +75,38 @@ public class ComboDisplayUI : MonoBehaviour
             return;
         }
 
-        string digits = combo.ToString();
-        EnsurePoolSize(digits.Length);
+        int digitCount = ExtractDigits(combo);
+        EnsurePoolSize(digitCount);
 
-        for (int i = 0; i < digits.Length; i++)
+        for (int i = 0; i < digitCount; i++)
         {
-            int d = digits[i] - '0';
             Image image = digitPool[i];
-            image.sprite = digitSprites[d];
+            image.sprite = digitSprites[digitBuffer[i]];
             image.gameObject.SetActive(true);
         }
 
-        SetVisibleCount(digits.Length);
+        SetVisibleCount(digitCount);
+    }
+
+    // 기능: combo(항상 0보다 큼)의 자릿수를 앞자리부터 digitBuffer에 채우고
+    //       개수를 돌려준다. combo.ToString()과 달리 문자열을 만들지 않는다.
+    private int ExtractDigits(int combo)
+    {
+        int count = 0;
+        while (combo > 0 && count < digitBuffer.Length)
+        {
+            digitBuffer[count] = combo % 10;
+            combo /= 10;
+            count++;
+        }
+
+        // 자릿수를 뒤에서부터 채웠으니(1의 자리부터) 앞자리부터 나오도록 뒤집는다.
+        for (int i = 0, j = count - 1; i < j; i++, j--)
+        {
+            (digitBuffer[i], digitBuffer[j]) = (digitBuffer[j], digitBuffer[i]);
+        }
+
+        return count;
     }
 
     private void EnsurePoolSize(int count)

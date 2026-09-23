@@ -55,6 +55,8 @@ public class Note : MonoBehaviour
     //   바꿨다.
     private Transform holdBody;
     private Transform tailCap;
+    private SpriteRenderer holdBodySr;
+    private SpriteRenderer tailCapSr;
     private Vector2 holdBodyNativeSize = Vector2.one;
     private float headNativeWidth = 1f;
     private Color bodyColor = Color.white;
@@ -276,15 +278,14 @@ public class Note : MonoBehaviour
         {
             var bodyObj = new GameObject("HoldBody");
             bodyObj.transform.SetParent(transform, false);
-            bodyObj.AddComponent<SpriteRenderer>();
+            holdBodySr = bodyObj.AddComponent<SpriteRenderer>();
             holdBody = bodyObj.transform;
         }
 
         Sprite fill = GetFlatFillSprite();
-        SpriteRenderer bodySr = holdBody.GetComponent<SpriteRenderer>();
-        bodySr.sprite = fill;
-        bodySr.color = bodyColor;
-        bodySr.sortingOrder = spriteRenderer.sortingOrder - 1;
+        holdBodySr.sprite = fill;
+        holdBodySr.color = bodyColor;
+        holdBodySr.sortingOrder = spriteRenderer.sortingOrder - 1;
 
         // 스프라이트의 "원래" 크기(로컬 스케일 1일 때 월드 유닛 크기)를 알아야
         // 몸통 길이를 원하는 월드 유닛 길이에 맞게 정확히 스케일링할 수 있다.
@@ -299,14 +300,13 @@ public class Note : MonoBehaviour
         {
             var tailObj = new GameObject("TailCap");
             tailObj.transform.SetParent(transform, false);
-            tailObj.AddComponent<SpriteRenderer>();
+            tailCapSr = tailObj.AddComponent<SpriteRenderer>();
             tailCap = tailObj.transform;
         }
 
-        SpriteRenderer tailSr = tailCap.GetComponent<SpriteRenderer>();
-        tailSr.sprite = spriteRenderer.sprite;
-        tailSr.color = spriteRenderer.color;
-        tailSr.sortingOrder = spriteRenderer.sortingOrder;
+        tailCapSr.sprite = spriteRenderer.sprite;
+        tailCapSr.color = spriteRenderer.color;
+        tailCapSr.sortingOrder = spriteRenderer.sortingOrder;
         // 부모(머리)의 lossyScale을 그대로 물려받아야 머리와 같은 크기로 보인다.
         tailCap.localScale = Vector3.one;
 
