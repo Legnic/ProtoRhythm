@@ -15,20 +15,20 @@ MonoBehaviour:
   notes:
   - lane: 0
     hitTime: 0
-    holdDuration: 1
+    holdDuration: 0.625
   - lane: 1
-    hitTime: 1.125
-    holdDuration: 0.875
+    hitTime: 0.375
+    holdDuration: 0.625
   - lane: 2
-    hitTime: 2.125
-    holdDuration: 0.875
+    hitTime: 0.75
+    holdDuration: 0.625
   - lane: 3
-    hitTime: 3.125
-    holdDuration: 0.875
+    hitTime: 1.125
+    holdDuration: 0.625
   speedChanges: []
   bpm: 120
-  offsetSeconds: 0
+  offsetSeconds: 1
   laneCount: 4
   beatsPerMeasure: 4
   subdivision: 4
-  measureCount: 8
+  measureCount: 4

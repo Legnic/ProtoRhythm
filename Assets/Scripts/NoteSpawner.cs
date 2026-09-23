@@ -32,6 +32,13 @@ public class NoteSpawner : MonoBehaviour
     [Tooltip("미리 만들어둘 노트 개수. 채보에서 동시에 화면에 떠 있을 수 있는 최대 노트 수보다 넉넉하게 잡아둔다.")]
     public int prewarmCount = 32;
 
+    [Header("레인별 노트 스프라이트")]
+    [Tooltip("인덱스 = 레인 번호. 비워두면(null) 그 레인은 notePrefab에 원래 붙어있던 스프라이트를 그대로 쓴다.")]
+    public Sprite[] laneNoteSprites = new Sprite[4];
+
+    [Tooltip("롱노트 몸통(머리와 꼬리 사이를 채우는 단색 부분)의 색. 인덱스 = 레인 번호. 레인 수보다 짧으면 그 레인은 흰색을 쓴다.")]
+    public Color[] laneBodyColors = new Color[4];
+
     private int nextNoteIndex = 0;
     private ObjectPool pool;
 
@@ -155,8 +162,11 @@ public class NoteSpawner : MonoBehaviour
             return;
         }
 
+        Sprite sprite = data.lane >= 0 && data.lane < laneNoteSprites.Length ? laneNoteSprites[data.lane] : null;
+        Color? bodyTint = data.lane >= 0 && data.lane < laneBodyColors.Length ? laneBodyColors[data.lane] : (Color?)null;
+
         note.SetPool(pool);
-        note.Setup(gameManager, laneManager.GetLaneX(data.lane), data.lane, data.hitTime, data.holdDuration);
+        note.Setup(gameManager, laneManager.GetLaneX(data.lane), data.lane, data.hitTime, data.holdDuration, sprite, bodyTint);
     }
 
     // 기능: 스폰 포인터를 처음으로 되돌린다.

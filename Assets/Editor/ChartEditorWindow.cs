@@ -12,10 +12,12 @@ using UnityEngine;
 //     2. BPM(외부 사이트 등에서 실제 곡의 BPM을 측정해 입력), 시작 오프셋,
 //        마디 수, 박자 세분화(4분~64분음표)를 정한다 — "불러오기"를 하면
 //        그 채보에 저장돼 있던 BPM/오프셋을 자동으로 채워준다
-//     3. 노트 격자: 클릭하면 탭 노트, 클릭한 채로 아래로 드래그하면
+//     3. 노트 격자: 좌클릭하면 탭 노트, 좌클릭한 채로 아래로 드래그하면
 //        그 길이만큼의 롱노트가 된다 (StepMania류 표준 방식). 클릭하기
 //        전 커서를 올리면 반투명 미리보기가 뜬다. 이미 있는 노트(머리든
-//        몸통이든) 위를 클릭하면 통째로 지워진다.
+//        몸통이든) 위를 우클릭하면 통째로 지워진다 — 좌클릭과 분리해둔
+//        이유는, 드래그하다 실수로 다른 노트 위에서 손을 떼는 것만으로
+//        멀쩡한 노트가 지워지는 사고를 막기 위해서다.
 //     4. 변속 열: 그 칸을 클릭하면 그 시각부터 적용되는 배속(기본 1.5배)이
 //        추가되고, 숫자를 직접 입력해 원하는 배율로 바꿀 수 있다. "x"를
 //        누르면 지운다. 다음 변속 지점이 나오기 전까지 그대로 유지된다
@@ -352,7 +354,9 @@ public class ChartEditorWindow : EditorWindow
         EditorGUILayout.LabelField("채보 설정", EditorStyles.boldLabel);
         targetChart = (ChartData)EditorGUILayout.ObjectField("대상 ChartData", targetChart, typeof(ChartData), false);
         bpm = Mathf.Max(1f, EditorGUILayout.FloatField("BPM", bpm));
-        offsetSeconds = EditorGUILayout.FloatField("시작 오프셋(초)", offsetSeconds);
+        // 음수 오프셋은 격자/시간 계산에서 의미가 없다(첫 박자가 곡 시작보다도
+        // 앞선다는 뜻이 되어버린다) — bpm과 같은 이유로 여기서 0 이상으로 막는다.
+        offsetSeconds = Mathf.Max(0f, EditorGUILayout.FloatField("시작 오프셋(초)", offsetSeconds));
         laneCount = EditorGUILayout.IntSlider("레인 수", laneCount, 1, 8);
         beatsPerMeasure = EditorGUILayout.IntSlider("한 마디당 박자 수", beatsPerMeasure, 1, 8);
         subdivision = EditorGUILayout.IntPopup("박자 세분화", subdivision,
@@ -419,11 +423,17 @@ public class ChartEditorWindow : EditorWindow
                 speedChanges.Clear();
             }
         }
+        if (GUILayout.Button("미리듣기 캐시 비우기", GUILayout.Width(130)))
+        {
+            AudioPreviewUtility.ClearDiskCache();
+            Debug.Log("Chart Editor: 배속 미리듣기 캐시를 비웠습니다.");
+        }
 
         EditorGUILayout.EndHorizontal();
         EditorGUILayout.HelpBox(
-            "노트 칸: 클릭 = 탭 노트, 클릭한 채로 드래그 = 롱노트, 노트 위 클릭 = 삭제.\n" +
-            "변속 칸: '+' 클릭 = 그 시각부터 배속 추가(숫자 직접 입력 가능), 'x' = 삭제.",
+            "노트 칸: 좌클릭 = 탭 노트, 좌클릭한 채로 드래그 = 롱노트, 노트 위 우클릭 = 삭제.\n" +
+            "변속 칸: '+' 클릭 = 그 시각부터 배속 추가(숫자 직접 입력 가능), 'x' = 삭제.\n" +
+            "\"미리듣기 캐시 비우기\"는 배속 변경 미리듣기용으로 만들어둔 디스크 파일만 지운다 — 채보 데이터와는 무관하다.",
             MessageType.None);
     }
 
@@ -435,6 +445,15 @@ public class ChartEditorWindow : EditorWindow
     //       RebuildSpeedLookup()을 먼저 호출해서 "이 칸에 무엇이 있는지"를
     //       조회 가능한 상태로 만들어둔 뒤, 스크롤 뷰 안에서 스텝(행) 단위로
     //       시간 레이블 -> 변속 칸 -> 레인별 노트 칸 순서로 그린다.
+    //
+    //       마디 수가 많고 세분화가 촘촘하면(예: 64마디 x 64분음표) 행이
+    //       수천 개에 이를 수 있는데, wantsMouseMove 때문에 마우스만 움직여도
+    //       OnGUI가 다시 실행되므로 매번 전체 행을 그대로 레이아웃하면 편집기
+    //       자체가 버벅인다. 그래서 실제로 스크롤 뷰에 보이는 범위(위아래로
+    //       몇 줄 여유 포함)만 실제로 그리고, 화면 밖 위/아래는 그 높이만큼의
+    //       빈 자리(GetRect)로만 채운다 — 스크롤바 길이는 기존과 동일하게
+    //       전체 행 수 기준으로 유지되면서, 화면에 보이지 않는 행은 애초에
+    //       그려지지 않으니 결과는 이전과 똑같다.
     private void DrawGrid()
     {
         int totalSteps = measureCount * beatsPerMeasure * subdivision;
@@ -454,17 +473,21 @@ public class ChartEditorWindow : EditorWindow
         bool playing = AudioPreviewUtility.IsPlaying();
         int playheadStep = hasPreviewTime ? Mathf.RoundToInt((previewTime - offsetSeconds) / secondsPerStep) : int.MinValue;
 
+        int firstStep = -preSteps;
+        int rowCount = totalSteps - firstStep;
+
         // 재생 중일 때만 재생 위치선을 따라 자동으로 스크롤한다. 멈춰 있을 땐
         // 사용자가 자유롭게 격자를 둘러볼 수 있어야 하므로 건드리지 않는다.
-        // 화면상 행 위치는 맨 위에 그려지는 step(-preSteps)을 0으로 놓고
-        // 세어야 하므로 playheadStep에 preSteps를 더해서 픽셀로 환산한다.
-        if (playing && playheadStep >= -preSteps)
+        // 화면상 행 위치는 맨 위에 그려지는 step(firstStep)을 0으로 놓고
+        // 세어야 하므로 playheadStep에서 firstStep을 빼서 픽셀로 환산한다.
+        if (playing && playheadStep >= firstStep)
         {
-            float rowY = HeaderHeight + (playheadStep + preSteps) * RowHeight;
+            float rowY = HeaderHeight + (playheadStep - firstStep) * RowHeight;
             scrollPos.y = Mathf.Max(0f, rowY - 150f);
         }
 
-        scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Height(500));
+        const float ViewportHeight = 500f;
+        scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Height(ViewportHeight));
 
         EditorGUILayout.BeginHorizontal();
         GUILayout.Label("", GUILayout.Width(TimeColumnWidth));
@@ -475,8 +498,22 @@ public class ChartEditorWindow : EditorWindow
         }
         EditorGUILayout.EndHorizontal();
 
-        for (int step = -preSteps; step < totalSteps; step++)
+        // 지금 스크롤 위치(scrollPos.y)를 기준으로, 실제로 화면에 보이는 행
+        // 인덱스 범위(0-based, firstStep로부터 몇 번째 행인지)만 계산한다.
+        // 위아래로 4줄씩 여유를 둬서, 스크롤 도중 경계 부분이 한 프레임
+        // 비어 보이는 것을 막는다.
+        int firstVisibleIndex = Mathf.Max(0, Mathf.FloorToInt((scrollPos.y - HeaderHeight) / RowHeight) - 4);
+        int lastVisibleIndex = Mathf.Min(rowCount - 1, Mathf.CeilToInt((scrollPos.y - HeaderHeight + ViewportHeight) / RowHeight) + 4);
+
+        if (firstVisibleIndex > 0)
         {
+            // 화면 위쪽에 가려진 행들은 그리지 않고, 그만큼의 빈 높이만 예약해둔다.
+            GUILayoutUtility.GetRect(1f, firstVisibleIndex * RowHeight);
+        }
+
+        for (int i = firstVisibleIndex; i <= lastVisibleIndex; i++)
+        {
+            int step = firstStep + i;
             EditorGUILayout.BeginHorizontal();
 
             float time = offsetSeconds + step * secondsPerStep;
@@ -506,6 +543,13 @@ public class ChartEditorWindow : EditorWindow
                 // (ScrollView가 어차피 넘치는 부분은 잘라서 보여주므로 안전하다).
                 EditorGUI.DrawRect(new Rect(0f, rowRect.y, 2000f, 2f), PlayheadColor);
             }
+        }
+
+        int remainingRows = rowCount - 1 - lastVisibleIndex;
+        if (remainingRows > 0)
+        {
+            // 화면 아래쪽에 가려진 행들도 마찬가지로 빈 높이만 예약해둔다.
+            GUILayoutUtility.GetRect(1f, remainingRows * RowHeight);
         }
 
         EditorGUILayout.EndScrollView();
@@ -567,20 +611,26 @@ public class ChartEditorWindow : EditorWindow
 
     // 기능: 격자 칸 하나의 마우스 이동/클릭/드래그를 감지해서, 커서 위치를
     //       기억하거나(미리보기) 노트를 만들거나, 늘리거나, 지운다
-    //       (StepMania류: 클릭=탭, 클릭+드래그=롱노트 길이 지정).
+    //       (StepMania류: 좌클릭=탭, 좌클릭+드래그=롱노트 길이 지정,
+    //       우클릭=삭제).
     // 원리: GUILayout.Toggle 같은 표준 컨트롤로는 "누른 채로 드래그"나
     //       "누르지 않고 지나가기"를 감지할 수 없어서, Event.current로 이
     //       칸의 사각형 위에서 일어난 원시 마우스 이벤트를 직접 읽는다.
     //       MouseMove는 클릭/드래그와 무관하게 hoverLane/hoverStep만
     //       갱신하고 끝낸다(다른 칸이 이미 hover 상태를 차지하고 있었다면
     //       바뀐 경우에만 Repaint해서 불필요한 다시그리기를 줄인다).
-    //       MouseDown 시점에 이미 노트가 있으면(머리든 몸통이든) 그 노트를
-    //       통째로 지우고, 없으면 길이 1짜리 새 노트를 만들며 동시에
-    //       "지금부터 이 레인에서 드래그로 늘리는 중"이라는 상태
-    //       (isDragging/dragLane/dragNote)를 기록한다. 이후 MouseDrag가
-    //       같은 레인 안에서 들어오면, "시작 칸부터 지금 칸까지의 거리 + 1"을
-    //       새 길이로 갱신한다. e.Use()는 이 이벤트를 자신이 처리했다고 Unity에
-    //       알려서 다른 컨트롤이 같은 이벤트를 중복 처리하지 않게 막는다.
+    //
+    //       삭제를 좌클릭이 아니라 우클릭(e.button == 1)에서만 하는 이유:
+    //       예전에는 좌클릭 한 번으로 "빈 칸이면 생성, 노트가 있으면 삭제"를
+    //       같이 처리했는데, 그러면 드래그로 롱노트를 늘이다가 실수로 다른
+    //       노트 위에서 손을 떼는 것만으로 그 노트가 지워지는 사고가 날 수
+    //       있었다. 지금은 좌클릭(button 0)은 항상 "생성 + 드래그 시작"만
+    //       담당하고(이미 노트가 있는 칸의 좌클릭은 그냥 무시), 삭제는
+    //       button 1(우클릭)에서만 일어나므로 실수로 지워질 일이 없다.
+    //       MouseDown 이후 같은 레인 안에서 MouseDrag가 들어오면, "시작
+    //       칸부터 지금 칸까지의 거리 + 1"을 새 길이로 갱신한다. e.Use()는
+    //       이 이벤트를 자신이 처리했다고 Unity에 알려서 다른 컨트롤(우클릭
+    //       기본 컨텍스트 메뉴 등)이 같은 이벤트를 중복 처리하지 않게 막는다.
     private void HandleCellInput(Rect rect, int lane, int step, EditorNote note)
     {
         Event e = Event.current;
@@ -603,21 +653,35 @@ public class ChartEditorWindow : EditorWindow
 
         if (e.type == EventType.MouseDown)
         {
-            if (note != null)
+            if (e.button == 1)
             {
-                // 머리든 몸통이든, 노트 위를 클릭하면 그 노트를 통째로 지운다.
-                notes.Remove(note);
+                // 우클릭 = 삭제. 머리든 몸통이든, 노트 위에서 우클릭하면 그 노트를 통째로 지운다.
+                if (note != null)
+                {
+                    notes.Remove(note);
+                    Repaint();
+                }
+                e.Use();
+                return;
             }
-            else
+
+            if (e.button != 0)
+            {
+                // 가운데 버튼 등은 이 격자에서 다루지 않는다.
+                return;
+            }
+
+            if (note == null)
             {
                 var newNote = new EditorNote { lane = lane, startStep = step, lengthSteps = 1 };
                 notes.Add(newNote);
                 isDragging = true;
                 dragLane = lane;
                 dragNote = newNote;
+                Repaint();
             }
+            // 이미 노트가 있는 칸의 좌클릭은 아무 일도 하지 않는다(삭제는 우클릭 전용).
             e.Use();
-            Repaint();
         }
         else if (e.type == EventType.MouseDrag && isDragging && lane == dragLane)
         {

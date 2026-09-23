@@ -73,6 +73,9 @@ public class CalibrationController : MonoBehaviour
         }
         UpdateLabel();
 
+        // 메트로놈 소리만 명확하게 들리도록, 이 탭에 있는 동안은 배경음을 잠깐 멈춘다.
+        if (AmbientLoopPlayer.Instance != null) AmbientLoopPlayer.Instance.Pause();
+
         if (tickSource != null)
         {
             if (cachedTickClip == null)
@@ -86,13 +89,15 @@ public class CalibrationController : MonoBehaviour
         }
     }
 
-    // 기능: 다른 탭으로 전환되어 이 패널이 꺼지면 메트로놈을 멈춘다.
+    // 기능: 다른 탭으로 전환되어 이 패널이 꺼지면 메트로놈을 멈추고 배경음을 이어서 재생한다.
     void OnDisable()
     {
         if (tickSource != null)
         {
             tickSource.Stop();
         }
+
+        if (AmbientLoopPlayer.Instance != null) AmbientLoopPlayer.Instance.Resume();
     }
 
     void Update()

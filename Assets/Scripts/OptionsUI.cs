@@ -26,7 +26,7 @@ public class OptionsUI : MonoBehaviour
     [Header("버튼")]
     public Button backButton;
 
-    // 기능: 씬이 시작될 때 버튼 클릭을 연결하고, 기본 탭(판정 보정)을 보여준다.
+    // 기능: 씬이 시작될 때 버튼 클릭을 연결하고, 기본 탭(일반)을 보여준다.
     void Start()
     {
         if (keyMappingTabButton != null) keyMappingTabButton.onClick.AddListener(ShowKeyMapping);
@@ -34,7 +34,7 @@ public class OptionsUI : MonoBehaviour
         if (volumeTabButton != null) volumeTabButton.onClick.AddListener(ShowVolume);
         if (backButton != null) backButton.onClick.AddListener(() => SceneLoader.Load(this, "TitleScene"));
 
-        ShowCalibration();
+        ShowVolume();
     }
 
     // 기능: "키 매핑" 탭을 보여준다.

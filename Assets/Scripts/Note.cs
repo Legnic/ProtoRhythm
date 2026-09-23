@@ -42,11 +42,45 @@ public class Note : MonoBehaviour
     private float laneX;
     private ObjectPool pool;
 
-    // 롱노트일 때만 보여주는, 머리(판정 지점)부터 꼬리까지를 표시하는 몸통 스프라이트.
-    // 풀링을 위해 한 번 만들면 파괴하지 않고 이 노트의 자식으로 두고 재사용한다
-    // (Setup에서 매번 IsLongNote 여부에 맞춰 활성/비활성만 바꾼다).
+    // 롱노트일 때만 보여주는, 머리(판정 지점)와 꼬리 사이를 잇는 몸통(단색 채움)과
+    // 꼬리 쪽 캡(머리와 같은 노트 이미지). 풀링을 위해 한 번 만들면 파괴하지 않고
+    // 이 노트의 자식으로 두고 재사용한다(Setup에서 매번 IsLongNote 여부에 맞춰
+    // 활성/비활성만 바꾼다).
+    //
+    //   전에는 몸통에도 머리와 같은(디테일이 있는) 노트 이미지를 그대로 늘려서
+    //   썼는데, 실제 노트 그림(Square_Blue_Note 등)으로 바꾸고 나니 세로로
+    //   늘어난 이미지가 부자연스럽게 찌그러져 보였다. 그래서 몸통은 단색으로
+    //   채우고(늘어나도 찌그러짐이 티나지 않는다), 꼬리에는 머리와 똑같은
+    //   크기의 캡 이미지를 별도로 하나 더 둬서, "머리-몸통(색)-꼬리" 3단 구성으로
+    //   바꿨다.
     private Transform holdBody;
+    private Transform tailCap;
     private Vector2 holdBodyNativeSize = Vector2.one;
+    private float headNativeWidth = 1f;
+    private Color bodyColor = Color.white;
+
+    // 몸통 채우기용 단색 스프라이트 — 엔진 내장 1x1 흰 텍스처로 매 노트마다 하나씩
+    // 새로 만들 필요 없이 전부 공유한다(에셋 참조가 필요 없어 빌드에도 항상 존재한다).
+    private static Sprite flatFillSprite;
+
+    private static Sprite GetFlatFillSprite()
+    {
+        if (flatFillSprite == null)
+        {
+            Texture2D tex = Texture2D.whiteTexture;
+            flatFillSprite = Sprite.Create(tex, new Rect(0f, 0f, tex.width, tex.height), new Vector2(0.5f, 0.5f), 100f);
+        }
+        return flatFillSprite;
+    }
+
+    // 머리(판정 지점) 스프라이트 — 풀에서 재사용되므로 매번 GetComponent하지
+    // 않도록 Awake에서 한 번만 캐싱해둔다.
+    private SpriteRenderer spriteRenderer;
+
+    void Awake()
+    {
+        spriteRenderer = GetComponent<SpriteRenderer>();
+    }
 
     // 기능: NoteSpawner가 이 노트를 풀에서 꺼낸 직후 호출해서, 어느 풀로
     //       돌아가야 하는지 기억해둔다.
@@ -60,23 +94,35 @@ public class Note : MonoBehaviour
     // 원리: 풀에서 재사용된 오브젝트는 이전 판정의 lane/hitTime 등 값이 그대로
     //       남아있을 수 있으므로, 매번 이 메서드에서 전부 새로 채워 넣는다.
     //       값 설정과 등록(NoteRegistry.Register)을 이 메서드 안에서 순서대로,
-    //       명시적으로 한 번에 처리한다.
-    public void Setup(GameManager manager, float x, int laneIndex, float hitTimeValue, float holdDurationValue = 0f)
+    //       명시적으로 한 번에 처리한다. sprite는 레인마다 다른 이미지를 쓸 수
+    //       있도록 NoteSpawner가 레인 번호를 보고 골라서 넘겨준다(어느 레인이
+    //       어떤 이미지인지는 Note가 몰라도 된다) — null이면(레인 범위를
+    //       벗어나는 등) 프리팹에 원래 붙어있던 스프라이트를 그대로 둔다.
+    //       bodyTint는 롱노트 몸통(단색 채움)에 쓸 색이다 — 지정하지 않으면
+    //       흰색을 쓴다.
+    public void Setup(GameManager manager, float x, int laneIndex, float hitTimeValue, float holdDurationValue = 0f, Sprite sprite = null, Color? bodyTint = null)
     {
         gameManager = manager;
         laneX = x;
         lane = laneIndex;
         hitTime = hitTimeValue;
         holdDuration = holdDurationValue;
+        bodyColor = bodyTint ?? Color.white;
         State = NoteState.Waiting;
+
+        if (sprite != null && spriteRenderer != null)
+        {
+            spriteRenderer.sprite = sprite;
+        }
 
         if (IsLongNote)
         {
             EnsureHoldBody();
         }
-        else if (holdBody != null)
+        else
         {
-            holdBody.gameObject.SetActive(false);
+            if (holdBody != null) holdBody.gameObject.SetActive(false);
+            if (tailCap != null) tailCap.gameObject.SetActive(false);
         }
 
         NoteRegistry.Register(this);
@@ -216,18 +262,16 @@ public class Note : MonoBehaviour
         ReturnToPool();
     }
 
-    // 기능: 롱노트의 몸통(머리~꼬리를 잇는 스프라이트)이 아직 없으면 만들고, 있으면
-    //       재사용한다.
+    // 기능: 롱노트의 몸통(단색 채움)과 꼬리 캡이 아직 없으면 만들고, 있으면 재사용한다.
     // 원리: 풀링 도입 전에는 노트마다 매번 새로 만들고 OnDestroy에서 같이 파괴했지만,
-    //       이제 노트 오브젝트 자체가 재사용되므로 몸통도 한 번만 만들어 이 노트의
-    //       자식으로 붙여두고 계속 재사용한다(activate/deactivate만 반복). 머리 노트와
-    //       같은 스프라이트를 재사용하되 반투명하게 표시한다. 스프라이트의 "원래" 크기
-    //       (sprite.bounds.size, 로컬 스케일이 1일 때의 월드 유닛 크기)를 매번 다시
-    //       기억해두는 이유는, 재사용 시점의 스프라이트가 바뀌어 있을 수도 있기 때문이다.
+    //       이제 노트 오브젝트 자체가 재사용되므로 둘 다 한 번만 만들어 이 노트의
+    //       자식으로 붙여두고 계속 재사용한다(activate/deactivate만 반복). 몸통은
+    //       머리 이미지를 늘리는 대신 단색(flatFillSprite)을 bodyColor로 칠해서
+    //       채운다 — 실제 그림을 세로로 늘리면 찌그러져 보이지만 단색은 늘어나도
+    //       티가 나지 않는다. 꼬리 캡은 머리와 완전히 같은 이미지를 그대로(늘이지
+    //       않고) 하나 더 배치해서, "머리-몸통(색)-꼬리" 3단으로 보이게 한다.
     void EnsureHoldBody()
     {
-        SpriteRenderer headSprite = GetComponent<SpriteRenderer>();
-
         if (holdBody == null)
         {
             var bodyObj = new GameObject("HoldBody");
@@ -236,37 +280,60 @@ public class Note : MonoBehaviour
             holdBody = bodyObj.transform;
         }
 
-        SpriteRenderer sr = holdBody.GetComponent<SpriteRenderer>();
-        sr.sprite = headSprite.sprite;
-        sr.color = new Color(headSprite.color.r, headSprite.color.g, headSprite.color.b, 0.8f);
-        sr.sortingOrder = headSprite.sortingOrder - 1;
+        Sprite fill = GetFlatFillSprite();
+        SpriteRenderer bodySr = holdBody.GetComponent<SpriteRenderer>();
+        bodySr.sprite = fill;
+        bodySr.color = bodyColor;
+        bodySr.sortingOrder = spriteRenderer.sortingOrder - 1;
 
         // 스프라이트의 "원래" 크기(로컬 스케일 1일 때 월드 유닛 크기)를 알아야
         // 몸통 길이를 원하는 월드 유닛 길이에 맞게 정확히 스케일링할 수 있다.
-        holdBodyNativeSize = headSprite.sprite != null ? headSprite.sprite.bounds.size : Vector2.one;
+        holdBodyNativeSize = fill.bounds.size;
+
+        // 몸통 너비를 캡(머리/꼬리)과 같게 맞추려면 캡 스프라이트의 원래 너비를
+        // 기억해둬야 한다 — 재사용 시점의 레인 스프라이트가 이전과 다를 수 있으므로
+        // (Setup마다 다시) 매번 새로 읽는다.
+        headNativeWidth = spriteRenderer.sprite != null ? spriteRenderer.sprite.bounds.size.x : 1f;
+
+        if (tailCap == null)
+        {
+            var tailObj = new GameObject("TailCap");
+            tailObj.transform.SetParent(transform, false);
+            tailObj.AddComponent<SpriteRenderer>();
+            tailCap = tailObj.transform;
+        }
+
+        SpriteRenderer tailSr = tailCap.GetComponent<SpriteRenderer>();
+        tailSr.sprite = spriteRenderer.sprite;
+        tailSr.color = spriteRenderer.color;
+        tailSr.sortingOrder = spriteRenderer.sortingOrder;
+        // 부모(머리)의 lossyScale을 그대로 물려받아야 머리와 같은 크기로 보인다.
+        tailCap.localScale = Vector3.one;
 
         holdBody.gameObject.SetActive(true);
+        tailCap.gameObject.SetActive(true);
     }
 
-    // 기능: 머리(headY)부터 꼬리(tailY)까지를 잇는 직사각형으로 몸통 위치/크기를
-    //       매 프레임 다시 그린다.
+    // 기능: 머리(headY)부터 꼬리(tailY)까지 몸통(단색)의 위치/길이와 꼬리 캡의
+    //       위치를 매 프레임 다시 그린다.
     // 원리: tailY는 머리와 같은 GetDistance 공식에 hitTime 대신 hitTime+holdDuration을
     //       넘겨서 구한다 — 꼬리도 "그 시각에 판정선에 도달해야 하는 지점"이라는
     //       점은 머리와 똑같기 때문이다. 홀드 중에는 머리가 판정선에 고정되어
     //       있으므로, tailY가 시간이 지날수록 judgmentY에 가까워지면서 몸통이
-    //       꼬리 쪽부터 줄어드는 것처럼 보인다. length(월드 유닛)를
-    //       holdBodyNativeSize.y로 나눠서 localScale.y로 변환하는 이유는,
-    //       스프라이트의 실제 크기가 스케일 1일 때 몇 유닛인지 모르면
-    //       "길이 length만큼 늘리기"를 정확한 배율로 환산할 수 없기 때문이다.
-    //       여기에 다시 transform.lossyScale.y로 나누는 이유는, holdBody가
-    //       이 노트(head)의 자식이라 localScale이 부모의 lossyScale과
+    //       꼬리 쪽부터 줄어드는 것처럼 보인다. 꼬리 캡은 tailY에 그대로 배치만
+    //       하고 늘이지 않는다(localScale 그대로) — 머리와 똑같은 크기를 유지해야
+    //       하기 때문이다. length(월드 유닛)를 holdBodyNativeSize.y로 나눠서
+    //       localScale.y로 변환하는 이유는, 스프라이트의 실제 크기가 스케일 1일
+    //       때 몇 유닛인지 모르면 "길이 length만큼 늘리기"를 정확한 배율로 환산할
+    //       수 없기 때문이다. 여기에 다시 transform.lossyScale.y로 나누는 이유는,
+    //       holdBody가 이 노트(head)의 자식이라 localScale이 부모의 lossyScale과
     //       곱해져서 화면에 나타나기 때문이다 — Note 프리팹 자체가 Y축을
     //       0.5로 눌러둔 모양이라, 이 나눗셈이 없으면 몸통이 의도한
     //       length의 절반 높이로만 그려져 머리와 몸통 사이에 빈틈이
     //       생긴다(실제로 보고된 "헤드가 분리되어 보이는" 버그의 원인).
     void UpdateHoldBody(float currentTime)
     {
-        if (holdBody == null)
+        if (holdBody == null || tailCap == null)
         {
             return;
         }
@@ -275,11 +342,14 @@ public class Note : MonoBehaviour
         float tailY = gameManager.judgmentY + gameManager.GetDistance(currentTime, hitTime + holdDuration);
         float length = Mathf.Max(0f, tailY - headY);
 
+        tailCap.position = new Vector3(laneX, tailY, transform.position.z);
         holdBody.position = new Vector3(laneX, headY + length * 0.5f, transform.position.z + 0.01f);
 
-        // 너비는 머리와 같은 화면 폭으로 보이면 되므로 로컬 스케일 1이면 충분하다
-        // (부모의 lossyScale.x가 그대로 곱해져 머리와 같은 폭이 된다).
-        float scaleX = 1f;
+        // 몸통 너비를 캡(머리/꼬리)과 같은 화면 폭으로 맞춘다. 몸통은 부모의
+        // lossyScale.x를 그대로 물려받으므로(둘 다 같은 부모 밑이라 lossyScale이
+        // 같다), 목표 화면 폭을 "네이티브 크기 비율"로만 맞추면 lossyScale은
+        // 저절로 상쇄된다 — 그래서 scaleY와 달리 lossyScale로 나눌 필요가 없다.
+        float scaleX = holdBodyNativeSize.x > 0f ? headNativeWidth / holdBodyNativeSize.x : 1f;
         float lossyScaleY = transform.lossyScale.y;
         float scaleY = (holdBodyNativeSize.y > 0f && lossyScaleY != 0f)
             ? length / (holdBodyNativeSize.y * lossyScaleY)

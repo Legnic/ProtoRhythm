@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SongData
   songName: Test
   audioClip:
-    m_AssetGUID: 3cb65debdcf8609458f56f9631d646be
+    m_AssetGUID: 5d874a254369dfb4c9f7a980bde47d94
     m_SubObjectName: 
     m_SubObjectType: 
     m_SubObjectGUID: 

@@ -21,10 +21,33 @@ public static class AudioPreviewUtility
     private const BindingFlags Flags = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
 
     private static readonly System.Type AudioUtilType = typeof(Editor).Assembly.GetType("UnityEditor.AudioUtil");
-    private static readonly MethodInfo PlayMethod = AudioUtilType.GetMethod("PlayPreviewClip", Flags);
-    private static readonly MethodInfo StopMethod = AudioUtilType.GetMethod("StopAllPreviewClips", Flags);
-    private static readonly MethodInfo IsPlayingMethod = AudioUtilType.GetMethod("IsPreviewClipPlaying", Flags);
-    private static readonly MethodInfo GetPositionMethod = AudioUtilType.GetMethod("GetPreviewClipPosition", Flags);
+    private static readonly MethodInfo PlayMethod = ResolveMethod("PlayPreviewClip");
+    private static readonly MethodInfo StopMethod = ResolveMethod("StopAllPreviewClips");
+    private static readonly MethodInfo IsPlayingMethod = ResolveMethod("IsPreviewClipPlaying");
+    private static readonly MethodInfo GetPositionMethod = ResolveMethod("GetPreviewClipPosition");
+
+    // 기능: AudioUtil에서 메서드 하나를 리플렉션으로 찾는다. 못 찾으면(에디터
+    //       버전이 올라가 시그니처/이름이 바뀐 경우) null을 돌려주는 대신
+    //       바로 여기서 한 번만 명확한 경고를 남긴다.
+    // 원리: 이 값들은 전부 static readonly라 클래스가 처음 쓰이는 순간(정적
+    //       생성자) 한 번만 계산된다. 예전에는 못 찾은 메서드를 그대로 null로
+    //       저장해뒀다가, 실제로 재생 버튼을 누르는 시점에 NullReferenceException이
+    //       터졌다 — C# 정적 생성자가 한 번 실패하면 그 세션 내내 이 클래스
+    //       전체가 TypeInitializationException으로 완전히 막혀버리는 문제도
+    //       있었다(미리듣기와 무관한 다른 조작에서도 재발). 여기서 미리 null
+    //       여부를 확인해 로그로 남겨두면, 실제 문제는 훨씬 이해하기 쉬운
+    //       경고 한 줄로 끝나고, 호출부(PlaySamples 등)는 null 체크만으로
+    //       "미리듣기가 조용히 동작하지 않는" 안전한 상태로 넘어간다.
+    private static MethodInfo ResolveMethod(string methodName)
+    {
+        MethodInfo method = AudioUtilType?.GetMethod(methodName, Flags);
+        if (method == null)
+        {
+            Debug.LogWarning($"AudioPreviewUtility: Unity 내부 AudioUtil.{methodName} API를 찾을 수 없습니다 — " +
+                              "에디터 버전 호환 문제일 수 있습니다. Chart Editor의 오디오 미리듣기 기능이 비활성화됩니다.");
+        }
+        return method;
+    }
 
     // 기능: 샘플 인덱스를 직접 지정해서 재생한다(속도 변형 클립처럼 declared
     //       frequency가 원본과 달라서, "시각 × frequency" 계산을 호출부가
@@ -36,24 +59,26 @@ public static class AudioPreviewUtility
     //       재생 경로의 알려진 특성 — 실제 게임 재생(AudioSource)에는 해당 없다).
     public static void PlaySamples(AudioClip clip, int startSample, bool loop = false)
     {
-        if (clip == null) return;
+        if (clip == null || PlayMethod == null) return;
         int clamped = Mathf.Clamp(startSample, 0, clip.samples - 1);
         PlayMethod.Invoke(null, new object[] { clip, clamped, loop });
     }
 
     public static void Stop()
     {
-        StopMethod.Invoke(null, null);
+        StopMethod?.Invoke(null, null);
     }
 
     public static bool IsPlaying()
     {
+        if (IsPlayingMethod == null) return false;
         return (bool)IsPlayingMethod.Invoke(null, null);
     }
 
     // 기능: 현재 재생 위치를 초 단위로 돌려준다(에디터 자체가 이 단위를 그대로 씀).
     public static float GetPosition()
     {
+        if (GetPositionMethod == null) return 0f;
         return (float)GetPositionMethod.Invoke(null, null);
     }
 
@@ -93,8 +118,17 @@ public static class AudioPreviewUtility
             return cached;
         }
 
+        // 캐시 파일명에 원본 애셋의 GUID를 포함시킨다 — 이름(source.name)만 쓰면
+        // 프로젝트 안에 같은 이름의 오디오 클립이 서로 다른 폴더에 있을 때
+        // 캐시 파일이 충돌해서, 엉뚱한 곡의 배속 변형을 재생하게 될 수 있다.
+        // GUID는 애셋마다 고유하므로 이런 충돌 자체가 생기지 않는다. 프로젝트
+        // 애셋이 아닌 클립(에셋 경로가 없는 경우)은 인스턴스 ID로 대신한다 —
+        // 세션 간에는 안정적이지 않지만, 그런 클립은 애초에 디스크 캐시를
+        // 세션 너머로 재사용할 일이 없다.
+        string sourcePath = AssetDatabase.GetAssetPath(source);
+        string sourceId = !string.IsNullOrEmpty(sourcePath) ? AssetDatabase.AssetPathToGUID(sourcePath) : source.GetEntityId().ToString();
         string safeName = string.Join("_", source.name.Split(System.IO.Path.GetInvalidFileNameChars()));
-        string assetPath = $"{CacheFolder}/{safeName}_x{speedMultiplier:0.##}.wav";
+        string assetPath = $"{CacheFolder}/{safeName}_{sourceId}_x{speedMultiplier:0.##}.wav";
 
         AudioClip variant = AssetDatabase.LoadAssetAtPath<AudioClip>(assetPath);
         if (variant == null)
@@ -118,6 +152,24 @@ public static class AudioPreviewUtility
 
         speedVariantCache[key] = variant;
         return variant;
+    }
+
+    // 기능: 지금까지 만들어둔 배속 미리듣기 캐시(디스크의 WAV 파일 전부)를 지운다.
+    // 원리: 세션이 쌓일수록 AudioPreviewCache 폴더에 (곡, 배속) 조합마다 WAV
+    //       파일이 하나씩 계속 남는다 — 재생 자체는 문제없지만 프로젝트 용량이
+    //       천천히 늘어난다. 필요할 때 수동으로 비울 수 있도록 별도 메서드로
+    //       뺐다. 지운 파일을 가리키는 낡은 참조가 메모리 캐시에 남지 않도록
+    //       speedVariantCache도 함께 비우고, 혹시 그중 하나가 재생 중이었을
+    //       경우를 대비해 먼저 멈춘다.
+    public static void ClearDiskCache()
+    {
+        Stop();
+        speedVariantCache.Clear();
+
+        if (AssetDatabase.IsValidFolder(CacheFolder))
+        {
+            AssetDatabase.DeleteAsset(CacheFolder);
+        }
     }
 
     // 기능: float 샘플 배열을 16비트 PCM WAV 파일로 저장한다.

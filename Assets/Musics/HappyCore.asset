@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SongData
   songName: Happy Core
   audioClip:
-    m_AssetGUID: 4c6f6605b3c769f4e95e651c102cc008
+    m_AssetGUID: 7adcfcea3d551af44be3756ed751b4b5
     m_SubObjectName: 
     m_SubObjectType: 
     m_SubObjectGUID: 

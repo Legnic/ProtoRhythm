@@ -20,6 +20,21 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 48ea09ed0d4189a46af3b65b66c8937e
+    m_Address: Assets/Images/Sky.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5d874a254369dfb4c9f7a980bde47d94
+    m_Address: Assets/AudioClip/Morning_birds_3.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7adcfcea3d551af44be3756ed751b4b5
+    m_Address: Assets/AudioClip/HappyCore_Edit.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 97a66005cea083b418eb04c2c8317476
     m_Address: Assets/AudioClip/BirdSoundLoop.wav
     m_ReadOnly: 0
@@ -32,6 +47,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: aa6e820dbcffab64bb072e334e791025
     m_Address: ChipTune_BG
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: aa96a7dd69870a944b7c5f0269cb60fa
+    m_Address: Assets/AudioClip/Juhani Junkala [Chiptune Adventures] 1. Stage 1.ogg
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

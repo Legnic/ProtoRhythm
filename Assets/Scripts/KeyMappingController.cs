@@ -64,10 +64,26 @@ public class KeyMappingController : MonoBehaviour
     }
 
     // 기능: 리바인드 버튼을 누르면 호출된다 — "다음에 누르는 키"를 기다리는 상태로 들어간다.
+    // 원리: 이미 다른 레인이 키 입력을 기다리는 중이었다면(그 레인은 아무 키도
+    //       배정받지 못한 채 취소된 것이다), 새 레인으로 넘어가기 전에 먼저
+    //       그 레인을 취소 처리해서 원래 키 텍스트로 되돌려야 한다 — 그렇지
+    //       않으면 이전 레인의 라벨이 "키 입력..."에 계속 멈춰있게 된다.
     private void BeginRebind(int lane, TMP_Text keyText)
     {
+        if (waitingLane >= 0 && waitingLane != lane)
+        {
+            CancelRebind(waitingLane);
+        }
+
         waitingLane = lane;
         keyText.text = "키 입력...";
+    }
+
+    // 기능: 지정한 레인의 리바인드를 취소하고, 저장된(또는 기본) 키 텍스트로 되돌린다.
+    private void CancelRebind(int lane)
+    {
+        Key fallback = lane < defaultKeys.Length ? defaultKeys[lane] : Key.None;
+        rowLabels[lane].text = GameSettings.GetLaneKey(lane, fallback).ToString();
     }
 
     // 기능: 리바인드를 기다리는 중이면, 이번 프레임에 새로 눌린 키를 찾아 그
@@ -91,8 +107,7 @@ public class KeyMappingController : MonoBehaviour
 
         if (keyboard[Key.Escape].wasPressedThisFrame)
         {
-            Key fallback = waitingLane < defaultKeys.Length ? defaultKeys[waitingLane] : Key.None;
-            rowLabels[waitingLane].text = GameSettings.GetLaneKey(waitingLane, fallback).ToString();
+            CancelRebind(waitingLane);
             waitingLane = -1;
             return;
         }

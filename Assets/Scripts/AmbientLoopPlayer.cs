@@ -61,4 +61,24 @@ public class AmbientLoopPlayer : MonoBehaviour
             source.Stop();
         }
     }
+
+    // 기능: 잠깐만 멈춰뒀다가 같은 위치에서 이어 들을 때 쓴다(Stop처럼 처음으로
+    //       되감기지 않는다) — 판정 보정 탭처럼 짧게 다른 소리(메트로놈)만
+    //       들려야 하는 동안 쓰기 위한 용도다.
+    public void Pause()
+    {
+        if (source != null && source.isPlaying)
+        {
+            source.Pause();
+        }
+    }
+
+    // 기능: Pause()로 멈춰뒀던 지점부터 다시 재생한다.
+    public void Resume()
+    {
+        if (source != null)
+        {
+            source.UnPause();
+        }
+    }
 }
