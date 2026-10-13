@@ -1,6 +1,13 @@
 using System.Collections;
 using UnityEngine;
 
+// 기능: 노트 모양 스킨. 옵션 화면에서 고르고 GameSettings에 저장된다.
+public enum NoteSkin
+{
+    Square,
+    Circle,
+}
+
 // ============================================================
 // NoteSpawner.cs
 //   채보의 각 노트를 "적절한 시점"에 생성(Instantiate)한다.
@@ -33,8 +40,14 @@ public class NoteSpawner : MonoBehaviour
     public int prewarmCount = 32;
 
     [Header("레인별 노트 스프라이트")]
-    [Tooltip("인덱스 = 레인 번호. 비워두면(null) 그 레인은 notePrefab에 원래 붙어있던 스프라이트를 그대로 쓴다.")]
+    [Tooltip("Square 스킨일 때 쓰는 레인별 스프라이트. 인덱스 = 레인 번호. 비워두면(null) 그 레인은 notePrefab에 원래 붙어있던 스프라이트를 그대로 쓴다.")]
     public Sprite[] laneNoteSprites = new Sprite[4];
+
+    [Tooltip("Circle 스킨일 때 쓰는 레인별 스프라이트. 인덱스 의미는 laneNoteSprites와 같다. 비워두면(null) 그 레인만 Square 쪽으로 대체된다.")]
+    public Sprite[] circleLaneSprites = new Sprite[4];
+
+    [Tooltip("Circle 스킨일 때 노트 세로 스케일에 곱하는 배율(프리팹 기본 세로 스케일 기준). Square 노트는 눌린 직사각형이 어울리지만, 원형은 그 비율로 누르면 타원이 되어버려서 따로 덜 누른다.")]
+    public float circleYScaleMultiplier = 2f;
 
     [Tooltip("롱노트 몸통(머리와 꼬리 사이를 채우는 단색 부분)의 색. 인덱스 = 레인 번호. 레인 수보다 짧으면 그 레인은 흰색을 쓴다.")]
     public Color[] laneBodyColors = new Color[4];
@@ -162,11 +175,29 @@ public class NoteSpawner : MonoBehaviour
             return;
         }
 
-        Sprite sprite = data.lane >= 0 && data.lane < laneNoteSprites.Length ? laneNoteSprites[data.lane] : null;
+        Sprite sprite = GetLaneSprite(data.lane);
         Color? bodyTint = data.lane >= 0 && data.lane < laneBodyColors.Length ? laneBodyColors[data.lane] : (Color?)null;
+        float yScaleMultiplier = GameSettings.NoteSkin == NoteSkin.Circle ? circleYScaleMultiplier : 1f;
 
         note.SetPool(pool);
-        note.Setup(gameManager, laneManager.GetLaneX(data.lane), data.lane, data.hitTime, data.holdDuration, sprite, bodyTint);
+        note.Setup(gameManager, laneManager.GetLaneX(data.lane), data.lane, data.hitTime, data.holdDuration, sprite, bodyTint, yScaleMultiplier);
+    }
+
+    // 기능: 현재 옵션에서 고른 스킨(GameSettings.NoteSkin)에 맞는, 해당 레인의
+    //       노트 스프라이트를 돌려준다.
+    // 원리: 노트가 스폰되는 매 순간 이걸 다시 읽으므로, 플레이 도중이 아니라
+    //       옵션 화면에서 스킨을 바꾸고 다음 곡을 시작하면 자동으로 새 스킨이
+    //       적용된다(따로 "스킨 변경 이벤트"를 만들 필요가 없다). Circle 쪽
+    //       배열에 그 레인만 비어있으면(null) Square 쪽으로 대체해서, 스킨을
+    //       절반만 채워둬도 안전하게 동작한다.
+    private Sprite GetLaneSprite(int lane)
+    {
+        Sprite[] active = GameSettings.NoteSkin == NoteSkin.Circle ? circleLaneSprites : laneNoteSprites;
+        if (active != null && lane >= 0 && lane < active.Length && active[lane] != null)
+        {
+            return active[lane];
+        }
+        return laneNoteSprites != null && lane >= 0 && lane < laneNoteSprites.Length ? laneNoteSprites[lane] : null;
     }
 
     // 기능: 스폰 포인터를 처음으로 되돌린다.

@@ -1702,6 +1702,11 @@ MonoBehaviour:
   - {fileID: -6944018870586139650, guid: 28833ebe585b2a4498c6094c8a1a096e, type: 3}
   - {fileID: -1009562339699470491, guid: dbe2534201f26c14f8ee54ab14946853, type: 3}
   - {fileID: -6944018870586139650, guid: 28833ebe585b2a4498c6094c8a1a096e, type: 3}
+  circleLaneSprites:
+  - {fileID: 1587752777832244619, guid: 6bb7db7b7bbeadf4bbdd5d7bc73d8e65, type: 3}
+  - {fileID: -883178004235229787, guid: c6bd9addcdb24cf42a720f981c2b1c44, type: 3}
+  - {fileID: 1587752777832244619, guid: 6bb7db7b7bbeadf4bbdd5d7bc73d8e65, type: 3}
+  - {fileID: -883178004235229787, guid: c6bd9addcdb24cf42a720f981c2b1c44, type: 3}
   laneBodyColors:
   - {r: 0.35, g: 0.65, b: 1, a: 0.9}
   - {r: 1, g: 0.55, b: 0.78, a: 0.9}

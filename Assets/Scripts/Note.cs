@@ -79,9 +79,15 @@ public class Note : MonoBehaviour
     // 않도록 Awake에서 한 번만 캐싱해둔다.
     private SpriteRenderer spriteRenderer;
 
+    // 프리팹에 원래 박혀있는 스케일(예: 세로 0.5로 눌린 사각형 노트 비율).
+    // 스킨마다 모양 비율이 달라서(원형은 눌리면 타원이 되어버린다) Setup마다
+    // yScaleMultiplier를 곱해 다시 계산하므로, 그 "원본" 값을 기억해둬야 한다.
+    private Vector3 baseLocalScale;
+
     void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
+        baseLocalScale = transform.localScale;
     }
 
     // 기능: NoteSpawner가 이 노트를 풀에서 꺼낸 직후 호출해서, 어느 풀로
@@ -101,8 +107,11 @@ public class Note : MonoBehaviour
     //       어떤 이미지인지는 Note가 몰라도 된다) — null이면(레인 범위를
     //       벗어나는 등) 프리팹에 원래 붙어있던 스프라이트를 그대로 둔다.
     //       bodyTint는 롱노트 몸통(단색 채움)에 쓸 색이다 — 지정하지 않으면
-    //       흰색을 쓴다.
-    public void Setup(GameManager manager, float x, int laneIndex, float hitTimeValue, float holdDurationValue = 0f, Sprite sprite = null, Color? bodyTint = null)
+    //       흰색을 쓴다. yScaleMultiplier는 프리팹의 원래 세로 스케일에 곱해지는
+    //       배율이다(기본 1이면 프리팹 그대로) — 노트 모양(스킨)마다 "눌린 정도"가
+    //       달라야 할 때(예: 원형 노트는 덜 눌려야 동그랗게 보인다) NoteSpawner가
+    //       넘겨준다.
+    public void Setup(GameManager manager, float x, int laneIndex, float hitTimeValue, float holdDurationValue = 0f, Sprite sprite = null, Color? bodyTint = null, float yScaleMultiplier = 1f)
     {
         gameManager = manager;
         laneX = x;
@@ -111,6 +120,8 @@ public class Note : MonoBehaviour
         holdDuration = holdDurationValue;
         bodyColor = bodyTint ?? Color.white;
         State = NoteState.Waiting;
+
+        transform.localScale = new Vector3(baseLocalScale.x, baseLocalScale.y * yScaleMultiplier, baseLocalScale.z);
 
         if (sprite != null && spriteRenderer != null)
         {

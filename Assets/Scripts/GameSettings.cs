@@ -15,6 +15,7 @@ public static class GameSettings
     private const string MasterVolumeKey = "MasterVolume";
     private const string TimingFeedbackDeadZoneKey = "TimingFeedbackDeadZone";
     private const string TimingFeedbackDisplayModeKey = "TimingFeedbackDisplayMode";
+    private const string NoteSkinKey = "NoteSkin";
 
     // 기능: 저장된 오디오 오프셋(초)을 읽어온다. 저장된 적이 없으면 0(보정 없음).
     public static float AudioOffset
@@ -70,6 +71,13 @@ public static class GameSettings
     {
         get => (TimingFeedbackDisplayMode)PlayerPrefs.GetInt(TimingFeedbackDisplayModeKey, (int)TimingFeedbackDisplayMode.FastLate);
         set => PlayerPrefs.SetInt(TimingFeedbackDisplayModeKey, (int)value);
+    }
+
+    // 기능: 저장된 노트 모양 스킨을 읽어온다. 저장된 적이 없으면 Square(기본값).
+    public static NoteSkin NoteSkin
+    {
+        get => (NoteSkin)PlayerPrefs.GetInt(NoteSkinKey, (int)NoteSkin.Square);
+        set => PlayerPrefs.SetInt(NoteSkinKey, (int)value);
     }
 
     // 기능: 지금까지 바뀐 값을 디스크에 실제로 기록한다.
