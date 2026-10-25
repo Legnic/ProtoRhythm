@@ -1,9 +1,5 @@
 fileFormatVersion: 2
-<<<<<<<< HEAD:Assets/Objects/KeyMappingRow.prefab.meta
-guid: fa0f7961ca10cd74fb7eba0e6318827f
-========
 guid: 3e52b8680af1583428cddc8e3f45495b
->>>>>>>> parent of 21a14e5 (Merge pull request #1 from Legnic/polishing):Assets/Objects/HitEffect.prefab.meta
 PrefabImporter:
   externalObjects: {}
   userData: 
