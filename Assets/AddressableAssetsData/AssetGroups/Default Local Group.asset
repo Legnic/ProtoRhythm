@@ -55,6 +55,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fae066f46ec736943b8abe190339d774
+    m_Address: FuturisticJoseonVibe_BG
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: e0b07f0816ca84146bdb48e473d6ce85, type: 2}
   m_SchemaSet:

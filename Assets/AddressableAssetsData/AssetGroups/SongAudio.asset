@@ -15,6 +15,11 @@ MonoBehaviour:
   m_GroupName: SongAudio
   m_GUID: 70a76c1d5a0e5b34b98b8de0a3f8a457
   m_SerializeEntries:
+  - m_GUID: 086eadcd3410b564c999f14a836083dd
+    m_Address: FuturisticJoseonVibe_Audio
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 4c6f6605b3c769f4e95e651c102cc008
     m_Address: HappyCore_Audio
     m_ReadOnly: 0
