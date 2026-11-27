@@ -1769,7 +1769,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::KeyMappingController
   laneCount: 4
   defaultKeys: 12000000140000001800000019000000i
-  rowPrefab: {fileID: 384549747587328257, guid: e1c973aca1999524a9f379e0250bd1c5, type: 3}
+  rowPrefab: {fileID: 384549747587328257, guid: fa0f7961ca10cd74fb7eba0e6318827f, type: 3}
   rowContainer: {fileID: 930887914}
 --- !u!1 &581859017
 GameObject:
