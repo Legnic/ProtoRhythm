@@ -138,13 +138,23 @@ public static class AudioPreviewUtility
                 AssetDatabase.CreateFolder("Assets/Editor", "AudioPreviewCache");
             }
 
-            var samples = new float[source.samples * source.channels];
-            source.GetData(samples, 0);
-            int newFrequency = Mathf.Max(1, Mathf.RoundToInt(source.frequency * speedMultiplier));
-
             string projectRoot = System.IO.Path.GetDirectoryName(Application.dataPath);
             string absolutePath = System.IO.Path.Combine(projectRoot, assetPath);
-            WriteWav(absolutePath, samples, source.channels, newFrequency);
+            int newFrequency = Mathf.Max(1, Mathf.RoundToInt(source.frequency * speedMultiplier));
+
+            // 1순위: 원본 WAV 파일을 디스크에서 직접 읽어 샘플레이트만 바꿔 쓴다.
+            // 2순위: (WAV가 아닌 경우 등) AudioClip.GetData로 샘플을 꺼낸다.
+            bool written = !string.IsNullOrEmpty(sourcePath)
+                && TryWriteRetimedWavCopy(System.IO.Path.Combine(projectRoot, sourcePath), absolutePath, source.frequency, newFrequency)
+                || TryWriteFromClipData(source, absolutePath, newFrequency);
+
+            if (!written)
+            {
+                Debug.LogError($"AudioPreviewUtility: '{source.name}'의 {speedMultiplier:0.##}x 미리듣기 클립을 만들지 못했습니다 — " +
+                               "원본 오디오 샘플을 읽을 수 없습니다. 원본이 WAV가 아니라면 임포트 설정의 Load Type을 " +
+                               "Decompress On Load로 바꾸거나 WAV 원본을 사용하세요.");
+                return null;
+            }
 
             AssetDatabase.ImportAsset(assetPath, ImportAssetOptions.ForceSynchronousImport);
             variant = AssetDatabase.LoadAssetAtPath<AudioClip>(assetPath);
@@ -152,6 +162,85 @@ public static class AudioPreviewUtility
 
         speedVariantCache[key] = variant;
         return variant;
+    }
+
+    // 기능: 원본 WAV 파일의 바이트를 그대로 복사하되, fmt 청크의 샘플레이트(와 그에
+    //       맞춘 byteRate)만 newFrequency로 바꿔서 destPath에 쓴다. 성공하면 true.
+    // 원리: 예전에는 AudioClip.GetData로 샘플을 꺼냈는데, 곡 클립들은 게임용으로
+    //       Load Type이 Streaming이라 GetData가 샘플을 읽지 못했다 — 배열이 전부 0인
+    //       채로 WAV가 저장돼서 0.5x 재생이 "재생 위치는 흐르는데 완전 무음"이었다.
+    //       임포터를 거치지 않고 원본 파일을 직접 읽으면 Load Type과 무관하게 항상
+    //       실제 샘플을 얻을 수 있고, 헤더 숫자 두 개만 바꾸므로 비트심도/포맷(16·24bit,
+    //       float 등) 변환도 필요 없다. 원본 파일의 샘플레이트가 임포트된 클립의
+    //       frequency와 다르면(임포터가 리샘플한 경우) 샘플 인덱스 계산이 어긋나므로
+    //       이 경로를 쓰지 않고 false를 돌려준다.
+    private static bool TryWriteRetimedWavCopy(string sourceFilePath, string destPath, int expectedSourceFrequency, int newFrequency)
+    {
+        if (!sourceFilePath.EndsWith(".wav", System.StringComparison.OrdinalIgnoreCase)) return false;
+        if (!System.IO.File.Exists(sourceFilePath)) return false;
+
+        byte[] bytes = System.IO.File.ReadAllBytes(sourceFilePath);
+        if (bytes.Length < 12
+            || System.Text.Encoding.ASCII.GetString(bytes, 0, 4) != "RIFF"
+            || System.Text.Encoding.ASCII.GetString(bytes, 8, 4) != "WAVE")
+        {
+            return false;
+        }
+
+        // RIFF 청크들을 훑어서 "fmt " 청크를 찾는다(앞에 LIST 등 다른 청크가 올 수 있음).
+        int pos = 12;
+        while (pos + 8 <= bytes.Length)
+        {
+            string chunkId = System.Text.Encoding.ASCII.GetString(bytes, pos, 4);
+            int chunkSize = System.BitConverter.ToInt32(bytes, pos + 4);
+            int body = pos + 8;
+
+            if (chunkId == "fmt ")
+            {
+                if (chunkSize < 16 || body + 16 > bytes.Length) return false;
+
+                int sampleRate = System.BitConverter.ToInt32(bytes, body + 4);
+                short blockAlign = System.BitConverter.ToInt16(bytes, body + 12);
+                if (sampleRate != expectedSourceFrequency || blockAlign <= 0) return false;
+
+                System.BitConverter.GetBytes(newFrequency).CopyTo(bytes, body + 4);
+                System.BitConverter.GetBytes(newFrequency * blockAlign).CopyTo(bytes, body + 8);
+                System.IO.File.WriteAllBytes(destPath, bytes);
+                return true;
+            }
+
+            if (chunkSize < 0) return false;
+            pos = body + chunkSize + (chunkSize & 1); // 청크는 짝수 바이트로 패딩된다
+        }
+        return false;
+    }
+
+    // 기능: AudioClip.GetData로 샘플을 꺼내 newFrequency로 선언한 WAV를 destPath에 쓴다.
+    //       샘플을 실제로 얻지 못했으면(GetData 실패, 전부 0) 파일을 쓰지 않고 false.
+    // 원리: 원본이 WAV가 아닐 때의 대체 경로. Streaming 클립은 GetData가 동작하지 않고,
+    //       Preload Audio Data가 꺼진 클립은 LoadAudioData로 먼저 메모리에 올려야 한다.
+    //       무음 파일이 디스크에 캐시되면 이후 계속 재사용되므로, 의심스러우면 쓰지 않는다.
+    private static bool TryWriteFromClipData(AudioClip source, string destPath, int newFrequency)
+    {
+        if (source.loadType == AudioClipLoadType.Streaming) return false;
+
+        if (source.loadState != AudioDataLoadState.Loaded)
+        {
+            source.LoadAudioData();
+        }
+
+        var samples = new float[source.samples * source.channels];
+        if (!source.GetData(samples, 0)) return false;
+
+        bool hasSound = false;
+        foreach (float s in samples)
+        {
+            if (s != 0f) { hasSound = true; break; }
+        }
+        if (!hasSound) return false;
+
+        WriteWav(destPath, samples, source.channels, newFrequency);
+        return true;
     }
 
     // 기능: 지금까지 만들어둔 배속 미리듣기 캐시(디스크의 WAV 파일 전부)를 지운다.
