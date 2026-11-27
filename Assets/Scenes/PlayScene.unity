@@ -515,6 +515,57 @@ MonoBehaviour:
   minCountdownSeconds: 3
   backgroundRenderer: {fileID: 1891533056}
   defaultBackground: {fileID: 2410671940745902572, guid: 48ea09ed0d4189a46af3b65b66c8937e, type: 3}
+--- !u!1 &277276208
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 277276210}
+  - component: {fileID: 277276209}
+  m_Layer: 0
+  m_Name: KeyHitSound
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &277276209
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 277276208}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7d8d7400e5715745ab968dab5919c9d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::KeyHitSound
+  clipReference:
+    m_AssetGUID: d10439b829e63374ea2697ed681a05db
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0
+  volume: 1
+--- !u!4 &277276210
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 277276208}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &294736591
 GameObject:
   m_ObjectHideFlags: 0
@@ -1679,6 +1730,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InputJudge
   gameManager: {fileID: 1400898291}
+  keySound: {fileID: 277276209}
   laneKeys: 12000000140000001800000019000000i
 --- !u!114 &1038818972
 MonoBehaviour:
@@ -1707,6 +1759,7 @@ MonoBehaviour:
   - {fileID: -883178004235229787, guid: c6bd9addcdb24cf42a720f981c2b1c44, type: 3}
   - {fileID: 1587752777832244619, guid: 6bb7db7b7bbeadf4bbdd5d7bc73d8e65, type: 3}
   - {fileID: -883178004235229787, guid: c6bd9addcdb24cf42a720f981c2b1c44, type: 3}
+  circleYScaleMultiplier: 2
   laneBodyColors:
   - {r: 0.35, g: 0.65, b: 1, a: 0.9}
   - {r: 1, g: 0.55, b: 0.78, a: 0.9}
@@ -3835,3 +3888,4 @@ SceneRoots:
   - {fileID: 1115706188}
   - {fileID: 75768653}
   - {fileID: 1527173350}
+  - {fileID: 277276210}

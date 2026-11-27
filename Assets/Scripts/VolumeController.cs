@@ -1,11 +1,13 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
+using UnityEngine.AddressableAssets;
 using TMPro;
 
 // ============================================================
 // VolumeController.cs
-//   옵션 화면의 "볼륨" 탭 — 전체 볼륨(마스터 볼륨) 하나만 슬라이더로
-//   조절한다. 개별 AudioSource(BGM, 효과음 등)를 하나씩 따로 관리하는
+//   옵션 화면의 "사운드" 탭 — 모든 음량 조절(전체 볼륨, 효과음 on/off와
+//   효과음 음량)이 여기에 모여 있다. 전체 볼륨은 개별 AudioSource(BGM, 효과음 등)를 하나씩 따로 관리하는
 //   대신 AudioListener.volume을 직접 조절한다 — 이 값은 씬에 어떤
 //   AudioSource가 몇 개 있든 상관없이 그 순간 스피커로 나가는 모든
 //   소리에 한꺼번에 곱해지는 전역 배율이라, "전체 볼륨 하나만"이라는
@@ -34,13 +36,82 @@ public class VolumeController : MonoBehaviour
     public Slider masterVolumeSlider;
     public TMP_Text valueLabel;
 
+    [Header("효과음 (키 입력 bells)")]
+    public Slider sfxVolumeSlider;
+    public TMP_Text sfxValueLabel;
+    [Tooltip("같은 ToggleGroup에 묶인 켜기/끄기 라디오 버튼.")]
+    public Toggle sfxOnToggle;
+    public Toggle sfxOffToggle;
+    [Tooltip("효과음 볼륨 슬라이더에서 손을 뗄 때 들려줄 미리듣기 소리(Addressables, 플레이 중 키 효과음과 같은 클립).")]
+    public AssetReferenceT<AudioClip> sfxPreviewClip;
+
     private bool dirty;
+    private AudioSource previewSource;
+    private AudioClip previewClip;
+    private readonly AddressableAssetSlot<AudioClip> previewSlot = new AddressableAssetSlot<AudioClip>();
 
     void Awake()
     {
+        // 미리듣기: 클립은 비동기로 미리 받아두고, 슬라이더에서 포인터를 뗄 때 한 번 재생한다.
+        previewSource = gameObject.AddComponent<AudioSource>();
+        previewSource.playOnAwake = false;
+        previewSource.spatialBlend = 0f;
+        previewSlot.Load(sfxPreviewClip, clip => previewClip = clip);
+
+        if (sfxVolumeSlider != null)
+        {
+            var trigger = sfxVolumeSlider.gameObject.GetComponent<EventTrigger>();
+            if (trigger == null) trigger = sfxVolumeSlider.gameObject.AddComponent<EventTrigger>();
+            var entry = new EventTrigger.Entry { eventID = EventTriggerType.PointerUp };
+            entry.callback.AddListener(_ => PlaySfxPreview());
+            trigger.triggers.Add(entry);
+        }
+
         if (masterVolumeSlider != null)
         {
             masterVolumeSlider.onValueChanged.AddListener(OnVolumeChanged);
+        }
+        if (sfxVolumeSlider != null) sfxVolumeSlider.onValueChanged.AddListener(OnSfxVolumeChanged);
+        if (sfxOnToggle != null) sfxOnToggle.onValueChanged.AddListener(isOn => { if (isOn) SetSfxEnabled(true); });
+        if (sfxOffToggle != null) sfxOffToggle.onValueChanged.AddListener(isOn => { if (isOn) SetSfxEnabled(false); });
+    }
+
+    void OnDestroy()
+    {
+        previewSlot.Release();
+    }
+
+    // 기능: 효과음 볼륨 슬라이더에서 손을 뗄 때 현재 음량으로 효과음을 한 번 들려준다.
+    // 원리: 전체 볼륨(AudioListener.volume)은 자동으로 곱해지므로 여기서는 효과음
+    //       음량만 곱한다. 효과음이 꺼져 있어도 음량을 맞춰볼 수 있게 항상 재생한다.
+    private void PlaySfxPreview()
+    {
+        if (previewClip != null)
+        {
+            previewSource.PlayOneShot(previewClip, GameSettings.SfxVolume);
+        }
+    }
+
+    // 효과음 on/off는 드래그처럼 연속으로 호출되지 않으므로 바로 저장한다.
+    private void SetSfxEnabled(bool enabled)
+    {
+        GameSettings.SfxEnabled = enabled;
+        GameSettings.Save();
+    }
+
+    // 마스터 볼륨과 같은 이유로 드래그 중에는 메모리에만 반영하고 OnDisable에서 저장한다.
+    private void OnSfxVolumeChanged(float value)
+    {
+        GameSettings.SfxVolume = value;
+        dirty = true;
+        UpdateSfxLabel(value);
+    }
+
+    private void UpdateSfxLabel(float value)
+    {
+        if (sfxValueLabel != null)
+        {
+            sfxValueLabel.text = $"효과음 볼륨: {Mathf.RoundToInt(value * 100f)}%";
         }
     }
 
@@ -55,6 +126,13 @@ public class VolumeController : MonoBehaviour
             masterVolumeSlider.SetValueWithoutNotify(saved);
         }
         UpdateLabel(saved);
+
+        float sfx = GameSettings.SfxVolume;
+        if (sfxVolumeSlider != null) sfxVolumeSlider.SetValueWithoutNotify(sfx);
+        UpdateSfxLabel(sfx);
+        bool sfxOn = GameSettings.SfxEnabled;
+        if (sfxOnToggle != null) sfxOnToggle.SetIsOnWithoutNotify(sfxOn);
+        if (sfxOffToggle != null) sfxOffToggle.SetIsOnWithoutNotify(!sfxOn);
     }
 
     // 기능: 이 패널을 벗어날 때(탭 전환/뒤로가기) 드래그 중 미뤄뒀던 저장을 확정한다.

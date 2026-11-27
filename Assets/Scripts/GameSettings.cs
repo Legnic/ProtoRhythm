@@ -16,6 +16,8 @@ public static class GameSettings
     private const string TimingFeedbackDeadZoneKey = "TimingFeedbackDeadZone";
     private const string TimingFeedbackDisplayModeKey = "TimingFeedbackDisplayMode";
     private const string NoteSkinKey = "NoteSkin";
+    private const string SfxEnabledKey = "SfxEnabled";
+    private const string SfxVolumeKey = "SfxVolume";
 
     // 기능: 저장된 오디오 오프셋(초)을 읽어온다. 저장된 적이 없으면 0(보정 없음).
     public static float AudioOffset
@@ -78,6 +80,20 @@ public static class GameSettings
     {
         get => (NoteSkin)PlayerPrefs.GetInt(NoteSkinKey, (int)NoteSkin.Square);
         set => PlayerPrefs.SetInt(NoteSkinKey, (int)value);
+    }
+
+    // 기능: 키 효과음(bells) 켜짐 여부. 저장된 적이 없으면 켜짐.
+    public static bool SfxEnabled
+    {
+        get => PlayerPrefs.GetInt(SfxEnabledKey, 1) != 0;
+        set => PlayerPrefs.SetInt(SfxEnabledKey, value ? 1 : 0);
+    }
+
+    // 기능: 효과음 음량(0~1). 마스터 볼륨(AudioListener.volume)과 곱해져서 최종 크기가 된다.
+    public static float SfxVolume
+    {
+        get => PlayerPrefs.GetFloat(SfxVolumeKey, 1f);
+        set => PlayerPrefs.SetFloat(SfxVolumeKey, value);
     }
 
     // 기능: 지금까지 바뀐 값을 디스크에 실제로 기록한다.

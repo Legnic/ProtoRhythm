@@ -20,6 +20,9 @@ public class InputJudge : MonoBehaviour
     [Header("참조")]
     public GameManager gameManager;
 
+    [Tooltip("키를 누를 때마다 울리는 효과음. 비워두면 소리 없음.")]
+    public KeyHitSound keySound;
+
     [Tooltip("레인 순서에 대응하는 키. LaneManager의 레인 개수와 길이가 같아야 한다.")]
     public Key[] laneKeys = { Key.D, Key.F, Key.J, Key.K };
 
@@ -60,6 +63,8 @@ public class InputJudge : MonoBehaviour
         {
             if (keyboard[laneKeys[lane]].wasPressedThisFrame)
             {
+                // 판정과 무관하게 키를 누르는 즉시 효과음을 낸다(헛치기/연타 포함).
+                if (keySound != null) keySound.Play();
                 TryPress(lane);
             }
             else if (keyboard[laneKeys[lane]].wasReleasedThisFrame)
@@ -133,6 +138,8 @@ public class InputJudge : MonoBehaviour
             return;
         }
 
+        // 롱노트 꼬리를 처리하는 순간에도 키를 누를 때와 같은 효과음을 낸다.
+        if (keySound != null) keySound.Play();
         note.ReleaseHold(gameManager.clock.CurrentTime);
     }
 }
