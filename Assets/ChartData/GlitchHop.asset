@@ -1785,8 +1785,8 @@ MonoBehaviour:
     multiplier: 1.08
   - time: 157.090909
     multiplier: 0.88
-  bpm: 132.7
-  offsetSeconds: 0.545
+  bpm: 132.706
+  offsetSeconds: 0.5473
   laneCount: 4
   beatsPerMeasure: 4
   subdivision: 8

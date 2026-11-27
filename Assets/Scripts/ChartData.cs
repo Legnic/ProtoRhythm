@@ -74,6 +74,13 @@ public class ChartData : ScriptableObject
     [Tooltip("Chart Editor 격자의 마디 수.")]
     public int measureCount = 8;
 
+    // Chart Editor 전용 템포 맵 — 판정/재생에는 관여하지 않는다(노트는 hitTime만으로 재생된다).
+    // 템포가 곡 진행에 따라 조금씩 변하는 곡은 고정 bpm/offsetSeconds 격자가 뒤로 갈수록
+    // 실제 박에서 어긋나므로, 박마다의 실제 시각을 여기 적어두면 Chart Editor가 그 시각을
+    // 격자로 쓴다. 0번 원소가 격자의 첫 박(step 0)이다. 비어 있으면 고정 BPM 격자를 쓴다.
+    [Tooltip("Chart Editor용 박 시각 목록(초). 비어 있으면 bpm/offsetSeconds 고정 격자를 쓴다.")]
+    public List<float> beatTimes = new List<float>();
+
     // 기능: notes 리스트를 hitTime이 빠른 순서대로 정렬한다.
     // 원리: NoteSpawner는 "포인터 하나로 앞에서부터 훑는" 방식으로 노트를 스폰하기
     //       때문에(NoteSpawner.cs 참고), 리스트가 시간순이 아니면 늦게 나와야 할

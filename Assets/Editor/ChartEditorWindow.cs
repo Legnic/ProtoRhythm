@@ -46,18 +46,33 @@ public class ChartEditorWindow : EditorWindow
 
     // 격자 위의 노트 하나. startStep에서 시작해서 lengthSteps칸을 차지한다.
     // lengthSteps == 1이면 탭 노트, 그보다 크면 롱노트다.
+    //
+    // 시각 보존: 채보 애셋에서 불러온 노트는 원래의 정확한 시각(exactTime)과
+    // 홀드 길이(exactHold)를 그대로 기억한다(keepsExactTime). 격자 칸
+    // (startStep/lengthSteps)은 화면 표시용으로만 매번 다시 계산하고, 저장할
+    // 때는 기억해둔 원래 시각을 그대로 쓴다 — 그래서 불러와서 아무것도 안 하고
+    // 저장해도, BPM/세분화를 바꾼 뒤 저장해도, 격자에서 벗어나 있던 노트가 격자로
+    // 끌려가 타이밍이 틀어지는 일이 없다. 편집기에서 새로 찍은 노트만 격자 시각으로
+    // 저장된다.
     private class EditorNote
     {
         public int lane;
         public int startStep;
         public int lengthSteps;
+        public bool keepsExactTime;
+        public float exactTime;
+        public float exactHold;
+        public bool offGrid; // 표시용: 원래 시각이 현재 격자 칸에서 OffGridToleranceSeconds 넘게 벗어나 있음
     }
 
     // 변속 열의 항목 하나. 이 스텝부터 새 배속(multiplier)이 적용된다.
+    // 노트와 마찬가지로, 불러온 항목은 원래 시각을 그대로 기억한다.
     private class EditorSpeedChange
     {
         public int step;
         public float multiplier;
+        public bool keepsExactTime;
+        public float exactTime;
     }
 
     public ChartData targetChart;
@@ -68,6 +83,20 @@ public class ChartEditorWindow : EditorWindow
     private int beatsPerMeasure = 4;
     private int subdivision = 4; // 1=4분, 2=8분, 4=16분, 8=32분, 16=64분음표
     private int measureCount = 8;
+
+    // 템포 맵(박마다의 실제 시각). 비어 있으면 bpm/offsetSeconds의 고정 격자를 쓴다.
+    // 채보 애셋의 beatTimes에서 불러오고, 저장할 때 그대로 되돌려 쓴다.
+    private readonly List<float> beatTimes = new List<float>();
+
+    // 같은 레인의 같은 칸에 겹쳐서 화면에 하나만 보이는 노트 수(세분화가 너무 굵을 때 생김).
+    private int hiddenOverlapCount;
+    private int offGridCount;
+
+    // 기능: 현재 설정(bpm/오프셋/세분화/템포 맵)으로 칸<->시각 변환기를 만든다.
+    // 원리: 설정 필드가 매 프레임 바뀔 수 있으므로 캐시하지 않고 필요할 때마다
+    //       만든다 — 가벼운 객체라 비용이 거의 없다.
+    private ChartTimeGrid Grid => new ChartTimeGrid(bpm, offsetSeconds, subdivision, beatTimes);
+    private float StepToTime(int step) => (float)Grid.StepToTime(step);
 
     private readonly List<EditorNote> notes = new List<EditorNote>();
     private readonly Dictionary<(int lane, int step), EditorNote> stepLookup = new Dictionary<(int, int), EditorNote>();
@@ -102,10 +131,14 @@ public class ChartEditorWindow : EditorWindow
 
     private static readonly Color EmptyColor = new Color(0.22f, 0.22f, 0.22f);
     private static readonly Color HeadColor = new Color(0.3f, 0.65f, 1f);
+    private static readonly Color OffGridHeadColor = new Color(0.35f, 0.85f, 0.6f);
     private static readonly Color BodyColor = new Color(0.3f, 0.65f, 1f, 0.45f);
     private static readonly Color HoverPreviewColor = new Color(0.3f, 0.65f, 1f, 0.25f);
     private static readonly Color PlayheadColor = new Color(1f, 0.7f, 0.2f);
     private static readonly Color MetronomeFlashColor = new Color(1f, 0.95f, 0.4f, 0.35f);
+
+    // 이보다 작은 차이는 사람이 느낄 수 없는 수준이라 "격자 위"로 본다(초록 표시 기준).
+    private const double OffGridToleranceSeconds = 0.005;
 
     private const float CellWidth = 50f;
     private const float CellHeight = 18f;
@@ -327,8 +360,7 @@ public class ChartEditorWindow : EditorWindow
 
         previewTime = AudioPreviewUtility.GetPosition() * playbackSpeed;
 
-        float secondsPerStep = (60f / bpm) / subdivision;
-        int currentStep = Mathf.RoundToInt((previewTime - offsetSeconds) / secondsPerStep);
+        int currentStep = (int)System.Math.Round(Grid.TimeToStep(previewTime));
         int stepsPerMeasure = beatsPerMeasure * subdivision;
         if (currentStep >= 0 && currentStep > lastMetronomeStep && currentStep % stepsPerMeasure == 0)
         {
@@ -353,10 +385,37 @@ public class ChartEditorWindow : EditorWindow
     {
         EditorGUILayout.LabelField("채보 설정", EditorStyles.boldLabel);
         targetChart = (ChartData)EditorGUILayout.ObjectField("대상 ChartData", targetChart, typeof(ChartData), false);
-        bpm = Mathf.Max(1f, EditorGUILayout.FloatField("BPM", bpm));
-        // 음수 오프셋은 격자/시간 계산에서 의미가 없다(첫 박자가 곡 시작보다도
-        // 앞선다는 뜻이 되어버린다) — bpm과 같은 이유로 여기서 0 이상으로 막는다.
-        offsetSeconds = Mathf.Max(0f, EditorGUILayout.FloatField("시작 오프셋(초)", offsetSeconds));
+
+        // 템포 맵이 있으면 격자는 박 시각 목록을 따르므로 BPM/오프셋 입력은 쓰이지 않는다 —
+        // 헷갈리지 않도록 잠가두고, 맵의 평균 BPM과 첫 박 시각을 안내한다.
+        bool usesTempoMap = beatTimes.Count >= 2;
+        if (usesTempoMap)
+        {
+            EditorGUILayout.HelpBox(
+                $"템포 맵 사용 중: {beatTimes.Count}박, 평균 BPM {Grid.AverageBpm():0.###}, 첫 박 {beatTimes[0]:0.###}초. " +
+                "격자 칸이 곡의 실제 박 위치를 따라갑니다(템포가 조금씩 변하는 곡용).",
+                MessageType.Info);
+            if (GUILayout.Button("템포 맵 해제 (고정 BPM 격자로 전환)", GUILayout.Width(240)))
+            {
+                if (EditorUtility.DisplayDialog("템포 맵 해제",
+                        "고정 BPM 격자로 바꿉니다. 이미 있는 노트의 시각은 그대로 보존되지만, 이후 새로 찍는 노트는 " +
+                        "곡의 실제 박에서 어긋날 수 있습니다. 저장해야 채보 애셋에 반영됩니다.", "해제", "취소"))
+                {
+                    bpm = (float)Grid.AverageBpm();
+                    // 오프셋 입력은 0 이상만 허용하므로, 첫 박이 0초보다 앞이면(곡 시작 직전) 그다음 박을 쓴다.
+                    offsetSeconds = beatTimes.Find(t => t >= 0f);
+                    beatTimes.Clear();
+                    usesTempoMap = false;
+                }
+            }
+        }
+        using (new EditorGUI.DisabledScope(usesTempoMap))
+        {
+            bpm = Mathf.Max(1f, EditorGUILayout.FloatField("BPM", bpm));
+            // 음수 오프셋은 격자/시간 계산에서 의미가 없다(첫 박자가 곡 시작보다도
+            // 앞선다는 뜻이 되어버린다) — bpm과 같은 이유로 여기서 0 이상으로 막는다.
+            offsetSeconds = Mathf.Max(0f, EditorGUILayout.FloatField("시작 오프셋(초)", offsetSeconds));
+        }
         laneCount = EditorGUILayout.IntSlider("레인 수", laneCount, 1, 8);
         beatsPerMeasure = EditorGUILayout.IntSlider("한 마디당 박자 수", beatsPerMeasure, 1, 8);
         subdivision = EditorGUILayout.IntPopup("박자 세분화", subdivision,
@@ -389,10 +448,8 @@ public class ChartEditorWindow : EditorWindow
     {
         if (previewClip == null) return;
 
-        float secondsPerStep = (60f / bpm) / subdivision;
         int stepsPerMeasure = Mathf.Max(1, beatsPerMeasure * subdivision);
-        float coveredSeconds = Mathf.Max(0f, previewClip.length - offsetSeconds);
-        int neededSteps = secondsPerStep > 0f ? Mathf.CeilToInt(coveredSeconds / secondsPerStep) : 0;
+        int neededSteps = Mathf.Max(0, Mathf.CeilToInt((float)Grid.TimeToStep(previewClip.length)));
 
         measureCount = Mathf.Max(1, Mathf.CeilToInt((float)neededSteps / stepsPerMeasure));
         Repaint();
@@ -433,8 +490,17 @@ public class ChartEditorWindow : EditorWindow
         EditorGUILayout.HelpBox(
             "노트 칸: 좌클릭 = 탭 노트, 좌클릭한 채로 드래그 = 롱노트, 노트 위 우클릭 = 삭제.\n" +
             "변속 칸: '+' 클릭 = 그 시각부터 배속 추가(숫자 직접 입력 가능), 'x' = 삭제.\n" +
-            "\"미리듣기 캐시 비우기\"는 배속 변경 미리듣기용으로 만들어둔 디스크 파일만 지운다 — 채보 데이터와는 무관하다.",
+            "\"미리듣기 캐시 비우기\"는 배속 변경 미리듣기용으로 만들어둔 디스크 파일만 지운다 — 채보 데이터와는 무관하다.\n" +
+            "불러온 노트는 원래 시각 그대로 저장된다. 초록색 노트 = 격자 칸 사이에 있는 노트(가장 가까운 칸에 표시됨).",
             MessageType.None);
+
+        if (hiddenOverlapCount > 0)
+        {
+            EditorGUILayout.HelpBox(
+                $"같은 칸에 겹쳐서 하나만 보이는 노트가 {hiddenOverlapCount}개 있습니다. 저장해도 지워지지 않지만, " +
+                "보고 편집하려면 '박자 세분화'를 더 촘촘하게 바꾸세요.",
+                MessageType.Warning);
+        }
     }
 
     // 기능: BPM/마디 수/세분화 설정에 맞춰 전체 격자(시간 레이블 + 변속 열 +
@@ -457,7 +523,7 @@ public class ChartEditorWindow : EditorWindow
     private void DrawGrid()
     {
         int totalSteps = measureCount * beatsPerMeasure * subdivision;
-        float secondsPerStep = (60f / bpm) / subdivision;
+        ChartTimeGrid grid = Grid;
 
         // 오프셋(offsetSeconds) 이전, 즉 곡의 진짜 도입부(0초~오프셋)도 격자에
         // 표시하고 그 구간에 노트를 놓을 수 있어야 한다 — 실제 게임에서는
@@ -465,13 +531,13 @@ public class ChartEditorWindow : EditorWindow
         // 오프셋 이전이라고 노트를 못 놓을 이유가 없다. 이 구간은 step을
         // 음수로 확장해서 표현한다: step -preSteps가 대략 0초, step 0이
         // 오프셋(첫 박자)이 되도록 한다.
-        int preSteps = secondsPerStep > 0f ? Mathf.Max(0, Mathf.CeilToInt(offsetSeconds / secondsPerStep)) : 0;
+        int preSteps = Mathf.Max(0, Mathf.CeilToInt((float)-grid.TimeToStep(0)));
 
         RebuildStepLookup();
         RebuildSpeedLookup();
 
         bool playing = AudioPreviewUtility.IsPlaying();
-        int playheadStep = hasPreviewTime ? Mathf.RoundToInt((previewTime - offsetSeconds) / secondsPerStep) : int.MinValue;
+        int playheadStep = hasPreviewTime ? (int)System.Math.Round(grid.TimeToStep(previewTime)) : int.MinValue;
 
         int firstStep = -preSteps;
         int rowCount = totalSteps - firstStep;
@@ -516,7 +582,7 @@ public class ChartEditorWindow : EditorWindow
             int step = firstStep + i;
             EditorGUILayout.BeginHorizontal();
 
-            float time = offsetSeconds + step * secondsPerStep;
+            float time = (float)grid.StepToTime(step);
             DrawTimeCell(time, step);
             DrawSpeedCell(step);
 
@@ -593,7 +659,7 @@ public class ChartEditorWindow : EditorWindow
         Color fill;
         if (note != null)
         {
-            fill = isHead ? HeadColor : BodyColor;
+            fill = isHead ? (note.offGrid ? OffGridHeadColor : HeadColor) : BodyColor;
         }
         else if (!isDragging && lane == hoverLane && step == hoverStep)
         {
@@ -737,11 +803,33 @@ public class ChartEditorWindow : EditorWindow
     //       차지하므로, 그 모든 칸에 같은 노트 참조를 채워 넣는다. 매 프레임
     //       DrawGrid 시작 시 호출해서, 격자를 그리는 동안에는 "이 칸에 노트가
     //       있는지"를 리스트 전체를 훑지 않고 O(1) 조회로 바로 알 수 있게 한다.
+    //       시각을 보존하는 노트(keepsExactTime)는 지금의 격자 설정(BPM/세분화/
+    //       템포 맵)으로 가장 가까운 칸을 매번 다시 계산한다 — 설정을 바꾸면 화면
+    //       위치는 따라 바뀌지만 저장되는 시각은 그대로다. 같은 칸을 이미 다른
+    //       노트가 차지하고 있으면 화면에는 하나만 보이므로 그 수를 세어 경고한다.
     private void RebuildStepLookup()
     {
         stepLookup.Clear();
+        hiddenOverlapCount = 0;
+        offGridCount = 0;
+        ChartTimeGrid grid = Grid;
         foreach (EditorNote note in notes)
         {
+            if (note.keepsExactTime)
+            {
+                note.startStep = (int)System.Math.Round(grid.TimeToStep(note.exactTime));
+                int endStep = note.exactHold > 0f
+                    ? (int)System.Math.Round(grid.TimeToStep(note.exactTime + note.exactHold))
+                    : note.startStep;
+                note.lengthSteps = Mathf.Max(1, endStep - note.startStep + 1);
+                note.offGrid = grid.DistanceFromGrid(note.exactTime) > OffGridToleranceSeconds;
+                if (note.offGrid) offGridCount++;
+            }
+
+            if (stepLookup.ContainsKey((note.lane, note.startStep)))
+            {
+                hiddenOverlapCount++;
+            }
             for (int s = note.startStep; s < note.startStep + note.lengthSteps; s++)
             {
                 stepLookup[(note.lane, s)] = note;
@@ -756,8 +844,13 @@ public class ChartEditorWindow : EditorWindow
     private void RebuildSpeedLookup()
     {
         speedStepLookup.Clear();
+        ChartTimeGrid grid = Grid;
         foreach (EditorSpeedChange change in speedChanges)
         {
+            if (change.keepsExactTime)
+            {
+                change.step = (int)System.Math.Round(grid.TimeToStep(change.exactTime));
+            }
             speedStepLookup[change.step] = change;
         }
     }
@@ -801,26 +894,33 @@ public class ChartEditorWindow : EditorWindow
         subdivision = targetChart.subdivision;
         measureCount = targetChart.measureCount;
 
-        float secondsPerStep = (60f / bpm) / subdivision;
+        beatTimes.Clear();
+        if (targetChart.beatTimes != null) beatTimes.AddRange(targetChart.beatTimes);
+
+        // 오프셋(첫 박자) 이전 시각(도입부 구간)의 노트도 음수 step으로 되살린다 —
+        // 격자가 그 구간까지 표시한다(DrawGrid 참고). 칸 위치(startStep/lengthSteps)는
+        // RebuildStepLookup이 exactTime에서 매번 다시 계산하므로 여기서는 시각만 기억한다.
         foreach (NoteData data in targetChart.notes)
         {
-            // 오프셋(첫 박자) 이전 시각(도입부 구간)의 노트도 음수 step으로
-            // 그대로 되살린다 — 격자가 이제 그 구간까지 표시한다(DrawGrid 참고).
-            int startStep = Mathf.RoundToInt((data.hitTime - offsetSeconds) / secondsPerStep);
-
-            // 탭 노트는 1칸, 롱노트는 홀드 길이를 스텝 수로 환산해 그만큼 칸을 차지한다.
-            int lengthSteps = data.holdDuration > 0f
-                ? Mathf.Max(1, Mathf.RoundToInt(data.holdDuration / secondsPerStep) + 1)
-                : 1;
-
-            notes.Add(new EditorNote { lane = data.lane, startStep = startStep, lengthSteps = lengthSteps });
+            notes.Add(new EditorNote
+            {
+                lane = data.lane,
+                keepsExactTime = true,
+                exactTime = data.hitTime,
+                exactHold = Mathf.Max(0f, data.holdDuration),
+            });
         }
 
         foreach (SpeedChange sc in targetChart.speedChanges)
         {
-            int step = Mathf.RoundToInt((sc.time - offsetSeconds) / secondsPerStep);
-            speedChanges.Add(new EditorSpeedChange { step = step, multiplier = sc.multiplier });
+            speedChanges.Add(new EditorSpeedChange { multiplier = sc.multiplier, keepsExactTime = true, exactTime = sc.time });
         }
+
+        RebuildStepLookup();
+        RebuildSpeedLookup();
+        Debug.Log($"채보 불러오기: 노트 {notes.Count}개, 변속 {speedChanges.Count}개" +
+                  (beatTimes.Count >= 2 ? $", 템포 맵 {beatTimes.Count}박" : "") +
+                  (offGridCount > 0 ? $" — 격자에서 벗어난 노트 {offGridCount}개는 원래 시각 그대로 보존됩니다." : ""));
     }
 
     // 기능: 현재 격자 위의 EditorNote/EditorSpeedChange 리스트를 초 단위
@@ -839,14 +939,20 @@ public class ChartEditorWindow : EditorWindow
             return;
         }
 
-        float secondsPerStep = (60f / bpm) / subdivision;
         Undo.RecordObject(targetChart, "채보 편집");
 
+        // 불러온 노트/변속은 기억해둔 원래 시각을, 편집기에서 새로 만든 것만
+        // 격자 칸 시각을 쓴다(EditorNote 주석 참고).
         var noteResult = new List<NoteData>();
         foreach (EditorNote note in notes)
         {
-            float time = offsetSeconds + note.startStep * secondsPerStep;
-            float holdDuration = (note.lengthSteps - 1) * secondsPerStep;
+            if (note.keepsExactTime)
+            {
+                noteResult.Add(new NoteData(note.lane, note.exactTime, note.exactHold));
+                continue;
+            }
+            float time = StepToTime(note.startStep);
+            float holdDuration = note.lengthSteps > 1 ? StepToTime(note.startStep + note.lengthSteps - 1) - time : 0f;
             noteResult.Add(new NoteData(note.lane, time, holdDuration));
         }
         noteResult.Sort((a, b) => a.hitTime.CompareTo(b.hitTime));
@@ -855,11 +961,12 @@ public class ChartEditorWindow : EditorWindow
         var speedResult = new List<SpeedChange>();
         foreach (EditorSpeedChange change in speedChanges)
         {
-            float time = offsetSeconds + change.step * secondsPerStep;
+            float time = change.keepsExactTime ? change.exactTime : StepToTime(change.step);
             speedResult.Add(new SpeedChange(time, change.multiplier));
         }
         speedResult.Sort((a, b) => a.time.CompareTo(b.time));
         targetChart.speedChanges = speedResult;
+        targetChart.beatTimes = new List<float>(beatTimes);
 
         targetChart.bpm = bpm;
         targetChart.offsetSeconds = offsetSeconds;
