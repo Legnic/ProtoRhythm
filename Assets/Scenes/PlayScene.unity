@@ -1731,6 +1731,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::InputJudge
   gameManager: {fileID: 1400898291}
   keySound: {fileID: 277276209}
+  keyBeam: {fileID: 2005907435}
   laneKeys: 12000000140000001800000019000000i
 --- !u!114 &1038818972
 MonoBehaviour:
@@ -3690,6 +3691,62 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2005907433
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2005907434}
+  - component: {fileID: 2005907435}
+  m_Layer: 0
+  m_Name: LaneKeyBeams
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2005907434
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2005907433}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2005907435
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2005907433}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 009e7d1001260b64dbd736296f1e5b7b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LaneKeyBeam
+  laneManager: {fileID: 1259059206}
+  gameManager: {fileID: 1400898291}
+  beamColor: {r: 0, g: 0, b: 0, a: 0.5882353}
+  beamHeight: 7
+  bottomOffset: 0.05
+  sidePadding: 0.06
+  gradientPower: 1.6
+  sortingOrder: -2
+  riseTime: 0.06
+  fadeTime: 0.25
+  riseStartScale: 0.3
+  fadeEndScale: 0.85
 --- !u!1 &2014028926
 GameObject:
   m_ObjectHideFlags: 0
@@ -4430,3 +4487,4 @@ SceneRoots:
   - {fileID: 75768653}
   - {fileID: 1527173350}
   - {fileID: 277276210}
+  - {fileID: 2005907434}

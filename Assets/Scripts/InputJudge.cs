@@ -25,8 +25,16 @@ public class InputJudge : MonoBehaviour
     [Tooltip("키를 누를 때마다 울리는 효과음. 비워두면 소리 없음.")]
     public KeyHitSound keySound;
 
+    [Tooltip("키를 누르면 레인 아래에서 솟는 빛줄기(키 빔). 비워두면 연출 없음.")]
+    public LaneKeyBeam keyBeam;
+
     [Tooltip("레인 순서에 대응하는 키. LaneManager의 레인 개수와 길이가 같아야 한다.")]
     public Key[] laneKeys = { Key.D, Key.F, Key.J, Key.K };
+
+    // 레인별 KeyControl 캐시 — 매 프레임 레인마다 keyboard[Key] 조회를 반복하지 않도록,
+    // 키보드 장치가 바뀔 때(연결/교체)만 다시 만든다.
+    private Keyboard cachedKeyboard;
+    private UnityEngine.InputSystem.Controls.KeyControl[] laneControls;
 
     // 기능: 씬이 시작될 때, 옵션 화면(키 매핑 탭)에서 저장해둔 키가 있으면
     //       인스펙터 기본값 대신 그 키로 덮어쓴다.
@@ -61,16 +69,26 @@ public class InputJudge : MonoBehaviour
             return;
         }
 
-        for (int lane = 0; lane < laneKeys.Length; lane++)
+        if (keyboard != cachedKeyboard || laneControls == null || laneControls.Length != laneKeys.Length)
         {
-            if (keyboard[laneKeys[lane]].wasPressedThisFrame)
+            cachedKeyboard = keyboard;
+            laneControls = new UnityEngine.InputSystem.Controls.KeyControl[laneKeys.Length];
+            for (int i = 0; i < laneKeys.Length; i++) laneControls[i] = keyboard[laneKeys[i]];
+        }
+
+        for (int lane = 0; lane < laneControls.Length; lane++)
+        {
+            var key = laneControls[lane];
+            if (key.wasPressedThisFrame)
             {
-                // 판정과 무관하게 키를 누르는 즉시 효과음을 낸다(헛치기/연타 포함).
+                // 판정과 무관하게 키를 누르는 즉시 효과음과 키 빔을 낸다(헛치기/연타 포함).
                 if (keySound != null) keySound.Play();
+                if (keyBeam != null) keyBeam.Press(lane);
                 TryPress(lane);
             }
-            else if (keyboard[laneKeys[lane]].wasReleasedThisFrame)
+            else if (key.wasReleasedThisFrame)
             {
+                if (keyBeam != null) keyBeam.Release(lane);
                 TryRelease(lane);
             }
         }
@@ -117,6 +135,8 @@ public class InputJudge : MonoBehaviour
             // 머리 판정만 바로 반영하고, 노트는 유지한 채 홀드 상태로 넘긴다.
             ScoreManager.Instance.ReportHit(grade, lane);
             note.BeginHold();
+            // 홀드가 이어지는 동안(키를 뗄 때까지) 키 빔을 최대 밝기로 유지한다.
+            if (keyBeam != null) keyBeam.BeginHold(lane, note);
         }
         else
         {
