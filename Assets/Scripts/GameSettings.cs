@@ -3,7 +3,7 @@ using UnityEngine.InputSystem;
 
 // ============================================================
 // GameSettings.cs
-//   앱을 재시작해도 유지되어야 하는 사용자 설정(판정 보정, 키 매핑)을
+//   앱을 재시작해도 유지되어야 하는 사용자 설정(판정 보정, 키 매핑, 배속 등)을
 //   PlayerPrefs로 감싸서 읽고 쓴다. 씬이 바뀌어도 유지되지만 앱을 껐다
 //   켜면 사라지는 GameSession과 달리, 이 값들은 디스크에 저장되어 앱을
 //   재시작해도 그대로 남아있어야 하는 값이라 별도 클래스로 분리했다.
@@ -18,6 +18,16 @@ public static class GameSettings
     private const string NoteSkinKey = "NoteSkin";
     private const string SfxEnabledKey = "SfxEnabled";
     private const string SfxVolumeKey = "SfxVolume";
+    private const string ScrollSpeedKey = "ScrollSpeed";
+
+    // 배속(노트 낙하 속도) 범위와 단위. 1.0이 기존 기본 속도다.
+    public const float ScrollSpeedMin = 0.5f;
+    public const float ScrollSpeedMax = 5.0f;
+    public const float ScrollSpeedDefault = 1.0f;
+
+    // 배속이 바뀔 때마다 새 값과 함께 알린다 — 플레이 중인 GameManager가 구독해서
+    // 일시정지 패널에서 슬라이더를 움직이는 즉시 노트 속도에 반영한다.
+    public static event System.Action<float> ScrollSpeedChanged;
 
     // 기능: 저장된 오디오 오프셋(초)을 읽어온다. 저장된 적이 없으면 0(보정 없음).
     public static float AudioOffset
@@ -94,6 +104,21 @@ public static class GameSettings
     {
         get => PlayerPrefs.GetFloat(SfxVolumeKey, 1f);
         set => PlayerPrefs.SetFloat(SfxVolumeKey, value);
+    }
+
+    // 기능: 배속(GameManager.hiSpeed에 들어가는 값). 저장된 적이 없으면 1.0(기존 속도).
+    // 원리: 0.1 단위로 반올림하고 범위 안으로 잘라서 저장한다 — 슬라이더와 저장값이
+    //       항상 같은 눈금에 있게 하기 위해서다. 값을 쓰면 ScrollSpeedChanged로 바로
+    //       알리므로, 플레이 중에 바꿔도 다음 프레임부터 노트 속도가 바뀐다.
+    public static float ScrollSpeed
+    {
+        get => Mathf.Clamp(PlayerPrefs.GetFloat(ScrollSpeedKey, ScrollSpeedDefault), ScrollSpeedMin, ScrollSpeedMax);
+        set
+        {
+            float v = Mathf.Clamp(Mathf.Round(value * 10f) / 10f, ScrollSpeedMin, ScrollSpeedMax);
+            PlayerPrefs.SetFloat(ScrollSpeedKey, v);
+            ScrollSpeedChanged?.Invoke(v);
+        }
     }
 
     // 기능: 지금까지 바뀐 값을 디스크에 실제로 기록한다.

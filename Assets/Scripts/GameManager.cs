@@ -25,7 +25,8 @@ public class GameManager : MonoBehaviour
     [Tooltip("hiSpeed 1.0일 때 기준이 되는 스크롤 속도 (유니티 유닛/초)")]
     public float baseScrollSpeed = 8f;
 
-    [Tooltip("플레이어가 조절하는 배속(하이스피드). 표시 속도에만 영향을 주고 판정에는 영향이 없다.")]
+    [Tooltip("플레이어가 조절하는 배속(하이스피드). 표시 속도에만 영향을 주고 판정에는 영향이 없다. " +
+             "실행하면 옵션에 저장된 배속(GameSettings.ScrollSpeed)으로 덮어쓰고, 일시정지 패널에서 바꾸면 즉시 따라간다.")]
     public float hiSpeed = 1f;
 
     [Header("레이아웃")]
@@ -81,5 +82,26 @@ public class GameManager : MonoBehaviour
     void Awake()
     {
         NoteRegistry.Init(laneManager.LaneCount);
+        hiSpeed = GameSettings.ScrollSpeed;
+    }
+
+    // 기능: 배속 설정이 바뀌면(일시정지 패널의 슬라이더 등) hiSpeed를 바로 따라 바꾼다.
+    // 원리: EffectiveSpeed/GetDistance가 매 프레임 hiSpeed를 새로 읽고, Note와
+    //       NoteSpawner가 매 프레임 GetDistance로 위치와 생성 시점을 계산하므로,
+    //       여기서 값만 바꿔주면 이미 화면에 있는 노트까지 다음 프레임부터 새 속도로
+    //       그려진다. 판정 시각(hitTime)은 그대로라 판정에는 영향이 없다.
+    void OnEnable()
+    {
+        GameSettings.ScrollSpeedChanged += OnScrollSpeedChanged;
+    }
+
+    void OnDisable()
+    {
+        GameSettings.ScrollSpeedChanged -= OnScrollSpeedChanged;
+    }
+
+    private void OnScrollSpeedChanged(float value)
+    {
+        hiSpeed = value;
     }
 }
