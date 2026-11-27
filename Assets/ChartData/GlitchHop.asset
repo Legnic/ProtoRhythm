@@ -13,1748 +13,1670 @@ MonoBehaviour:
   m_Name: GlitchHop
   m_EditorClassIdentifier: Assembly-CSharp::ChartData
   notes:
-  - lane: 2
-    hitTime: 0.317512
+  - lane: 1
+    hitTime: 0.321236
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 0.543586
-    holdDuration: 0.000000
-  - lane: 2
-    hitTime: 0.769659
+    hitTime: 0.773364
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 0.995933
+    hitTime: 0.999427
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 2.353747
+    hitTime: 0.999427
     holdDuration: 0.000000
-  - lane: 1
-    hitTime: 3.032480
+  - lane: 3
+    hitTime: 1.451555
+    holdDuration: 0.000000
+  - lane: 0
+    hitTime: 1.903682
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 3.937440
+    hitTime: 1.903682
     holdDuration: 0.000000
-  - lane: 0
-    hitTime: 4.163649
+  - lane: 2
+    hitTime: 2.129745
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 4.616042
+    hitTime: 2.355809
     holdDuration: 0.000000
-  - lane: 0
-    hitTime: 5.294631
+  - lane: 2
+    hitTime: 2.581873
     holdDuration: 0.000000
-  - lane: 0
-    hitTime: 5.520828
+  - lane: 3
+    hitTime: 2.807936
+    holdDuration: 0.000000
+  - lane: 1
+    hitTime: 3.034000
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 5.520828
+    hitTime: 3.260064
     holdDuration: 0.000000
-  - lane: 1
-    hitTime: 5.747014
+  - lane: 0
+    hitTime: 3.712191
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 6.086285
+    hitTime: 3.712191
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 6.312466
+    hitTime: 3.938254
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 6.651737
+    hitTime: 4.164318
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 6.991008
+    hitTime: 4.390382
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 7.217183
-    holdDuration: 0.000000
-  - lane: 3
-    hitTime: 7.217183
+    hitTime: 4.842509
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 7.556306
+    hitTime: 5.294636
     holdDuration: 0.000000
-  - lane: 3
-    hitTime: 7.556306
-    holdDuration: 0.000000
-  - lane: 1
-    hitTime: 7.895429
+  - lane: 2
+    hitTime: 5.746763
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 7.895429
+    hitTime: 6.198891
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 8.234552
+    hitTime: 6.651018
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 8.234552
-    holdDuration: 0.000000
-  - lane: 0
-    hitTime: 8.573675
-    holdDuration: 0.000000
-  - lane: 2
-    hitTime: 9.025874
-    holdDuration: 0.452148
   - lane: 0
-    hitTime: 9.365050
+    hitTime: 6.877082
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 9.591168
+    hitTime: 7.103145
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 9.817286
+    hitTime: 7.555273
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 10.269521
+    hitTime: 8.007400
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 10.269521
+    hitTime: 8.233463
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 10.608677
+    hitTime: 8.459527
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 10.834771
+  - lane: 0
+    hitTime: 8.911654
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 11.173914
+    hitTime: 9.137718
+    holdDuration: 0.000000
+  - lane: 2
+    hitTime: 9.137718
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 11.513056
+    hitTime: 9.589845
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 11.739150
+    hitTime: 9.815909
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 11.739150
+  - lane: 1
+    hitTime: 10.041972
+    holdDuration: 0.000000
+  - lane: 3
+    hitTime: 10.268036
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 12.078286
+    hitTime: 10.494100
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 12.530433
+    hitTime: 10.946227
     holdDuration: 0.000000
-  - lane: 3
-    hitTime: 12.869544
-    holdDuration: 0.000000
-  - lane: 3
-    hitTime: 13.208655
+  - lane: 0
+    hitTime: 11.172291
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 13.660771
+    hitTime: 11.398354
     holdDuration: 0.000000
-  - lane: 0
-    hitTime: 14.338615
+  - lane: 3
+    hitTime: 11.624418
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 15.468503
+    hitTime: 12.076545
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 15.468503
+    hitTime: 12.528672
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 15.807613
+    hitTime: 12.754736
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 16.146724
+    hitTime: 13.206863
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 16.372798
+  - lane: 1
+    hitTime: 13.658991
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 16.598872
+    hitTime: 14.111118
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 16.598872
-    holdDuration: 0.000000
   - lane: 3
-    hitTime: 16.824955
+    hitTime: 14.111118
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 17.051123
+    hitTime: 14.337181
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 17.277292
-    holdDuration: 0.000000
-  - lane: 1
-    hitTime: 17.503460
-    holdDuration: 0.000000
-  - lane: 0
-    hitTime: 18.181965
+    hitTime: 14.563245
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 18.181965
+    hitTime: 14.789309
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 18.408133
+    hitTime: 15.015372
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 18.634276
+    hitTime: 15.015372
     holdDuration: 0.000000
-  - lane: 0
-    hitTime: 19.086561
+  - lane: 1
+    hitTime: 15.241436
     holdDuration: 0.000000
-  - lane: 3
-    hitTime: 19.425775
+  - lane: 0
+    hitTime: 15.467500
     holdDuration: 0.000000
-  - lane: 1
-    hitTime: 19.991132
+  - lane: 0
+    hitTime: 16.371754
     holdDuration: 0.000000
-  - lane: 1
-    hitTime: 20.217210
+  - lane: 3
+    hitTime: 16.371754
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 20.217210
+    hitTime: 16.597818
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 20.443284
-    holdDuration: 0.000000
-  - lane: 3
-    hitTime: 20.669358
+    hitTime: 16.823881
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 20.895432
+    hitTime: 17.276009
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 20.895432
-    holdDuration: 0.000000
-  - lane: 2
-    hitTime: 21.121505
-    holdDuration: 0.000000
-  - lane: 0
-    hitTime: 21.460616
+    hitTime: 17.276009
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 21.686682
+    hitTime: 17.502072
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 21.686682
+    hitTime: 17.954199
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 21.912733
+    hitTime: 18.406327
+    holdDuration: 0.000000
+  - lane: 2
+    hitTime: 18.632390
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 22.364836
+    hitTime: 19.084518
     holdDuration: 0.000000
-  - lane: 3
-    hitTime: 22.364836
+  - lane: 2
+    hitTime: 19.310581
     holdDuration: 0.000000
-  - lane: 1
-    hitTime: 22.703914
+  - lane: 3
+    hitTime: 19.762708
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 23.381977
+    hitTime: 20.214836
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 23.607913
+    hitTime: 20.440899
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 23.607913
+    hitTime: 20.440899
     holdDuration: 0.000000
-  - lane: 1
-    hitTime: 23.833848
-    holdDuration: 0.000000
   - lane: 0
-    hitTime: 24.172752
+    hitTime: 20.893027
     holdDuration: 0.000000
-  - lane: 3
-    hitTime: 24.172752
+  - lane: 0
+    hitTime: 21.119090
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 24.511655
+    hitTime: 21.571218
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 24.737591
+  - lane: 1
+    hitTime: 22.023345
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 25.076459
-    holdDuration: 0.000000
-  - lane: 1
-    hitTime: 25.302366
+    hitTime: 22.249408
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 25.641227
+    hitTime: 22.249408
     holdDuration: 0.000000
-  - lane: 1
-    hitTime: 25.867134
-    holdDuration: 0.452148
-  - lane: 1
-    hitTime: 26.657886
+  - lane: 3
+    hitTime: 22.701536
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 26.996848
+    hitTime: 23.153663
     holdDuration: 0.000000
-  - lane: 3
-    hitTime: 27.222824
+  - lane: 1
+    hitTime: 23.379727
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 27.448799
+    hitTime: 23.605790
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 27.448799
+    hitTime: 23.605790
+    holdDuration: 0.000000
+  - lane: 1
+    hitTime: 23.831854
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 27.674774
+    hitTime: 24.057917
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 28.013737
+    hitTime: 24.510045
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 28.013737
+    hitTime: 24.510045
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 28.352709
-    holdDuration: 0.000000
-  - lane: 3
-    hitTime: 28.578691
+    hitTime: 24.736108
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 28.804672
+    hitTime: 25.188236
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 29.030654
+    hitTime: 25.640363
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 29.369626
+    hitTime: 25.866426
+    holdDuration: 0.000000
+  - lane: 1
+    hitTime: 26.318554
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 29.369626
+    hitTime: 26.318554
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 29.595607
+    hitTime: 26.544617
+    holdDuration: 0.000000
+  - lane: 1
+    hitTime: 26.996745
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 29.934716
+    hitTime: 27.448872
+    holdDuration: 0.000000
+  - lane: 1
+    hitTime: 27.674936
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 29.934716
+    hitTime: 27.674936
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 30.273827
+    hitTime: 28.127063
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 30.839011
+    hitTime: 28.353126
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 30.839011
+  - lane: 3
+    hitTime: 28.805254
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 31.065085
+    hitTime: 29.031317
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 31.404201
-    holdDuration: 0.000000
-  - lane: 1
-    hitTime: 31.743320
+    hitTime: 29.031317
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 31.969399
+    hitTime: 29.257381
+    holdDuration: 0.000000
+  - lane: 2
+    hitTime: 29.483445
     holdDuration: 0.000000
+  - lane: 1
+    hitTime: 29.709508
+    holdDuration: 0.000000
   - lane: 0
-    hitTime: 32.308518
+    hitTime: 29.935572
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 32.647637
+    hitTime: 30.839826
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 32.647637
+    hitTime: 30.839826
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 32.873733
+    hitTime: 31.065890
+    holdDuration: 0.000000
+  - lane: 0
+    hitTime: 31.291954
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 33.099865
+    hitTime: 31.744081
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 33.099865
+    hitTime: 31.744081
     holdDuration: 0.000000
+  - lane: 3
+    hitTime: 31.970144
+    holdDuration: 0.000000
   - lane: 0
-    hitTime: 33.552127
+    hitTime: 32.422272
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 33.891325
+  - lane: 1
+    hitTime: 32.874399
     holdDuration: 0.000000
+  - lane: 0
+    hitTime: 33.100463
+    holdDuration: 0.000000
   - lane: 1
-    hitTime: 34.456654
+    hitTime: 33.552590
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 34.682786
-    holdDuration: 0.904295
+    hitTime: 33.778654
+    holdDuration: 0.000000
+  - lane: 2
+    hitTime: 34.230781
+    holdDuration: 0.000000
   - lane: 0
-    hitTime: 34.908919
+    hitTime: 34.456844
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 35.135052
+    hitTime: 34.456844
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 35.361185
+    hitTime: 34.682908
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 35.587317
+    hitTime: 34.908972
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 36.152638
+    hitTime: 35.361099
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 36.152638
+    hitTime: 35.361099
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 36.378753
+  - lane: 0
+    hitTime: 35.587163
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 36.604869
-    holdDuration: 0.000000
-  - lane: 3
-    hitTime: 36.604869
+    hitTime: 36.039290
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 36.830984
+  - lane: 1
+    hitTime: 36.491417
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 37.170157
+    hitTime: 36.717481
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 37.170157
-    holdDuration: 0.000000
-  - lane: 0
-    hitTime: 37.848458
+    hitTime: 36.717481
     holdDuration: 0.000000
-  - lane: 1
-    hitTime: 38.074532
-    holdDuration: 0.000000
   - lane: 2
-    hitTime: 38.074532
+    hitTime: 37.169608
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 38.300606
+    hitTime: 37.621735
     holdDuration: 0.000000
-  - lane: 1
-    hitTime: 38.526680
+  - lane: 0
+    hitTime: 37.847799
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 38.526680
+    hitTime: 38.299926
     holdDuration: 0.000000
-  - lane: 1
-    hitTime: 38.752754
+  - lane: 0
+    hitTime: 38.525990
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 38.978828
+    hitTime: 38.525990
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 39.204901
-    holdDuration: 0.000000
-  - lane: 3
-    hitTime: 39.770074
+    hitTime: 38.752053
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 39.996143
+    hitTime: 39.204181
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 40.448281
+    hitTime: 39.656308
     holdDuration: 0.000000
+  - lane: 1
+    hitTime: 40.108435
+    holdDuration: 0.000000
   - lane: 0
-    hitTime: 40.787385
+    hitTime: 40.334499
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 41.465529
+    hitTime: 40.334499
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 41.691576
+    hitTime: 40.786626
     holdDuration: 0.000000
-  - lane: 3
-    hitTime: 41.691576
+  - lane: 0
+    hitTime: 41.012690
+    holdDuration: 0.000000
+  - lane: 1
+    hitTime: 41.464817
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 41.917624
+    hitTime: 41.690881
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 42.143671
-    holdDuration: 0.000000
+    hitTime: 41.916944
+    holdDuration: 0.339095
   - lane: 3
-    hitTime: 42.595723
+    hitTime: 42.369071
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 42.821719
+    hitTime: 42.821199
+    holdDuration: 0.339095
+  - lane: 2
+    hitTime: 43.273326
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 44.403705
+    hitTime: 43.499390
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 45.307711
+  - lane: 3
+    hitTime: 43.499390
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 45.533712
+    hitTime: 43.725453
     holdDuration: 0.000000
-  - lane: 3
-    hitTime: 45.759765
+  - lane: 2
+    hitTime: 44.177580
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 46.211913
+    hitTime: 44.629708
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 46.211913
-    holdDuration: 0.000000
-  - lane: 2
-    hitTime: 46.551023
+    hitTime: 45.081835
     holdDuration: 0.000000
-  - lane: 0
-    hitTime: 46.777097
+  - lane: 1
+    hitTime: 45.307899
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 47.116208
+    hitTime: 45.307899
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 47.342312
+    hitTime: 45.533962
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 47.681493
-    holdDuration: 0.000000
-  - lane: 1
-    hitTime: 47.907615
-    holdDuration: 0.000000
-  - lane: 3
-    hitTime: 47.907615
+    hitTime: 45.760026
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 48.359857
+    hitTime: 46.212153
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 48.925134
-    holdDuration: 0.000000
-  - lane: 2
-    hitTime: 49.151207
+    hitTime: 46.438217
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 49.377281
+    hitTime: 46.664280
     holdDuration: 0.000000
-  - lane: 1
-    hitTime: 49.716392
+  - lane: 2
+    hitTime: 46.664280
     holdDuration: 0.000000
-  - lane: 3
-    hitTime: 49.716392
+  - lane: 2
+    hitTime: 47.116408
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 49.942466
-    holdDuration: 0.000000
-  - lane: 1
-    hitTime: 50.168540
-    holdDuration: 0.000000
-  - lane: 2
-    hitTime: 50.168540
+    hitTime: 47.342471
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 50.507639
+    hitTime: 47.568535
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 50.733690
+    hitTime: 47.568535
     holdDuration: 0.000000
-  - lane: 1
-    hitTime: 50.959740
+  - lane: 2
+    hitTime: 48.020662
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 51.298816
+    hitTime: 48.246726
     holdDuration: 0.000000
-  - lane: 3
-    hitTime: 51.298816
+  - lane: 0
+    hitTime: 48.698853
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 51.637892
+    hitTime: 49.150980
+    holdDuration: 0.000000
+  - lane: 0
+    hitTime: 49.377044
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 51.637892
+    hitTime: 49.377044
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 51.976968
+    hitTime: 49.829171
     holdDuration: 0.000000
-  - lane: 3
-    hitTime: 52.428961
-    holdDuration: 0.452148
-  - lane: 0
-    hitTime: 52.767951
+  - lane: 2
+    hitTime: 50.281298
     holdDuration: 0.000000
-  - lane: 1
-    hitTime: 52.993944
+  - lane: 3
+    hitTime: 50.507362
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 52.993944
+    hitTime: 50.733426
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 53.445932
+    hitTime: 50.959489
     holdDuration: 0.000000
-  - lane: 3
-    hitTime: 53.671951
+  - lane: 0
+    hitTime: 51.185553
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 54.011062
+    hitTime: 51.185553
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 54.237135
+  - lane: 1
+    hitTime: 51.637680
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 54.576246
+    hitTime: 51.863744
     holdDuration: 0.000000
-  - lane: 1
-    hitTime: 54.915357
+  - lane: 3
+    hitTime: 52.315871
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 55.254467
+    hitTime: 52.541935
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 55.593570
-    holdDuration: 0.000000
-  - lane: 1
-    hitTime: 56.158742
-    holdDuration: 0.000000
-  - lane: 0
-    hitTime: 56.384811
+    hitTime: 52.541935
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 56.384811
+    hitTime: 52.767998
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 56.610880
+    hitTime: 52.994062
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 56.949982
+  - lane: 0
+    hitTime: 53.446189
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 57.176049
+    hitTime: 53.672253
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 57.402116
+    hitTime: 53.898317
+    holdDuration: 0.000000
+  - lane: 3
+    hitTime: 53.898317
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 57.741216
+    hitTime: 54.124380
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 57.741216
+    hitTime: 54.576507
     holdDuration: 0.000000
-  - lane: 1
-    hitTime: 58.080317
-    holdDuration: 0.000000
   - lane: 2
-    hitTime: 58.080317
-    holdDuration: 0.000000
-  - lane: 1
-    hitTime: 58.306384
+    hitTime: 54.802571
     holdDuration: 0.000000
-  - lane: 1
-    hitTime: 58.645477
+  - lane: 3
+    hitTime: 55.254698
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 58.645477
-    holdDuration: 0.000000
-  - lane: 3
-    hitTime: 58.871538
+    hitTime: 55.480762
     holdDuration: 0.000000
-  - lane: 0
-    hitTime: 59.210630
+  - lane: 1
+    hitTime: 55.706826
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 59.210630
+    hitTime: 55.932889
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 59.775782
+  - lane: 1
+    hitTime: 56.385016
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 60.001843
+    hitTime: 56.611080
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 60.227894
+    hitTime: 56.837144
     holdDuration: 0.000000
-  - lane: 1
-    hitTime: 60.566972
-    holdDuration: 0.000000
   - lane: 2
-    hitTime: 60.566972
+    hitTime: 57.289271
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 61.019076
+  - lane: 0
+    hitTime: 57.741398
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 61.358153
+    hitTime: 58.419589
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 61.584205
+    hitTime: 58.419589
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 61.810214
+    hitTime: 58.645653
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 62.036219
+    hitTime: 59.097780
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 62.488230
+    hitTime: 59.549907
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 62.827238
+    hitTime: 60.002035
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 63.392310
+    hitTime: 60.228098
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 63.392310
+  - lane: 0
+    hitTime: 60.680225
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 63.618383
+    hitTime: 60.680225
+    holdDuration: 0.000000
+  - lane: 0
+    hitTime: 60.906289
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 63.957494
+    hitTime: 61.358416
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 64.296605
+    hitTime: 61.584480
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 64.296605
+    hitTime: 61.584480
     holdDuration: 0.000000
-  - lane: 0
-    hitTime: 64.635716
+  - lane: 1
+    hitTime: 61.810544
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 64.861792
+    hitTime: 62.036607
     holdDuration: 0.000000
-  - lane: 0
-    hitTime: 65.087874
+  - lane: 3
+    hitTime: 62.488734
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 65.087874
+    hitTime: 62.714798
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 65.313956
+    hitTime: 62.940862
+    holdDuration: 0.000000
+  - lane: 2
+    hitTime: 63.166925
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 65.540038
+    hitTime: 63.392989
     holdDuration: 0.000000
-  - lane: 0
-    hitTime: 65.766120
+  - lane: 3
+    hitTime: 63.392989
+    holdDuration: 0.000000
+  - lane: 2
+    hitTime: 63.845116
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 66.105243
+    hitTime: 64.297243
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 66.105243
+    hitTime: 64.523307
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 66.444364
+    hitTime: 64.975434
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 66.444364
-    holdDuration: 0.000000
-  - lane: 3
-    hitTime: 67.009549
+    hitTime: 65.201498
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 67.235622
+    hitTime: 65.427562
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 67.461696
+    hitTime: 65.653625
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 67.461696
+  - lane: 1
+    hitTime: 66.105753
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 67.913844
-    holdDuration: 0.000000
-  - lane: 2
-    hitTime: 68.252945
+    hitTime: 66.105753
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 68.592043
-    holdDuration: 0.000000
-  - lane: 1
-    hitTime: 68.818109
+    hitTime: 66.331816
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 69.044174
+    hitTime: 66.783943
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 69.270239
+    hitTime: 67.236071
+    holdDuration: 0.000000
+  - lane: 0
+    hitTime: 67.462134
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 69.270239
+    hitTime: 67.462134
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 69.722356
+    hitTime: 67.914262
     holdDuration: 0.000000
-  - lane: 0
-    hitTime: 70.061415
-    holdDuration: 0.904295
   - lane: 3
-    hitTime: 70.626514
+    hitTime: 68.140325
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 70.852554
-    holdDuration: 0.000000
   - lane: 0
-    hitTime: 71.191613
+    hitTime: 68.592452
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 71.530555
+    hitTime: 69.044580
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 71.869494
+  - lane: 0
+    hitTime: 69.496707
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 72.208434
+    hitTime: 69.722771
     holdDuration: 0.000000
+  - lane: 2
+    hitTime: 69.722771
+    holdDuration: 0.000000
   - lane: 3
-    hitTime: 72.208434
+    hitTime: 69.948834
+    holdDuration: 0.000000
+  - lane: 2
+    hitTime: 70.174898
+    holdDuration: 0.000000
+  - lane: 1
+    hitTime: 70.400961
+    holdDuration: 0.000000
+  - lane: 0
+    hitTime: 70.627025
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 72.547373
+    hitTime: 70.853089
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 72.547373
+    hitTime: 71.079152
     holdDuration: 0.000000
-  - lane: 0
-    hitTime: 72.773333
+  - lane: 2
+    hitTime: 71.531280
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 72.999218
+    hitTime: 71.757343
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 72.999218
+  - lane: 1
+    hitTime: 72.209471
+    holdDuration: 0.000000
+  - lane: 0
+    hitTime: 72.887661
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 74.241539
+    hitTime: 72.887661
     holdDuration: 0.000000
-  - lane: 1
-    hitTime: 74.467445
+  - lane: 3
+    hitTime: 73.339789
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 74.693416
+    hitTime: 73.791916
+    holdDuration: 0.000000
+  - lane: 3
+    hitTime: 74.017980
+    holdDuration: 0.000000
+  - lane: 3
+    hitTime: 74.470107
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 75.145358
+    hitTime: 74.696170
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 76.275340
+    hitTime: 74.696170
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 76.501414
-    holdDuration: 0.000000
-  - lane: 3
-    hitTime: 77.179636
+    hitTime: 74.922234
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 78.084145
+    hitTime: 75.148298
     holdDuration: 0.000000
+  - lane: 1
+    hitTime: 76.052552
+    holdDuration: 0.000000
   - lane: 3
-    hitTime: 78.310318
+    hitTime: 76.052552
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 78.762664
+    hitTime: 76.504679
+    holdDuration: 0.000000
+  - lane: 0
+    hitTime: 76.956807
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 79.441143
+    hitTime: 76.956807
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 80.232617
+    hitTime: 77.182870
+    holdDuration: 0.339095
+  - lane: 3
+    hitTime: 77.861061
     holdDuration: 0.000000
-  - lane: 1
-    hitTime: 80.571820
+  - lane: 2
+    hitTime: 78.313189
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 80.571820
+    hitTime: 78.539252
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 80.911022
+    hitTime: 78.765316
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 81.476353
+    hitTime: 78.765316
+    holdDuration: 0.000000
+  - lane: 1
+    hitTime: 79.669570
+    holdDuration: 0.000000
+  - lane: 0
+    hitTime: 80.121698
+    holdDuration: 0.000000
+  - lane: 1
+    hitTime: 80.573825
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 81.702485
+    hitTime: 81.025952
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 81.702485
+    hitTime: 81.252016
+    holdDuration: 0.000000
+  - lane: 1
+    hitTime: 81.478079
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 81.928618
+    hitTime: 81.704143
+    holdDuration: 0.000000
+  - lane: 2
+    hitTime: 81.930207
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 82.154750
+    hitTime: 82.382334
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 82.380882
+    hitTime: 82.608397
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 82.380882
+  - lane: 1
+    hitTime: 83.060525
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 82.607059
+    hitTime: 83.286588
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 83.172508
+    hitTime: 83.286588
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 83.511778
-    holdDuration: 0.000000
-  - lane: 1
-    hitTime: 83.737958
+    hitTime: 83.512652
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 83.737958
+  - lane: 3
+    hitTime: 83.738716
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 84.190227
+    hitTime: 84.190843
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 84.529338
+    hitTime: 84.190843
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 84.868449
+    hitTime: 84.416906
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 85.207559
+    hitTime: 84.869034
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 85.546670
+    hitTime: 85.095097
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 85.772611
-    holdDuration: 0.000000
-  - lane: 0
-    hitTime: 85.998514
+    hitTime: 85.095097
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 86.337367
+    hitTime: 85.547225
     holdDuration: 0.000000
-  - lane: 0
-    hitTime: 86.676221
-    holdDuration: 0.000000
-  - lane: 3
-    hitTime: 86.676221
-    holdDuration: 0.000000
-  - lane: 1
-    hitTime: 87.015075
-    holdDuration: 0.000000
   - lane: 3
-    hitTime: 87.015075
+    hitTime: 85.773288
     holdDuration: 0.000000
-  - lane: 1
-    hitTime: 87.241011
+  - lane: 2
+    hitTime: 85.999352
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 87.580121
+    hitTime: 86.225416
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 87.806195
+  - lane: 1
+    hitTime: 86.677543
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 88.145306
+    hitTime: 87.355734
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 88.145306
+    hitTime: 87.355734
     holdDuration: 0.000000
-  - lane: 3
-    hitTime: 88.710491
+  - lane: 0
+    hitTime: 87.581797
     holdDuration: 0.000000
-  - lane: 1
-    hitTime: 88.936633
+  - lane: 2
+    hitTime: 87.807861
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 88.936633
+    hitTime: 88.259988
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 89.162817
-    holdDuration: 0.000000
-  - lane: 0
-    hitTime: 89.389002
+    hitTime: 88.486052
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 89.615186
+    hitTime: 88.938179
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 89.954463
+    hitTime: 89.164243
     holdDuration: 0.000000
+  - lane: 2
+    hitTime: 89.164243
+    holdDuration: 0.000000
   - lane: 1
-    hitTime: 90.406830
+    hitTime: 89.616370
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 90.406830
+    hitTime: 89.842434
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 90.746052
+    hitTime: 90.068497
     holdDuration: 0.000000
-  - lane: 3
-    hitTime: 91.085273
+  - lane: 0
+    hitTime: 90.294561
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 91.311420
+    hitTime: 90.520624
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 91.311420
+  - lane: 3
+    hitTime: 90.520624
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 91.763715
-    holdDuration: 0.000000
-  - lane: 0
-    hitTime: 92.328990
+    hitTime: 90.746688
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 92.555074
+    hitTime: 90.972752
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 92.894199
+    hitTime: 91.424879
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 92.894199
+    hitTime: 91.424879
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 93.233324
+    hitTime: 91.650943
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 93.572449
+    hitTime: 91.877006
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 93.798562
+    hitTime: 92.329134
     holdDuration: 0.000000
-  - lane: 1
-    hitTime: 94.024679
-    holdDuration: 0.000000
-  - lane: 2
-    hitTime: 94.024679
-    holdDuration: 0.000000
-  - lane: 2
-    hitTime: 94.363855
+  - lane: 0
+    hitTime: 92.555197
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 95.042206
+    hitTime: 92.781261
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 95.042206
+    hitTime: 92.781261
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 95.381383
+    hitTime: 93.233388
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 95.720562
+    hitTime: 93.459452
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 95.946681
+    hitTime: 93.685515
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 95.946681
+    hitTime: 94.137643
     holdDuration: 0.000000
-  - lane: 3
-    hitTime: 96.172801
-    holdDuration: 0.452148
   - lane: 2
-    hitTime: 96.511979
+    hitTime: 94.363706
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 96.851148
+    hitTime: 94.589770
     holdDuration: 0.000000
-  - lane: 3
-    hitTime: 96.851148
+  - lane: 0
+    hitTime: 95.041897
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 97.190259
+    hitTime: 95.041897
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 97.416332
-    holdDuration: 0.000000
-  - lane: 0
-    hitTime: 97.642406
+    hitTime: 95.267961
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 97.868480
+  - lane: 1
+    hitTime: 95.720088
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 98.207591
+    hitTime: 96.172215
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 98.546685
+    hitTime: 96.398279
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 99.111806
+  - lane: 3
+    hitTime: 96.398279
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 99.563903
+    hitTime: 96.850406
+    holdDuration: 0.000000
+  - lane: 2
+    hitTime: 97.076470
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 99.789952
+    hitTime: 97.528597
     holdDuration: 0.000000
-  - lane: 3
-    hitTime: 99.789952
+  - lane: 1
+    hitTime: 97.754661
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 100.128981
+    hitTime: 97.754661
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 100.354954
-    holdDuration: 0.000000
-  - lane: 2
-    hitTime: 100.354954
+    hitTime: 97.980724
     holdDuration: 0.000000
-  - lane: 0
-    hitTime: 100.580928
+  - lane: 3
+    hitTime: 98.206788
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 100.806901
-    holdDuration: 0.000000
-  - lane: 0
-    hitTime: 101.145861
+    hitTime: 98.658915
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 101.145861
+    hitTime: 98.658915
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 101.484821
+  - lane: 0
+    hitTime: 98.884979
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 101.710735
+    hitTime: 99.337106
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 101.936588
+    hitTime: 99.563170
+    holdDuration: 0.000000
+  - lane: 0
+    hitTime: 99.789233
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 102.162442
+    hitTime: 100.015297
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 102.162442
+    hitTime: 100.015297
     holdDuration: 0.000000
-  - lane: 0
-    hitTime: 102.614148
+  - lane: 2
+    hitTime: 100.467424
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 103.178782
+    hitTime: 100.693488
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 103.178782
+  - lane: 1
+    hitTime: 100.919551
     holdDuration: 0.000000
-  - lane: 0
-    hitTime: 103.404776
+  - lane: 1
+    hitTime: 101.371679
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 103.743785
+    hitTime: 101.823806
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 103.743785
+    hitTime: 101.823806
     holdDuration: 0.000000
-  - lane: 1
-    hitTime: 104.082793
+  - lane: 0
+    hitTime: 102.275933
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 104.308799
+  - lane: 1
+    hitTime: 102.728060
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 104.647808
+    hitTime: 102.954124
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 104.873837
+    hitTime: 103.406251
+    holdDuration: 0.000000
+  - lane: 1
+    hitTime: 103.632315
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 105.212948
+    hitTime: 104.084442
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 105.439022
+    hitTime: 104.310506
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 105.778133
+    hitTime: 104.762633
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 106.230280
+    hitTime: 104.988697
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 106.230280
-    holdDuration: 0.000000
-  - lane: 1
-    hitTime: 106.795731
+    hitTime: 104.988697
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 107.021955
-    holdDuration: 0.000000
-  - lane: 1
-    hitTime: 107.361291
+    hitTime: 105.214760
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 107.700628
+    hitTime: 105.440824
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 107.926852
-    holdDuration: 0.000000
-  - lane: 2
-    hitTime: 107.926852
+    hitTime: 105.892951
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 108.266061
-    holdDuration: 0.000000
-  - lane: 0
-    hitTime: 108.492179
+    hitTime: 106.119015
     holdDuration: 0.000000
-  - lane: 3
-    hitTime: 108.492179
+  - lane: 1
+    hitTime: 106.571142
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 108.831355
-    holdDuration: 0.000000
-  - lane: 0
-    hitTime: 109.170532
-    holdDuration: 0.000000
-  - lane: 1
-    hitTime: 109.509708
+    hitTime: 106.797206
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 109.735799
+    hitTime: 107.023269
     holdDuration: 0.000000
-  - lane: 0
-    hitTime: 110.300983
+  - lane: 1
+    hitTime: 107.249333
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 110.300983
+    hitTime: 107.249333
     holdDuration: 0.000000
-  - lane: 1
-    hitTime: 110.640094
+  - lane: 3
+    hitTime: 107.701460
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 110.640094
+    hitTime: 107.927524
     holdDuration: 0.000000
-  - lane: 0
-    hitTime: 110.866168
+  - lane: 1
+    hitTime: 108.379651
     holdDuration: 0.000000
+  - lane: 1
+    hitTime: 108.831778
+    holdDuration: 0.452127
   - lane: 3
-    hitTime: 111.092242
+    hitTime: 109.283906
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 111.544300
+    hitTime: 109.736033
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 111.544300
-    holdDuration: 0.000000
-  - lane: 0
-    hitTime: 111.996331
+    hitTime: 110.188160
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 112.222346
+    hitTime: 110.414224
     holdDuration: 0.000000
+  - lane: 3
+    hitTime: 110.414224
+    holdDuration: 0.000000
   - lane: 2
-    hitTime: 112.448362
+    hitTime: 110.640288
     holdDuration: 0.000000
-  - lane: 3
-    hitTime: 112.787385
+  - lane: 1
+    hitTime: 110.866351
     holdDuration: 0.000000
+  - lane: 0
+    hitTime: 111.318478
+    holdDuration: 0.000000
   - lane: 1
-    hitTime: 113.013387
+    hitTime: 111.544542
     holdDuration: 0.000000
-  - lane: 3
-    hitTime: 113.013387
+  - lane: 1
+    hitTime: 111.996669
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 113.465390
-    holdDuration: 0.904295
-  - lane: 3
-    hitTime: 113.917393
+    hitTime: 112.448797
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 114.143395
-    holdDuration: 0.000000
-  - lane: 0
-    hitTime: 114.482395
+    hitTime: 112.674860
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 114.482395
+    hitTime: 113.126987
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 114.821388
+    hitTime: 113.353051
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 114.821388
+    hitTime: 113.805178
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 115.160381
+    hitTime: 114.031242
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 115.386377
+    hitTime: 114.483369
+    holdDuration: 0.000000
+  - lane: 2
+    hitTime: 114.709433
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 115.725370
+    hitTime: 114.935496
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 116.290261
+    hitTime: 115.161560
+    holdDuration: 0.000000
+  - lane: 3
+    hitTime: 115.613687
+    holdDuration: 0.000000
+  - lane: 3
+    hitTime: 115.839751
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 117.645800
+    hitTime: 116.291878
+    holdDuration: 0.000000
+  - lane: 1
+    hitTime: 116.744005
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 117.871799
+    hitTime: 117.422196
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 119.227801
+    hitTime: 117.874324
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 119.453875
+    hitTime: 118.326451
+    holdDuration: 0.000000
+  - lane: 1
+    hitTime: 118.552515
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 119.679949
+    hitTime: 119.230705
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 119.906023
+    hitTime: 119.456769
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 121.262874
+    hitTime: 119.456769
+    holdDuration: 0.000000
+  - lane: 2
+    hitTime: 119.682833
+    holdDuration: 0.000000
+  - lane: 1
+    hitTime: 119.908896
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 121.489145
+    hitTime: 121.265278
     holdDuration: 0.000000
-  - lane: 3
-    hitTime: 121.715416
+  - lane: 2
+    hitTime: 121.265278
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 122.054823
+    hitTime: 121.491342
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 122.281094
+    hitTime: 122.395596
     holdDuration: 0.000000
-  - lane: 0
-    hitTime: 122.507361
+  - lane: 1
+    hitTime: 122.847723
+    holdDuration: 0.000000
+  - lane: 3
+    hitTime: 123.073787
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 122.507361
+    hitTime: 123.525914
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 122.846754
+    hitTime: 123.751978
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 122.846754
+    hitTime: 124.204105
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 123.186147
-    holdDuration: 0.000000
-  - lane: 3
-    hitTime: 123.412409
+    hitTime: 124.656233
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 123.864933
+    hitTime: 124.882296
+    holdDuration: 0.000000
+  - lane: 0
+    hitTime: 125.108360
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 123.864933
+    hitTime: 125.334423
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 124.091117
+    hitTime: 125.786551
     holdDuration: 0.000000
-  - lane: 0
-    hitTime: 124.317191
+  - lane: 1
+    hitTime: 126.012614
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 124.317191
-    holdDuration: 0.000000
-  - lane: 2
-    hitTime: 124.882375
+    hitTime: 126.464742
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 125.108449
+    hitTime: 126.690805
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 125.447560
+    hitTime: 126.690805
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 125.673620
+    hitTime: 126.916869
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 125.673620
+  - lane: 0
+    hitTime: 127.142932
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 126.125688
+  - lane: 0
+    hitTime: 127.595060
     holdDuration: 0.000000
-  - lane: 1
-    hitTime: 126.464739
+  - lane: 3
+    hitTime: 127.595060
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 126.690773
+    hitTime: 128.047187
     holdDuration: 0.000000
-  - lane: 0
-    hitTime: 126.916807
+  - lane: 2
+    hitTime: 128.273251
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 127.255863
+    hitTime: 128.499314
     holdDuration: 0.000000
-  - lane: 0
-    hitTime: 127.934029
+  - lane: 1
+    hitTime: 128.725378
     holdDuration: 0.000000
-  - lane: 3
-    hitTime: 128.273112
+  - lane: 2
+    hitTime: 129.177505
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 128.499167
+    hitTime: 129.403569
     holdDuration: 0.000000
-  - lane: 3
-    hitTime: 128.499167
+  - lane: 0
+    hitTime: 129.629632
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 128.725222
+  - lane: 0
+    hitTime: 130.081760
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 128.951290
-    holdDuration: 0.000000
-  - lane: 3
-    hitTime: 129.290401
+    hitTime: 130.533887
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 129.516474
+    hitTime: 130.759951
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 129.742548
+    hitTime: 130.759951
     holdDuration: 0.000000
-  - lane: 0
-    hitTime: 130.081659
+  - lane: 3
+    hitTime: 130.986014
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 130.081659
+    hitTime: 131.212078
+    holdDuration: 0.000000
+  - lane: 0
+    hitTime: 131.664205
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 130.420776
+    hitTime: 131.890269
     holdDuration: 0.000000
-  - lane: 3
-    hitTime: 130.420776
+  - lane: 0
+    hitTime: 132.116332
+    holdDuration: 0.000000
+  - lane: 2
+    hitTime: 132.116332
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 130.646902
+    hitTime: 132.342396
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 130.986091
-    holdDuration: 0.452148
   - lane: 0
-    hitTime: 131.212218
+    hitTime: 132.568460
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 131.551407
+    hitTime: 132.794523
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 131.551407
+  - lane: 0
+    hitTime: 133.020587
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 132.116695
+    hitTime: 133.020587
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 132.342769
+    hitTime: 133.246650
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 132.342769
+    hitTime: 133.472714
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 132.568843
+  - lane: 1
+    hitTime: 133.924841
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 132.794916
+    hitTime: 134.150905
     holdDuration: 0.000000
-  - lane: 0
-    hitTime: 133.020990
+  - lane: 1
+    hitTime: 134.603032
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 133.020990
+    hitTime: 135.055159
     holdDuration: 0.000000
-  - lane: 0
-    hitTime: 133.247064
-    holdDuration: 0.000000
   - lane: 2
-    hitTime: 133.925231
-    holdDuration: 0.000000
-  - lane: 1
-    hitTime: 134.151266
+    hitTime: 135.281223
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 134.377302
+    hitTime: 135.507287
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 135.168428
+    hitTime: 135.733350
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 135.507534
-    holdDuration: 0.000000
-  - lane: 0
-    hitTime: 135.733608
-    holdDuration: 0.000000
-  - lane: 3
-    hitTime: 135.733608
+    hitTime: 135.733350
     holdDuration: 0.000000
-  - lane: 3
-    hitTime: 135.959682
-    holdDuration: 0.000000
   - lane: 0
-    hitTime: 136.185756
+    hitTime: 135.959414
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 136.411830
-    holdDuration: 0.000000
-  - lane: 1
-    hitTime: 136.637904
+    hitTime: 136.185478
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 136.637904
-    holdDuration: 0.000000
-  - lane: 3
-    hitTime: 136.863985
-    holdDuration: 0.000000
-  - lane: 1
-    hitTime: 137.203135
+    hitTime: 136.637605
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 137.203135
+    hitTime: 136.863669
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 137.429236
+  - lane: 3
+    hitTime: 137.089732
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 137.881436
-    holdDuration: 0.000000
-  - lane: 3
-    hitTime: 138.107536
+    hitTime: 137.315796
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 138.446687
+    hitTime: 137.541859
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 138.446687
+    hitTime: 137.993987
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 139.124993
+    hitTime: 138.446114
     holdDuration: 0.000000
-  - lane: 1
-    hitTime: 139.351095
-    holdDuration: 0.000000
   - lane: 2
-    hitTime: 139.351095
+    hitTime: 138.446114
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 139.577197
+    hitTime: 138.672178
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 139.803300
+  - lane: 0
+    hitTime: 139.124305
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 140.029407
+    hitTime: 139.576432
     holdDuration: 0.000000
-  - lane: 1
-    hitTime: 140.255542
+  - lane: 0
+    hitTime: 139.802496
     holdDuration: 0.000000
-  - lane: 3
-    hitTime: 140.255542
+  - lane: 2
+    hitTime: 140.254623
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 140.481678
+    hitTime: 140.706750
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 141.160085
+    hitTime: 140.706750
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 141.386221
+    hitTime: 140.932814
     holdDuration: 0.000000
-  - lane: 1
-    hitTime: 141.612355
-    holdDuration: 0.000000
   - lane: 0
-    hitTime: 142.403710
+    hitTime: 141.384941
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 142.742862
-    holdDuration: 0.000000
-  - lane: 1
-    hitTime: 142.968964
+    hitTime: 141.837068
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 143.195065
+    hitTime: 142.063132
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 143.195065
+    hitTime: 142.063132
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 143.421139
+    hitTime: 142.289196
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 143.647213
+    hitTime: 142.515259
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 143.873287
-    holdDuration: 0.000000
   - lane: 1
-    hitTime: 144.099361
-    holdDuration: 0.000000
-  - lane: 2
-    hitTime: 144.099361
+    hitTime: 142.741323
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 144.325435
+    hitTime: 142.967387
     holdDuration: 0.000000
-  - lane: 0
-    hitTime: 144.664546
-    holdDuration: 0.000000
   - lane: 2
-    hitTime: 144.664546
-    holdDuration: 0.000000
-  - lane: 1
-    hitTime: 145.116622
+    hitTime: 142.967387
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 145.455657
+    hitTime: 143.193450
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 145.681680
+    hitTime: 143.419514
     holdDuration: 0.000000
-  - lane: 3
-    hitTime: 145.681680
-    holdDuration: 0.000000
   - lane: 0
-    hitTime: 146.020715
+    hitTime: 143.871641
     holdDuration: 0.000000
-  - lane: 3
-    hitTime: 146.020715
+  - lane: 1
+    hitTime: 144.097705
     holdDuration: 0.000000
-  - lane: 3
-    hitTime: 146.472767
-    holdDuration: 0.452148
   - lane: 0
-    hitTime: 146.811830
+    hitTime: 144.323768
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 147.037871
+    hitTime: 144.775896
     holdDuration: 0.000000
-  - lane: 3
-    hitTime: 147.037871
+  - lane: 2
+    hitTime: 144.775896
     holdDuration: 0.000000
-  - lane: 1
-    hitTime: 147.489955
+  - lane: 3
+    hitTime: 145.001959
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 147.829017
+    hitTime: 145.228023
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 148.055063
+    hitTime: 145.454086
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 148.281122
+    hitTime: 145.680150
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 148.620210
+    hitTime: 146.358341
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 148.846268
+    hitTime: 146.810468
     holdDuration: 0.000000
-  - lane: 0
-    hitTime: 149.185356
+  - lane: 1
+    hitTime: 147.036532
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 149.185356
+  - lane: 3
+    hitTime: 147.488659
+    holdDuration: 0.000000
+  - lane: 0
+    hitTime: 147.714723
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 149.637476
+    hitTime: 148.166850
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 150.202661
+    hitTime: 148.618977
+    holdDuration: 0.000000
+  - lane: 0
+    hitTime: 148.845041
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 150.428735
+    hitTime: 149.297168
     holdDuration: 0.000000
-  - lane: 1
-    hitTime: 150.654808
+  - lane: 0
+    hitTime: 149.749295
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 150.654808
+    hitTime: 149.749295
     holdDuration: 0.000000
-  - lane: 3
-    hitTime: 150.880882
+  - lane: 1
+    hitTime: 149.975359
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 151.106956
+    hitTime: 150.427486
+    holdDuration: 0.000000
+  - lane: 1
+    hitTime: 150.653550
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 151.446111
+    hitTime: 150.879614
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 151.672225
+    hitTime: 151.105677
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 151.898338
+    hitTime: 151.557804
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 151.898338
+    hitTime: 151.557804
     holdDuration: 0.000000
-  - lane: 1
-    hitTime: 152.350566
+  - lane: 0
+    hitTime: 151.783868
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 152.576679
+    hitTime: 152.235995
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 152.915829
+    hitTime: 152.462059
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 152.915829
+    hitTime: 152.914186
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 153.594051
+    hitTime: 153.140250
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 153.820124
-    holdDuration: 0.000000
-  - lane: 3
-    hitTime: 153.820124
+    hitTime: 153.592377
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 154.046198
+    hitTime: 154.044504
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 154.272272
+    hitTime: 154.270568
+    holdDuration: 0.000000
+  - lane: 1
+    hitTime: 154.496632
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 154.724413
+    hitTime: 154.722695
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 155.063517
+  - lane: 0
+    hitTime: 154.948759
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 155.289587
+    hitTime: 155.400886
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 155.515656
-    holdDuration: 0.000000
-  - lane: 2
-    hitTime: 155.515656
+    hitTime: 155.853013
     holdDuration: 0.000000
   - lane: 2
-    hitTime: 155.854760
+    hitTime: 156.079077
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 156.080805
+    hitTime: 156.305141
+    holdDuration: 0.000000
+  - lane: 2
+    hitTime: 156.757268
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 156.871825
+    hitTime: 156.983332
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 157.097830
+    hitTime: 157.209395
     holdDuration: 0.000000
-  - lane: 0
-    hitTime: 157.323836
+  - lane: 1
+    hitTime: 157.435459
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 157.323836
-    holdDuration: 0.000000
-  - lane: 2
-    hitTime: 157.662830
+    hitTime: 157.435459
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 157.888788
+    hitTime: 157.887586
     holdDuration: 0.000000
-  - lane: 2
-    hitTime: 157.888788
+  - lane: 3
+    hitTime: 158.339713
     holdDuration: 0.000000
   - lane: 1
-    hitTime: 158.453683
+    hitTime: 158.565777
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 158.453683
-    holdDuration: 0.000000
-  - lane: 2
-    hitTime: 159.018578
-    holdDuration: 0.000000
-  - lane: 0
-    hitTime: 159.696392
+    hitTime: 159.017904
     holdDuration: 0.000000
   - lane: 0
-    hitTime: 160.027000
+    hitTime: 159.696095
     holdDuration: 0.000000
   - lane: 3
-    hitTime: 160.027000
+    hitTime: 159.696095
+    holdDuration: 0.000000
+  - lane: 1
+    hitTime: 159.922159
+    holdDuration: 0.000000
+  - lane: 0
+    hitTime: 160.148222
     holdDuration: 0.000000
   speedChanges:
   - time: 0
